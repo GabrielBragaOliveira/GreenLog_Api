@@ -27,6 +27,8 @@ public class RoteamentoController {
     public RoteamentoController(RoteamentoService roteamentoService) {
         this.roteamentoService = roteamentoService;
     }
+    
+   //Padrao de projeto Facade 
     @GetMapping("/calcular")
     public ResponseEntity<ResultadoRotaDTO> calcularRota(
             @RequestParam(name = "origemId") Long origemId,
