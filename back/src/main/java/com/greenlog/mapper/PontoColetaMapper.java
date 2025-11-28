@@ -30,7 +30,9 @@ public class PontoColetaMapper {
                 ponto.getId(),
                 ponto.getNomeResponsavel(),
                 ponto.getContato(),
+                ponto.getEmail(),
                 ponto.getEndereco(),
+                ponto.getHorarioFuncionamento(),
                 bairroMapper.toResponseDTO(ponto.getBairro()),
                 ponto.getTiposResiduosAceitos() == null ? null
                 : ponto.getTiposResiduosAceitos().stream()
@@ -47,7 +49,9 @@ public class PontoColetaMapper {
         PontoColeta entity = new PontoColeta();
         entity.setNomeResponsavel(request.nomeResponsavel());
         entity.setContato(request.contato());
+        entity.setEmail(request.email());
         entity.setEndereco(request.endereco());
+        entity.setHorarioFuncionamento(request.horarioFuncionamento());
         return entity;
     }
 
@@ -58,5 +62,6 @@ public class PontoColetaMapper {
         entity.setNomeResponsavel(request.nomeResponsavel());
         entity.setContato(request.contato());
         entity.setEndereco(request.endereco());
+        entity.setHorarioFuncionamento(request.horarioFuncionamento());
     }
 }

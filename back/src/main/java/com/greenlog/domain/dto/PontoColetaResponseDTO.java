@@ -14,7 +14,9 @@ public record PontoColetaResponseDTO(
     Long id,
     String nomeResponsavel,
     String contato,
+    String email,
     String endereco,
+    String horarioFuncionamento,
     BairroResponseDTO bairro,
     List<TipoResiduoResponseDTO> tiposResiduosAceitos
         

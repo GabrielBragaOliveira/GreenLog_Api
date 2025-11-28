@@ -5,6 +5,7 @@
 package com.greenlog.domain.dto;
 
 import com.greenlog.util.RegexConstants;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -23,10 +24,17 @@ public record PontoColetaRequestDTO(
 
     @Pattern(regexp = RegexConstants.TELEFONE_REGEX, message = "Formato de contato inválido.")
     String contato,
+    
+    @NotBlank(message = "O email do responsável é obrigatório.")
+    @Email
+    String email,
 
     @NotBlank(message = "O endereço é obrigatório.")
     @Size(max = 255)
     String endereco,
+    
+    @NotBlank(message = "O horario de funcionamento é obrigatório.")
+    String horarioFuncionamento,
 
     @NotNull(message = "O ID do bairro é obrigatório.")
     Long bairroId,
