@@ -1,0 +1,39 @@
+<div class="flex flex-column gap-3">
+  <div class="flex justify-content-between align-items-center">
+    <h2 class="m-0 text-800">Conexões entre Bairros</h2>
+    <p-button label="Nova Conexão" icon="pi pi-plus" routerLink="novo"></p-button>
+  </div>
+
+  <p-card styleClass="shadow-2">
+    <p-table [value]="conexoes" [loading]="isLoading" [rows]="10" [paginator]="true" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Origem</th>
+          <th class="text-center"><i class="pi pi-arrow-right"></i></th>
+          <th>Destino</th>
+          <th>Distância (km)</th>
+          <th class="text-center w-8rem">Ações</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-conexao>
+        <tr>
+          <td class="font-semibold">{{ conexao.bairroOrigem.nome }}</td>
+          <td class="text-center text-500"><i class="pi pi-arrow-right"></i></td>
+          <td class="font-semibold">{{ conexao.bairroDestino.nome }}</td>
+          <td>{{ conexao.distancia }} km</td>
+          <td class="text-center">
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-warning mr-1" 
+                      [routerLink]="['editar', conexao.id]" pTooltip="Editar"></p-button>
+            <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" 
+                      (click)="confirmarExclusao(conexao)" pTooltip="Excluir"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="5" class="text-center p-4">Nenhuma conexão cadastrada.</td></tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
