@@ -1,0 +1,66 @@
+<div class="flex justify-content-center">
+  <p-card [header]="isEdicao ? 'Editar Ponto de Coleta' : 'Novo Ponto de Coleta'" styleClass="w-full md:w-8 shadow-2">
+    
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
+      
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="responsavel" class="font-semibold">Nome Responsável <span class="text-red-500">*</span></label>
+          <input pInputText id="responsavel" formControlName="nomeResponsavel" class="w-full" />
+          @if (form.get('nomeResponsavel')?.hasError('required') && form.get('nomeResponsavel')?.touched) {
+            <small class="text-red-500 block mt-1">O nome é obrigatório.</small>
+          }
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="contato" class="font-semibold">Contato <span class="text-red-500">*</span></label>
+          <input pInputText id="contato" formControlName="contato" placeholder="(99) 99999-9999" class="w-full" />
+          @if (form.get('contato')?.hasError('pattern') && form.get('contato')?.touched) {
+            <small class="text-red-500 block mt-1">Formato inválido. Use (99) 99999-9999.</small>
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="endereco" class="font-semibold">Endereço <span class="text-red-500">*</span></label>
+        <input pInputText id="endereco" formControlName="endereco" class="w-full" />
+      </div>
+
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="bairro" class="font-semibold">Bairro <span class="text-red-500">*</span></label>
+          <p-dropdown 
+            id="bairro"
+            [options]="bairros" 
+            formControlName="bairroId" 
+            optionLabel="nome" 
+            optionValue="id" 
+            placeholder="Selecione..." 
+            styleClass="w-full"
+            [filter]="true" filterBy="nome">
+          </p-dropdown>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="tipos" class="font-semibold">Resíduos Aceitos <span class="text-red-500">*</span></label>
+          <p-multiSelect 
+            id="tipos"
+            [options]="tiposResiduos" 
+            formControlName="tiposResiduosIds" 
+            optionLabel="nome" 
+            optionValue="id"
+            placeholder="Selecione..."
+            display="chip"
+            styleClass="w-full">
+          </p-multiSelect>
+        </div>
+      </div>
+
+      <div class="flex justify-content-end gap-2 mt-3">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" type="button" (click)="cancelar()"></p-button>
+        <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="isSaving"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+</div>

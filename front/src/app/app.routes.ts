@@ -5,6 +5,10 @@ import { authGuard } from './nucleo/guards/auth.guard';
 import { formExitGuard } from './nucleo/guards/form-exit.guard';
 import { CaminhaoListaComponent } from './funcionalidades/caminhao/caminhao-lista/caminhao-lista.component';
 import { CaminhaoFormComponent } from './funcionalidades/caminhao/caminhao-form/caminhao-form.component';
+import { PontosListaComponent } from './funcionalidades/pontos/pontos-lista/pontos-lista.component';
+import { PontosFormComponent } from './funcionalidades/pontos/pontos-form/pontos-form.component';
+import { ConexoesListaComponent } from './funcionalidades/conexoes/conexoes-lista/conexoes-lista.component';
+import { ConexoesFormComponent } from './funcionalidades/conexoes/conexoes-form/conexoes-form.component';
 
 export const routes: Routes = [
   { 
@@ -34,6 +38,35 @@ export const routes: Routes = [
         canDeactivate: [formExitGuard]
       },
 
+      { 
+        path: 'pontos-coleta', 
+        component: PontosListaComponent 
+      },
+      { 
+        path: 'pontos-coleta/novo', 
+        component: PontosFormComponent,
+        canDeactivate: [formExitGuard]
+      },
+      { 
+        path: 'pontos-coleta/editar/:id', 
+        component: PontosFormComponent,
+        canDeactivate: [formExitGuard]
+      },
+
+      { 
+        path: 'conexoes', 
+        component: ConexoesListaComponent 
+      },
+      { 
+        path: 'conexoes/novo', 
+        component: ConexoesFormComponent,
+        canDeactivate: [formExitGuard]
+      },
+      { 
+        path: 'conexoes/editar/:id', 
+        component: ConexoesFormComponent,
+        canDeactivate: [formExitGuard]
+      }
     ]
   },
   
