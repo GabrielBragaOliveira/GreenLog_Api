@@ -22,8 +22,8 @@ import { MessageModule } from 'primeng/message';
     PasswordModule,
     MessageModule
   ],
-  templateUrl: './login.component.html', // Aponta para o arquivo HTML
-  styleUrl: './login.component.scss'     // Aponta para o arquivo SCSS
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -44,7 +44,6 @@ export class LoginComponent {
       this.authService.login({ email: email!, senha: senha! }).subscribe({
         next: () => this.isLoading = false,
         error: () => this.isLoading = false 
-        // O erro já é tratado no ApiBaseService -> MessageService
       });
     } else {
       this.loginForm.markAllAsTouched();

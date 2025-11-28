@@ -4,11 +4,10 @@ import { MainLayoutComponent } from './estrutura/main-layout/main-layout.compone
 import { inject } from '@angular/core';
 import { AuthService } from './nucleo/servicos/auth.service';
 
-// Guard simples funcional para proteger rotas
 const authGuard = () => {
   const authService = inject(AuthService);
   if (authService.isLogado()) return true;
-  authService.logout(); // Redireciona
+  authService.logout();
   return false;
 };
 
@@ -20,12 +19,9 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard], // Protege todo o layout
+    canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'rotas', pathMatch: 'full' }, // Home padrão
-      
-      // Aqui carregaremos os módulos lazy-loaded futuramente
-      // Ex: { path: 'bairros', loadComponent: () => import(...).then(m => m.BairrosListaComponent) }
+      { path: '', redirectTo: 'rotas', pathMatch: 'full' },
     ]
   },
   { path: '**', redirectTo: '' }

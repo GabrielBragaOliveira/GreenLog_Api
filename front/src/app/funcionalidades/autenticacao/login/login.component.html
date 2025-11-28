@@ -8,7 +8,6 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-3">
       
-      <!-- Email -->
       <div class="flex flex-column gap-2">
         <label for="email" class="font-semibold">E-mail</label>
         <input pInputText id="email" formControlName="email" placeholder="ex: admin@greenlog.com" />
@@ -17,7 +16,6 @@
         }
       </div>
 
-      <!-- Senha -->
       <div class="flex flex-column gap-2">
         <label for="senha" class="font-semibold">Senha</label>
         <p-password id="senha" formControlName="senha" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full"></p-password>
@@ -26,7 +24,6 @@
         }
       </div>
 
-      <!-- Botão Entrar -->
       <p-button label="Entrar" type="submit" [loading]="isLoading" styleClass="w-full p-button-success mt-2"></p-button>
     
     </form>

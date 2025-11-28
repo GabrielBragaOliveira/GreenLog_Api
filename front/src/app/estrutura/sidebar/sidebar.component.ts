@@ -37,7 +37,6 @@ export class SidebarComponent implements OnInit {
         icon: 'pi pi-fw pi-home',
         routerLink: ['/']
       },
-      // Grupo Operacional (Visível para todos)
       {
         label: 'Operacional',
         icon: 'pi pi-fw pi-compass',
@@ -48,7 +47,6 @@ export class SidebarComponent implements OnInit {
       }
     ];
 
-    // Grupo Administrativo (Apenas ADMIN)
     if (isAdmin) {
       this.items.push({
         label: 'Cadastros',

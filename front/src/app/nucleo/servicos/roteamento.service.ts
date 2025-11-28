@@ -22,7 +22,6 @@ export class RoteamentoService {
       }
     }).pipe(
       catchError(error => {
-        // Reutiliza lógica de erro se necessário, ou trata especificamente aqui
         const msg = error.error?.mensagem || 'Erro ao calcular rota.';
         this.messageService.add({ severity: 'error', summary: 'Erro no Cálculo', detail: msg });
         throw error;

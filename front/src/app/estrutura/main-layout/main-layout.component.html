@@ -1,16 +1,12 @@
 <div class="flex flex-column h-screen">
-  <!-- Topo -->
   <app-navbar></app-navbar>
   
   <div class="flex flex-grow-1 overflow-hidden">
-    <!-- Lateral Fixa (Escondida em Mobile, Visível em Desktop 'md') -->
     <div class="w-18rem hidden md:block h-full overflow-y-auto">
       <app-sidebar></app-sidebar>
     </div>
 
-    <!-- Conteúdo Principal com Scroll Próprio -->
     <main class="flex-grow-1 p-4 bg-gray-50 overflow-y-auto">
-      <!-- Onde as telas (Bairros, Caminhões...) serão renderizadas -->
       <router-outlet></router-outlet>
     </main>
   </div>
