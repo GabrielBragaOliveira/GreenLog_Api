@@ -1,0 +1,48 @@
+/* Arquivo: styles.scss
+  Responsável pela importação do tema e reset global.
+*/
+
+/* 1. Tema do PrimeNG (Aura Light Green) */
+@import "primeng/resources/themes/aura-light-green/theme.css";
+
+/* 2. Estilos Core do PrimeNG */
+@import "primeng/resources/primeng.css";
+
+/* 3. Ícones (PrimeIcons) */
+@import "primeicons/primeicons.css";
+
+/* 4. Utilitários CSS (PrimeFlex) */
+@import "primeflex/primeflex.css";
+
+/* 5. Reset e Configurações Globais */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: var(--font-family); /* Usa a fonte definida pelo tema do PrimeNG */
+    background-color: var(--surface-ground); /* Cor de fundo padrão do tema */
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ajuste para inputs preencherem largura em formulários responsivos */
+.p-fluid .p-inputtext {
+    width: 100%;
+}
+
+/* Configuração de Scrollbar (Opcional - Estilo moderno) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--surface-section);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--surface-400);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--surface-500);
+}
