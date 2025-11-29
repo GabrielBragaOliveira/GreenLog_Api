@@ -3,7 +3,6 @@
 
     <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
 
-      <!-- Nome -->
       <div class="field">
         <label for="nome" class="font-semibold">Nome do Bairro <span class="text-red-500">*</span></label>
         <input pInputText id="nome" formControlName="nome" class="w-full" autofocus />
