@@ -12,9 +12,12 @@ import java.util.List;
  */
 public record PontoColetaResponseDTO(    
     Long id,
+    String nomePonto,
     String nomeResponsavel,
     String contato,
+    String email,
     String endereco,
+    String horarioFuncionamento,
     BairroResponseDTO bairro,
     List<TipoResiduoResponseDTO> tiposResiduosAceitos
         
