@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.greenlog.service.template.ProcessadorCadastroUsuario;
+import com.greenlog.util.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -28,10 +29,10 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
     @Autowired
     private UsuarioMapper usuarioMapper;
-    
+
     @Autowired
     private ProcessadorCadastroUsuario processadorCadastroUsuario;
 
@@ -56,7 +57,8 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO salvar(UsuarioRequestDTO request) {
         Usuario novoUsuario = usuarioMapper.toEntity(request);
-        novoUsuario.setSenha(request.senha());
+
+        novoUsuario.setSenha(HashUtil.hash(request.senha()));
 
         Usuario usuarioSalvo = processadorCadastroUsuario.processar(novoUsuario);
 
@@ -67,7 +69,7 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO request) {
         Usuario usuarioExistente = buscarEntityPorId(id);
         usuarioMapper.updateEntityFromDTO(request, usuarioExistente);
-        if (request.senha()!= null && !request.senha().isEmpty()) {
+        if (request.senha() != null && !request.senha().isEmpty()) {
             usuarioExistente.setSenha(request.senha());
         }
 
@@ -79,16 +81,16 @@ public class UsuarioService {
         Usuario usuario = buscarEntityPorId(id);
         usuarioRepository.delete(usuario);
     }
-    
+
     @Transactional(readOnly = true)
     public UsuarioResponseDTO login(LoginRequestDTO request) {
         Usuario usuario = usuarioRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com este e-mail."));
-
         if (!usuario.getSenha().equals(request.senha())) {
-            throw new RegraDeNegocioException("Senha incorreta.");
+            if (!HashUtil.matches(request.senha(), usuario.getSenha())) {
+                throw new RegraDeNegocioException("Senha incorreta.");
+            }
         }
-
         return usuarioMapper.toResponseDTO(usuario);
     }
 }

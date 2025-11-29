@@ -33,6 +33,10 @@ public class PontoColeta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @NotBlank(message = "O nome do Ponto é obrigatório.")
+    @Column(nullable = false , unique = true)
+    private String nomePonto;
 
     @NotBlank(message = "O nome do responsável é obrigatório.")
     @Column(nullable = false)
@@ -41,10 +45,16 @@ public class PontoColeta {
     @Pattern(regexp = RegexConstants.TELEFONE_REGEX, message = "Formato de contato inválido.")
     @Column(nullable = false)
     private String contato;
+    
+    @Column(nullable = false)
+    private String email;
 
     @NotBlank(message = "O endereço é obrigatório.")
     @Column(nullable = false)
     private String endereco;
+    
+    @Column(nullable = false)
+    private String horarioFuncionamento;
 
     @NotNull(message = "O bairro é obrigatório.")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -57,6 +67,7 @@ public class PontoColeta {
             inverseJoinColumns = @JoinColumn(name = "tipo_residuo_id"))
     private List<TipoResiduo> tiposResiduosAceitos;
 
+    
     public PontoColeta() {
     }
 
@@ -108,6 +119,30 @@ public class PontoColeta {
         this.tiposResiduosAceitos = tiposResiduosAceitos;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getHorarioFuncionamento() {
+        return horarioFuncionamento;
+    }
+
+    public void setHorarioFuncionamento(String horarioFuncionamento) {
+        this.horarioFuncionamento = horarioFuncionamento;
+    }
+
+    public String getNomePonto() {
+        return nomePonto;
+    }
+
+    public void setNomePonto(String nomePonto) {
+        this.nomePonto = nomePonto;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {

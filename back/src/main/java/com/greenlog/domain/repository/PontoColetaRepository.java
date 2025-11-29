@@ -7,6 +7,7 @@ package com.greenlog.domain.repository;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.domain.entity.PontoColeta;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -16,4 +17,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PontoColetaRepository extends JpaRepository<PontoColeta, Long> {
     List<PontoColeta> findByBairro(Bairro bairro);
     boolean existsByBairro(Bairro bairro);
+    Optional<PontoColeta> findBynomePonto(String nomePonto);
 }
