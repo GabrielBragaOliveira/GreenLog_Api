@@ -1,0 +1,29 @@
+<div class="flex justify-content-center">
+  <p-card [header]="isEdicao ? 'Editar Bairro' : 'Novo Bairro'" styleClass="w-full md:w-11 shadow-2">
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
+
+      <!-- Nome -->
+      <div class="field">
+        <label for="nome" class="font-semibold">Nome do Bairro <span class="text-red-500">*</span></label>
+        <input pInputText id="nome" formControlName="nome" class="w-full" autofocus />
+        @if (form.get('nome')?.hasError('required') && form.get('nome')?.touched) {
+          <small class="text-red-500 block mt-1">O nome é obrigatório.</small>
+        }
+      </div>
+
+      <!-- Descrição -->
+      <div class="field">
+        <label for="descricao" class="font-semibold">Descrição (Opcional)</label>
+        <textarea pInputTextarea id="descricao" formControlName="descricao" rows="3" class="w-full"></textarea>
+      </div>
+
+      <!-- Botões -->
+      <div class="flex justify-content-end gap-2 mt-3">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" type="button" (click)="cancelar()"></p-button>
+        <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="isSaving"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+</div>

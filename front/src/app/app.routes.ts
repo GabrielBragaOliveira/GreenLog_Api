@@ -10,65 +10,82 @@ import { PontosFormComponent } from './funcionalidades/pontos/pontos-form/pontos
 import { ConexoesListaComponent } from './funcionalidades/conexoes/conexoes-lista/conexoes-lista.component';
 import { ConexoesFormComponent } from './funcionalidades/conexoes/conexoes-form/conexoes-form.component';
 
+import { BairrosListaComponent } from './funcionalidades/bairros/bairros-lista/bairros-lista.component';
+import { BairrosFormComponent } from './funcionalidades/bairros/bairros-form/bairros-form.component';
+
 export const routes: Routes = [
-  { 
-    path: 'login', 
-    component: LoginComponent 
+  {
+    path: 'login',
+    component: LoginComponent
   },
-  
+
   {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'caminhoes', pathMatch: 'full' },
-      
-      { 
-        path: 'caminhoes', 
-        component: CaminhaoListaComponent 
+
+      {
+        path: 'caminhoes',
+        component: CaminhaoListaComponent
       },
-      { 
-        path: 'caminhoes/novo', 
+      {
+        path: 'caminhoes/novo',
         component: CaminhaoFormComponent,
         canDeactivate: [formExitGuard]
       },
-      { 
-        path: 'caminhoes/editar/:id', 
+      {
+        path: 'caminhoes/editar/:id',
         component: CaminhaoFormComponent,
         canDeactivate: [formExitGuard]
       },
 
-      { 
-        path: 'pontos-coleta', 
-        component: PontosListaComponent 
+      {
+        path: 'pontos-coleta',
+        component: PontosListaComponent
       },
-      { 
-        path: 'pontos-coleta/novo', 
+      {
+        path: 'pontos-coleta/novo',
         component: PontosFormComponent,
         canDeactivate: [formExitGuard]
       },
-      { 
-        path: 'pontos-coleta/editar/:id', 
+      {
+        path: 'pontos-coleta/editar/:id',
         component: PontosFormComponent,
         canDeactivate: [formExitGuard]
       },
 
-      { 
-        path: 'conexoes', 
-        component: ConexoesListaComponent 
+      {
+        path: 'conexoes',
+        component: ConexoesListaComponent
       },
-      { 
-        path: 'conexoes/novo', 
+      {
+        path: 'conexoes/novo',
         component: ConexoesFormComponent,
         canDeactivate: [formExitGuard]
       },
-      { 
-        path: 'conexoes/editar/:id', 
+      {
+        path: 'conexoes/editar/:id',
         component: ConexoesFormComponent,
+        canDeactivate: [formExitGuard]
+      },
+      {
+        path: 'bairros',
+        component: BairrosListaComponent
+      },
+      {
+        path: 'bairros/novo',
+        component: BairrosFormComponent,
+        canDeactivate: [formExitGuard]
+      },
+      {
+        path: 'bairros/editar/:id',
+        component: BairrosFormComponent,
         canDeactivate: [formExitGuard]
       }
     ]
   },
-  
+
   { path: '**', redirectTo: '' }
 ];
