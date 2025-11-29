@@ -4,7 +4,7 @@ import { MainLayoutComponent } from './estrutura/main-layout/main-layout.compone
 import { authGuard } from './nucleo/guards/auth.guard';
 import { formExitGuard } from './nucleo/guards/form-exit.guard';
 import { CaminhaoListaComponent } from './funcionalidades/caminhao/caminhao-lista/caminhao-lista.component';
-import { CaminhaoFormComponent } from './funcionalidades/caminhao/caminhao-form/caminhao-form.component'
+import { CaminhaoFormComponent } from './funcionalidades/caminhao/caminhao-form/caminhao-form.component';
 import { PontosListaComponent } from './funcionalidades/pontos/pontos-lista/pontos-lista.component';
 import { PontosFormComponent } from './funcionalidades/pontos/pontos-form/pontos-form.component';
 import { ConexoesListaComponent } from './funcionalidades/conexoes/conexoes-lista/conexoes-lista.component';
