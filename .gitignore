@@ -3,6 +3,7 @@
 
 # Ignorar configurações do IntelliJ IDEA
 .idea/
+data/
 
 # Ignorar a pasta target (build do Maven)
 target/
