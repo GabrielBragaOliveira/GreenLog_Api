@@ -10,6 +10,8 @@ import { PontosFormComponent } from './funcionalidades/pontos/pontos-form/pontos
 import { ConexoesListaComponent } from './funcionalidades/conexoes/conexoes-lista/conexoes-lista.component';
 import { ConexoesFormComponent } from './funcionalidades/conexoes/conexoes-form/conexoes-form.component';
 import { RoteamentoCalculoComponent } from './funcionalidades/rotas/roteamento-calculo/roteamento-calculo.component';
+import { BairrosListaComponent } from './funcionalidades/bairros/bairros-lista/bairros-lista.component';
+import { BairrosFormComponent } from './funcionalidades/bairros/bairros-form/bairros-form.component';
 
 export const routes: Routes = [{
   path: 'login',
@@ -66,6 +68,20 @@ export const routes: Routes = [{
     {
       path: 'conexoes/editar/:id',
       component: ConexoesFormComponent,
+      canDeactivate: [formExitGuard]
+    },
+    {
+      path: 'bairros',
+      component: BairrosListaComponent
+    },
+    {
+      path: 'bairros/novo',
+      component: BairrosFormComponent,
+      canDeactivate: [formExitGuard]
+    },
+    {
+      path: 'bairros/editar/:id',
+      component: BairrosFormComponent,
       canDeactivate: [formExitGuard]
     }
   ]
