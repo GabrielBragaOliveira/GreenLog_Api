@@ -15,6 +15,7 @@
           <th>Responsável</th>
           <th style="min-width: 120px;">Contato</th>
           <th>Email do Responsável</th>
+          <th>Endereço</th>
           <th>Bairro</th>
           <th>Resíduos Aceitos</th>
           <th class="text-center w-8rem">Ações</th>
@@ -27,6 +28,7 @@
           <td>{{ ponto.nomeResponsavel }}</td>
           <td class="white-space-nowrap"> {{ ponto.contato }}</td>
           <td>{{ ponto.email }}</td>
+          <td>{{ ponto.endereco }}</td>
           <td>{{ ponto.bairro.nome }}</td>
           <td>
             <div class="flex gap-1 flex-wrap">
@@ -36,7 +38,7 @@
             </div>
           </td>
           <td class="text-center">
-            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-warning mr-1"
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
               [routerLink]="['editar', ponto.id]" pTooltip="Editar"></p-button>
             <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
               (click)="confirmarExclusao(ponto)" pTooltip="Excluir"></p-button>
