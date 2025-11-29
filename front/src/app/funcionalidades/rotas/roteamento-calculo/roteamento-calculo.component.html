@@ -1,0 +1,105 @@
+<div class="flex flex-column gap-4">
+  
+  <h2 class="m-0 text-800">Cálculo de Melhor Rota</h2>
+
+  <p-card styleClass="shadow-2">
+    <div class="p-fluid formgrid grid align-items-end">
+      
+      <div class="field col-12 md:col-5">
+        <label for="origem" class="font-semibold text-lg">Ponto de Partida (Origem)</label>
+        <p-dropdown 
+          id="origem"
+          [options]="bairros" 
+          [(ngModel)]="origemId" 
+          optionLabel="nome" 
+          optionValue="id" 
+          placeholder="Selecione o bairro de origem..." 
+          [filter]="true" filterBy="nome"
+          showClear="true"
+          styleClass="text-lg">
+        </p-dropdown>
+      </div>
+
+      <div class="field col-12 md:col-2 flex justify-content-center pb-3">
+        <i class="pi pi-arrow-right text-2xl text-500 hidden md:block"></i>
+        <i class="pi pi-arrow-down text-2xl text-500 md:hidden"></i>
+      </div>
+
+      <div class="field col-12 md:col-5">
+        <label for="destino" class="font-semibold text-lg">Destino Final</label>
+        <p-dropdown 
+          id="destino"
+          [options]="bairros" 
+          [(ngModel)]="destinoId" 
+          optionLabel="nome" 
+          optionValue="id" 
+          placeholder="Selecione o bairro de destino..." 
+          [filter]="true" filterBy="nome"
+          showClear="true"
+          styleClass="text-lg">
+        </p-dropdown>
+      </div>
+
+      <div class="col-12 mt-3 flex justify-content-end">
+        <p-button 
+          label="Calcular Rota Otimizada" 
+          icon="pi pi-compass" 
+          (click)="calcular()" 
+          [disabled]="!origemId || !destinoId || origemId === destinoId"
+          [loading]="isCalculating"
+          styleClass="p-button-lg">
+        </p-button>
+      </div>
+    </div>
+  </p-card>
+
+  @if (resultado) {
+    <p-panel header="Resultado da Análise" styleClass="shadow-2 border-green-500 border-left-3">
+      <div class="flex flex-column md:flex-row justify-content-between gap-4">
+        
+        <div class="flex-1">
+          <div class="text-500 mb-2">Distância Total Estimada</div>
+          <div class="text-4xl font-bold text-green-700 mb-4">
+            {{ resultado.distanciaTotal }} <span class="text-xl text-600">km</span>
+          </div>
+          
+          <p-button 
+            label="Salvar como Rota Fixa" 
+            icon="pi pi-save" 
+            styleClass="p-button-outlined p-button-secondary" 
+            (click)="abrirModalSalvar()">
+          </p-button>
+        </div>
+
+        <div class="flex-2 bg-green-50 p-4 border-round-md">
+          <h3 class="mt-0 mb-3 text-700 text-sm uppercase">Itinerário Sugerido</h3>
+          
+          <p-timeline [value]="resultado.listaOrdenadaDeBairros" align="alternate">
+            <ng-template pTemplate="marker" let-bairro let-i="index">
+              <span class="custom-marker shadow-2" [style.backgroundColor]="getCormarker(i, resultado.listaOrdenadaDeBairros.length)">
+                <i [class]="getIconeMarker(i, resultado.listaOrdenadaDeBairros.length)"></i>
+              </span>
+            </ng-template>
+            <ng-template pTemplate="content" let-bairro>
+              <div class="font-semibold text-700">{{ bairro }}</div>
+            </ng-template>
+          </p-timeline>
+        </div>
+
+      </div>
+    </p-panel>
+  }
+
+  <p-dialog header="Salvar Rota" [(visible)]="showSalvarDialog" [modal]="true" [style]="{width: '400px'}">
+    <div class="flex flex-column gap-3 pt-2">
+      <label for="nomeRota" class="font-semibold">Nome da Rota</label>
+      <input pInputText id="nomeRota" [(ngModel)]="nomeRotaSalvar" placeholder="Ex: Rota Centro-Sul Diária" autofocus />
+      <small class="text-500">A sequência de bairros calculada será salva automaticamente.</small>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" (click)="showSalvarDialog = false"></p-button>
+      <p-button label="Salvar" icon="pi pi-check" (click)="salvarRota()" [disabled]="!nomeRotaSalvar"></p-button>
+    </ng-template>
+  </p-dialog>
+
+</div>

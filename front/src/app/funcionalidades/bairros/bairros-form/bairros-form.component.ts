@@ -2,15 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-
-// PrimeNG Imports
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
-
-// Seus Serviços e Models
 import { BairroService } from '../../../nucleo/servicos/bairro.service';
 import { BairroRequest } from '../../../compartilhado/models/bairro.model';
 

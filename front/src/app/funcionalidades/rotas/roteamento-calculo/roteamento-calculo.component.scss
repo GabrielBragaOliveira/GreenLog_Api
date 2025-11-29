@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+.custom-marker {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+:host ::ng-deep .p-timeline-event-opposite {
+  flex: 0;
+}

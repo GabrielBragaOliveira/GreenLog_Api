@@ -1,13 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
-// PrimeNG Imports
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog'; // Necessário para o popup
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
@@ -25,20 +23,18 @@ import { BairroResponse } from '../../../compartilhado/models/bairro.model';
     CardModule,
     TooltipModule,
     ToastModule,
-    ConfirmDialogModule // Adicionado
+    ConfirmDialogModule
   ],
-  providers: [ConfirmationService, MessageService], // Provedores locais
+  providers: [ConfirmationService, MessageService],
   templateUrl: './bairros-lista.component.html',
   styleUrl: './bairros-lista.component.scss'
 })
 export class BairrosListaComponent implements OnInit {
 
-  // INJEÇÃO DE DEPENDÊNCIA MODERNA
   private bairroService = inject(BairroService);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
-  private messageService = inject(MessageService); // Usado apenas para erros específicos (ex: 409)
-
+  private messageService = inject(MessageService);
   bairros: BairroResponse[] = [];
   isLoading = true;
 
@@ -54,7 +50,6 @@ export class BairrosListaComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => this.isLoading = false
-      // O erro genérico já é tratado no ApiBaseService, não precisa por aqui
     });
   }
 
@@ -81,12 +76,9 @@ export class BairrosListaComponent implements OnInit {
   private excluir(id: number) {
     this.bairroService.excluir(id).subscribe({
       next: () => {
-        // O ApiBaseService já mandou o Toast de Sucesso.
-        // Só precisamos atualizar a lista na tela.
         this.bairros = this.bairros.filter(b => b.id !== id);
       },
       error: (err) => {
-        // Tratamento específico: Se o bairro estiver em uso (Erro 409 Conflict)
         if (err.status === 409) {
           this.messageService.add({
             severity: 'warn',
@@ -95,7 +87,6 @@ export class BairrosListaComponent implements OnInit {
             life: 5000
           });
         }
-        // Outros erros já são tratados pelo ApiBaseService
       }
     });
   }
