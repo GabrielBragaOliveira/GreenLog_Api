@@ -27,11 +27,11 @@ MERGE INTO caminhao_residuo (caminhao_id, tipo_residuo_id) KEY(caminhao_id, tipo
     (2, 2), (2, 5),
     (3, 1), (3, 4), (3, 6);
 
-MERGE INTO ponto_coleta (id, nome_responsavel, contato, endereco, bairro_id) KEY(id) VALUES
-    (1, 'Marcos Almeida', '(11)99999-1111', 'Rua A, 123', 1),
-    (2, 'Fernanda Rocha', '(11)98888-2222', 'Av. B, 456', 2),
-    (3, 'Cláudia Lopes', '(11)97777-3333', 'Rua C, 789', 3),
-    (4, 'Ricardo Santos', '(11)96666-4444', 'Av. D, 321', 4);
+MERGE INTO ponto_coleta (id, nome_ponto, nome_responsavel, contato, email, endereco, bairro_id) KEY(id) VALUES 
+(1, 'Ponto Central', 'Marcos Almeida', '(11)99999-1111', 'ponto1@greenlog.com', 'Rua A, 123', 1),
+(2, 'Coleta Jardim das Flores', 'Fernanda Rocha', '(11)98888-2222', 'ponto2@greenlog.com', 'Av. B, 456', 2),
+(3, 'Ponto Vila Nova', 'Cláudia Lopes', '(11)97777-3333', 'ponto3@greenlog.com', 'Rua C, 789', 3),
+(4, 'Coleta Industrial', 'Ricardo Santos', '(11)96666-4444', 'ponto4@greenlog.com', 'Av. D, 321', 4);
 
 MERGE INTO ponto_residuo (ponto_coleta_id, tipo_residuo_id) KEY(ponto_coleta_id, tipo_residuo_id) VALUES
     (1, 1), (1, 2), (1, 5),
