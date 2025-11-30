@@ -1,13 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TagModule } from 'primeng/tag'; // Para o badge do Perfil
+import { TagModule } from 'primeng/tag';
 import { ConfirmationService } from 'primeng/api';
 
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';

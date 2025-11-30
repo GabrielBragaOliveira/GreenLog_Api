@@ -13,7 +13,6 @@
 
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 10%">ID</th>
           <th style="width: 30%">Nome</th>
           <th>Descrição</th>
           <th class="text-center w-8rem">Ações</th>
@@ -22,12 +21,11 @@
 
       <ng-template pTemplate="body" let-bairro>
         <tr>
-          <td>{{ bairro.id }}</td>
           <td><span class="font-bold">{{ bairro.nome }}</span></td>
           <td>{{ bairro.descricao || '-' }}</td>
 
           <td class="text-center">
-            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-warning mr-1"
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
                       (onClick)="editarBairro(bairro.id)" pTooltip="Editar" tooltipPosition="top"></p-button>
 
             <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
