@@ -7,11 +7,12 @@ import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
-import { ConfirmationService } from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
 import { UsuarioResponse } from '../../../compartilhado/models/usuario.model';
 import { Perfil } from '../../../compartilhado/models/perfil.enum';
+import {TooltipModule} from "primeng/tooltip";
 
 @Component({
   selector: 'app-usuarios-lista',
@@ -24,9 +25,10 @@ import { Perfil } from '../../../compartilhado/models/perfil.enum';
     CardModule,
     ToastModule,
     ConfirmDialogModule,
-    TagModule
+    TagModule,
+    TooltipModule
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './usuarios-lista.component.html',
   styleUrl: './usuarios-lista.component.scss'
 })
@@ -35,28 +37,25 @@ export class UsuariosListaComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
-
+  private messageService = inject(MessageService);
   usuarios: UsuarioResponse[] = [];
-  loading = true;
+  isLoading = true;
 
 
   PerfilEnum = Perfil;
 
   ngOnInit() {
-    this.buscarUsuarios();
+    this.carregarUsuarios();
   }
 
-  buscarUsuarios() {
-    this.loading = true;
+  carregarUsuarios() {
+    this.isLoading = true;
     this.usuarioService.listar().subscribe({
       next: (dados) => {
         this.usuarios = dados;
-        this.loading = false;
+        this.isLoading = false;
       },
-      error: () => {
-
-        this.loading = false;
-      }
+      error: () => this.isLoading = false
     });
   }
 
@@ -65,30 +64,25 @@ export class UsuariosListaComponent implements OnInit {
   }
 
   editarUsuario(id: number) {
-    this.router.navigate(['/usuarios/editar', id]);
+    this.router.navigate([`/usuarios/editar/${id}`]);
   }
 
-  excluirUsuario(event: Event, id: number) {
+  confirmarExclusao(usuario:UsuarioResponse) {
     this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: 'Tem certeza que deseja excluir este usuário?',
+      message: `Tem certeza que deseja excluir este usuário <b>${usuario.nome}</b>?`,
       header: 'Confirmação',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim',
-      rejectLabel: 'Não',
+      acceptLabel: 'Sim,excluir',
+      rejectLabel: 'Cancelar',
       acceptButtonStyleClass: 'p-button-danger p-button-text',
-      rejectButtonStyleClass: 'p-button-text',
-      accept: () => {
-        this.confirmarExclusao(id);
-      }
+      accept: () => this.excluir(usuario.id)
     });
   }
-
-  private confirmarExclusao(id: number) {
+  private excluir(id: number) {
     this.usuarioService.excluir(id).subscribe({
       next: () => {
 
-        this.buscarUsuarios();
+        this.carregarUsuarios();
       },
       error: () => {
 

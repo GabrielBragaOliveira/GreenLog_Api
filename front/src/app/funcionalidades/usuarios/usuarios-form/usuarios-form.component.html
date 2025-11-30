@@ -4,24 +4,31 @@
     <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
 
 
-      <div class="field">
-        <label for="nome" class="font-semibold">Nome Completo <span class="text-red-500">*</span></label>
-        <input pInputText id="nome" formControlName="nome" class="w-full" autofocus />
-        @if (form.get('nome')?.hasError('required') && form.get('nome')?.touched) {
-          <small class="text-red-500 block mt-1">O nome é obrigatório.</small>
-        }
-      </div>
+      <div class="formgrid grid">
 
+        <div class="field col-12 md:col-6">
+          <label for="nome" class="font-semibold">
+            Nome Completo <span class="text-red-500">*</span>
+          </label>
+          <input pInputText id="nome" formControlName="nome" class="w-full" autofocus />
+          @if (form.get('nome')?.hasError('required') && form.get('nome')?.touched) {
+            <small class="text-red-500 block mt-1">O nome é obrigatório.</small>
+          }
+        </div>
 
-      <div class="field">
-        <label for="email" class="font-semibold">E-mail <span class="text-red-500">*</span></label>
-        <input pInputText id="email" formControlName="email" class="w-full" />
-        @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
-          <small class="text-red-500 block mt-1">O e-mail é obrigatório.</small>
-        }
-        @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
-          <small class="text-red-500 block mt-1">Digite um e-mail válido.</small>
-        }
+        <div class="field col-12 md:col-6">
+          <label for="email" class="font-semibold">
+            E-mail <span class="text-red-500">*</span>
+          </label>
+          <input pInputText id="email" formControlName="email" class="w-full" />
+          @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
+            <small class="text-red-500 block mt-1">O e-mail é obrigatório.</small>
+          }
+          @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+            <small class="text-red-500 block mt-1">Digite um e-mail válido.</small>
+          }
+        </div>
+
       </div>
 
       <div class="formgrid grid">
