@@ -79,4 +79,18 @@ public class ConexaoBairroService {
         ConexaoBairro conexao = buscarEntityPorId(id);
         conexaoBairroRepository.delete(conexao);
     }
+
+    @Transactional
+    public void alterarStatus(Long id) {
+        ConexaoBairro conexao = conexaoBairroRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Conexão de bairro não encontrada."));
+
+        if (conexao.isAtivo()) {
+            conexao.setAtivo(false);
+        } else {
+            conexao.setAtivo(true);
+        }
+
+        conexaoBairroRepository.save(conexao);
+    }
 }

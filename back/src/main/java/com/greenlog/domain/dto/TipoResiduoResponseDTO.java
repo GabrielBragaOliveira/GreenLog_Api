@@ -10,6 +10,7 @@ package com.greenlog.domain.dto;
  */
 public record TipoResiduoResponseDTO(    
     Long id,
-    String nome
+    String nome,
+    Boolean ativo
         
 ) {}

@@ -20,7 +20,9 @@ public class BairroMapper {
         return new BairroResponseDTO(
                 bairro.getId(),
                 bairro.getNome(),
-                bairro.getDescricao());
+                bairro.getDescricao(),
+                bairro.getAtivo());
+        
     }
 
     public Bairro toEntity(BairroRequestDTO request) {

@@ -10,9 +10,12 @@ import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.TipoResiduoMapper;
 import com.greenlog.domain.repository.TipoResiduoRepository;
+import com.greenlog.exception.ConflitoException;
+import com.greenlog.exception.ErroValidacaoException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,8 +51,32 @@ public class TipoResiduoService {
 
     @Transactional
     public TipoResiduoResponseDTO salvar(TipoResiduoRequestDTO request) {
-        TipoResiduo novoTipo = tipoResiduoMapper.toEntity(request);
-        return tipoResiduoMapper.toResponseDTO(tipoResiduoRepository.save(novoTipo));
+
+        if (request.nome() == null || request.nome().isBlank()) {
+            throw new ErroValidacaoException("O nome do tipo de resíduo é obrigatório.");
+        }
+
+        Optional<TipoResiduo> existente = tipoResiduoRepository.findByNome(request.nome());
+
+        if (existente.isPresent()) {
+            TipoResiduo tipo = existente.get();
+
+            if (!tipo.isAtivo()) {
+                tipo.setNome(request.nome());
+                tipo.setAtivo(true);
+
+                tipoResiduoRepository.save(tipo);
+                return tipoResiduoMapper.toResponseDTO(tipo);
+            } else {
+                throw new ConflitoException("Já existe um tipo de resíduo ativo com este nome.");
+            }
+        }
+
+        TipoResiduo novo = tipoResiduoMapper.toEntity(request);
+        novo.setAtivo(true);
+
+        TipoResiduo salvo = tipoResiduoRepository.save(novo);
+        return tipoResiduoMapper.toResponseDTO(salvo);
     }
 
     @Transactional
@@ -63,5 +90,14 @@ public class TipoResiduoService {
     public void excluir(Long id) {
         TipoResiduo tipo = buscarEntityPorId(id);
         tipoResiduoRepository.delete(tipo);
+    }
+
+    @Transactional
+    public void inativar(Long id) {
+        TipoResiduo tipo = tipoResiduoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tipo de resíduo não encontrado."));
+
+        tipo.setAtivo(false);
+        tipoResiduoRepository.save(tipo);
     }
 }

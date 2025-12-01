@@ -6,6 +6,7 @@ package com.greenlog.domain.repository;
 
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.domain.entity.ConexaoBairro;
+import com.greenlog.domain.entity.Usuario;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,6 @@ public interface ConexaoBairroRepository extends JpaRepository<ConexaoBairro, Lo
     
     // Usado para garantir que não haja conexões duplicadas (ex: A -> B e A -> B)
     Optional<ConexaoBairro> findByBairroOrigemAndBairroDestino(Bairro origem, Bairro destino);
+    
+    List<Usuario> findByAtivo(Boolean ativo);
 }

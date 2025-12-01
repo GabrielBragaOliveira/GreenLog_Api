@@ -37,9 +37,6 @@ public record PontoColetaRequestDTO(
     @NotBlank(message = "O endereço é obrigatório.")
     @Size(max = 255)
     String endereco,
-    
-    @NotBlank(message = "O horario de funcionamento é obrigatório.")
-    String horarioFuncionamento,
 
     @NotNull(message = "O ID do bairro é obrigatório.")
     Long bairroId,

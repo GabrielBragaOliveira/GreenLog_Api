@@ -20,7 +20,8 @@ public class LoginMapper {
             usuario.getId(),
             usuario.getNome(),
             usuario.getEmail(),
-            usuario.getPerfil()
+            usuario.getPerfil(),
+            usuario.getAtivo()
         );
     }
 }

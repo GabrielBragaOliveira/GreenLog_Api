@@ -53,6 +53,9 @@ public class Caminhao {
             joinColumns = @JoinColumn(name = "caminhao_id"),
             inverseJoinColumns = @JoinColumn(name = "tipo_residuo_id"))
     private List<TipoResiduo> tiposSuportados;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     public Caminhao() {
     }
@@ -95,6 +98,18 @@ public class Caminhao {
 
     public void setTiposSuportados(List<TipoResiduo> tiposSuportados) {
         this.tiposSuportados = tiposSuportados;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
 
     @Override

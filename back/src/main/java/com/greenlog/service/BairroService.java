@@ -12,7 +12,10 @@ import com.greenlog.domain.repository.BairroRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.EntidadeEmUsoException;
 import com.greenlog.domain.repository.ConexaoBairroRepository;
+import com.greenlog.exception.ConflitoException;
+import com.greenlog.exception.ErroValidacaoException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,8 +56,33 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO salvar(BairroRequestDTO request) {
-        Bairro novoBairro = bairroMapper.toEntity(request);
-        return bairroMapper.toResponseDTO(bairroRepository.save(novoBairro));
+        if (request.nome() == null || request.nome().isBlank()) {
+            throw new ErroValidacaoException("O nome do bairro é obrigatório.");
+        }
+
+        Optional<Bairro> existente = bairroRepository.findByNome(request.nome());
+
+        if (existente.isPresent()) {
+            Bairro bairro = existente.get();
+
+            if (!bairro.isAtivo()) {
+                bairro.setNome(request.nome());
+                bairro.setDescricao(request.descricao());
+                bairro.setAtivo(true);
+
+                Bairro salvo = bairroRepository.save(bairro);
+                return bairroMapper.toResponseDTO(salvo);
+
+            } else {
+                throw new ConflitoException("Já existe um bairro ativo com este nome.");
+            }
+        }
+
+        Bairro novo = bairroMapper.toEntity(request);
+        novo.setAtivo(true);
+
+        Bairro salvo = bairroRepository.save(novo);
+        return bairroMapper.toResponseDTO(salvo);
     }
 
     @Transactional
@@ -72,5 +100,18 @@ public class BairroService {
         }
 
         bairroRepository.delete(bairro);
+    }
+
+    @Transactional
+    public void inativar(Long id) {
+        Bairro bairro = bairroRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Bairro não encontrado."));
+
+        if (conexaoBairroRepository.existsByBairroOrigemOrBairroDestino(bairro, bairro)) {
+            throw new EntidadeEmUsoException("Bairro não pode ser inativado pois está associado a uma ou mais conexões.");
+        }
+
+        bairro.setAtivo(false);
+        bairroRepository.save(bairro);
     }
 }

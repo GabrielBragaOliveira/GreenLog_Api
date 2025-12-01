@@ -15,5 +15,8 @@ public record CaminhaoResponseDTO(
      String placa,
      String motorista,
      Integer capacidadeKg,
-     List<TipoResiduoResponseDTO> tiposSuportados) 
+     List<TipoResiduoResponseDTO> tiposSuportados,
+     Boolean ativo
+     
+     ) 
 {}

@@ -5,6 +5,8 @@
 package com.greenlog.domain.repository;
 
 import com.greenlog.domain.entity.Bairro;
+import com.greenlog.domain.entity.Usuario;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +17,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BairroRepository extends JpaRepository<Bairro, Long> {
     Optional<Bairro> findByNome(String nome);
     boolean existsByNome(String nome);
+    List<Usuario> findByAtivo(Boolean ativo);
 }

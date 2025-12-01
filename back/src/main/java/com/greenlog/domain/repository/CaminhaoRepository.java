@@ -5,6 +5,8 @@
 package com.greenlog.domain.repository;
 
 import com.greenlog.domain.entity.Caminhao;
+import com.greenlog.domain.entity.Usuario;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +17,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CaminhaoRepository extends JpaRepository<Caminhao, Long> {
     Optional<Caminhao> findByPlaca(String placa);
     boolean existsByPlaca(String placa);
+    List<Usuario> findByAtivo(Boolean ativo);
 }

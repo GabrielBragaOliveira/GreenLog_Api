@@ -52,9 +52,6 @@ public class PontoColeta {
     @NotBlank(message = "O endereço é obrigatório.")
     @Column(nullable = false)
     private String endereco;
-    
-    @Column(nullable = false)
-    private String horarioFuncionamento;
 
     @NotNull(message = "O bairro é obrigatório.")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,6 +63,9 @@ public class PontoColeta {
             joinColumns = @JoinColumn(name = "ponto_coleta_id"),
             inverseJoinColumns = @JoinColumn(name = "tipo_residuo_id"))
     private List<TipoResiduo> tiposResiduosAceitos;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     
     public PontoColeta() {
@@ -126,21 +126,25 @@ public class PontoColeta {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public String getHorarioFuncionamento() {
-        return horarioFuncionamento;
-    }
-
-    public void setHorarioFuncionamento(String horarioFuncionamento) {
-        this.horarioFuncionamento = horarioFuncionamento;
-    }
-
+    
     public String getNomePonto() {
         return nomePonto;
     }
 
     public void setNomePonto(String nomePonto) {
         this.nomePonto = nomePonto;
+    }
+    
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
     
     @Override
