@@ -31,12 +31,13 @@ export class PontosFormComponent implements OnInit, ComponenteComFormulario {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // Regex de Telefone do Backend (RegexConstants.TELEFONE_REGEX)
   readonly PHONE_REGEX = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
 
   form = this.fb.group({
+    nomePonto: ['', [Validators.required, Validators.maxLength(100)]],
     nomeResponsavel: ['', [Validators.required, Validators.maxLength(100)]],
     contato: ['', [Validators.required, Validators.pattern(this.PHONE_REGEX)]],
+    email: ['', [Validators.required, Validators.email]],
     endereco: ['', [Validators.required]],
     bairroId: [null as number | null, [Validators.required]],
     tiposResiduosIds: [<number[]>[], [Validators.required]]
@@ -50,7 +51,6 @@ export class PontosFormComponent implements OnInit, ComponenteComFormulario {
 
   ngOnInit() {
     this.carregarDependencias();
-    
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdicao = true;
@@ -67,8 +67,10 @@ export class PontosFormComponent implements OnInit, ComponenteComFormulario {
   carregarPonto(id: number) {
     this.pontoService.buscarPorId(id).subscribe(ponto => {
       this.form.patchValue({
+        nomePonto:ponto.nomePonto,
         nomeResponsavel: ponto.nomeResponsavel,
         contato: ponto.contato,
+        email: ponto.email,
         endereco: ponto.endereco,
         bairroId: ponto.bairro.id,
         tiposResiduosIds: ponto.tiposResiduosAceitos.map(t => t.id)
@@ -105,6 +107,6 @@ export class PontosFormComponent implements OnInit, ComponenteComFormulario {
   }
 
   temMudancasNaoSalvas(): boolean {
-    return this.form.dirty && !this.form.pristine;
+    return !this.isSaving && this.form.dirty;
   }
 }

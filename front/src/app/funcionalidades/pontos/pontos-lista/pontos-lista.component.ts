@@ -41,7 +41,7 @@ export class PontosListaComponent implements OnInit {
 
   confirmarExclusao(ponto: PontoColetaResponse) {
     this.confirmationService.confirm({
-      message: `Deseja excluir o ponto de coleta de <b>${ponto.nomeResponsavel}</b>?`,
+      message: `Deseja realmente excluir o ponto de coleta <b>${ponto.nomePonto}</b>?`,
       header: 'Confirmar Exclusão',
       icon: 'pi pi-trash',
       acceptLabel: 'Sim, excluir',
@@ -51,7 +51,8 @@ export class PontosListaComponent implements OnInit {
     });
   }
 
-  private excluir(id: number) {
+  private excluir(id: number | undefined) {
+    if (!id) return;
     this.pontoService.excluir(id).subscribe(() => {
       this.pontos = this.pontos.filter(p => p.id !== id);
     });

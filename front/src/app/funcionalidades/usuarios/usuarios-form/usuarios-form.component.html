@@ -1,0 +1,86 @@
+<div class="flex justify-content-center">
+  <p-card [header]="isEdicao ? 'Editar Usuário' : 'Novo Usuário'" styleClass="w-full md:w-8 shadow-2">
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
+
+
+      <div class="formgrid grid">
+
+        <div class="field col-12 md:col-6">
+          <label for="nome" class="font-semibold">
+            Nome Completo <span class="text-red-500">*</span>
+          </label>
+          <input pInputText id="nome" formControlName="nome" class="w-full" autofocus />
+          @if (form.get('nome')?.hasError('required') && form.get('nome')?.touched) {
+            <small class="text-red-500 block mt-1">O nome é obrigatório.</small>
+          }
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="email" class="font-semibold">
+            E-mail <span class="text-red-500">*</span>
+          </label>
+          <input pInputText id="email" formControlName="email" class="w-full" />
+          @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
+            <small class="text-red-500 block mt-1">O e-mail é obrigatório.</small>
+          }
+          @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+            <small class="text-red-500 block mt-1">Digite um e-mail válido.</small>
+          }
+        </div>
+
+      </div>
+
+      <div class="formgrid grid">
+
+        <div class="field col-12 md:col-6">
+          <label for="perfil" class="font-semibold">Perfil de Acesso <span class="text-red-500">*</span></label>
+          <p-dropdown
+            id="perfil"
+            [options]="opcoesPerfil"
+            formControlName="perfil"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecione..."
+            styleClass="w-full">
+          </p-dropdown>
+          @if (form.get('perfil')?.hasError('required') && form.get('perfil')?.touched) {
+            <small class="text-red-500 block mt-1">O perfil é obrigatório.</small>
+          }
+        </div>
+
+
+        <div class="field col-12 md:col-6">
+          <label for="senha" class="font-semibold">
+            Senha
+            @if (!isEdicao) { <span class="text-red-500">*</span> }
+          </label>
+          <p-password
+            id="senha"
+            formControlName="senha"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-password>
+
+          @if (form.get('senha')?.hasError('required') && form.get('senha')?.touched) {
+            <small class="text-red-500 block mt-1">A senha é obrigatória.</small>
+          }
+          @if (form.get('senha')?.hasError('minlength') && form.get('senha')?.touched) {
+            <small class="text-red-500 block mt-1">A senha deve ter no mínimo 6 caracteres.</small>
+          }
+          @if (isEdicao) {
+            <small class="text-gray-500 block mt-1">Deixe em branco para manter a atual.</small>
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-content-end gap-2 mt-3">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" type="button" (click)="cancelar()"></p-button>
+        <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="isSaving"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+</div>

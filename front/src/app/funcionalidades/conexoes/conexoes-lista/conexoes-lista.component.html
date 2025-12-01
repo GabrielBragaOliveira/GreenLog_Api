@@ -23,7 +23,7 @@
           <td class="font-semibold">{{ conexao.bairroDestino.nome }}</td>
           <td>{{ conexao.distancia }} km</td>
           <td class="text-center">
-            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-warning mr-1" 
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" 
                       [routerLink]="['editar', conexao.id]" pTooltip="Editar"></p-button>
             <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" 
                       (click)="confirmarExclusao(conexao)" pTooltip="Excluir"></p-button>

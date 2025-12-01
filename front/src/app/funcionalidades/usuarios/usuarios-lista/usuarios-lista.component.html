@@ -1,0 +1,61 @@
+<div class="flex flex-column gap-3">
+
+  <div class="flex justify-content-between align-items-center">
+    <h2 class="m-0 text-800">Gestão de Usuários</h2>
+    <p-button label="Novo Usuário" icon="pi pi-plus" (onClick)="novoUsuario()"></p-button>
+  </div>
+
+    <p-card styleClass="shadow-2">
+
+
+
+      <p-table
+        [value]="usuarios"
+        [loading]="isLoading"
+        [rows]="10"
+        [paginator]="true"
+        [rowHover]="true"
+        responsiveLayout="stack"
+        styleClass="p-datatable-sm">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th style="width: 150px">Perfil</th>
+            <th style="width: 120px" class="text-center">Ações</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-usuarios>
+          <tr>
+            <td class="font-semibold">{{ usuarios.nome }}</td>
+            <td>{{ usuarios.email }}</td>
+            <td>
+              <p-tag
+                [value]="usuarios.perfil"
+                [severity]="usuarios.perfil === PerfilEnum.ADMIN ? 'warning' : 'info'">
+              </p-tag>
+            </td>
+            <td class="text-center">
+              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
+                        (onClick)="editarUsuario(usuarios.id)" pTooltip="Editar" tooltipPosition="top"></p-button>
+              <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
+                        (onClick)="confirmarExclusao(usuarios)" pTooltip="Excluir" tooltipPosition="top"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center p-4">
+              Nenhum usuário encontrado.
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </p-card>
+  </div>
+
+<p-toast></p-toast> <p-confirmDialog></p-confirmDialog>

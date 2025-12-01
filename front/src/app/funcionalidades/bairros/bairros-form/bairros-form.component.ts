@@ -90,7 +90,8 @@ export class BairrosFormComponent implements OnInit {
   cancelar() {
     this.router.navigate(['/bairros']);
   }
+  
   temMudancasNaoSalvas(): boolean {
-    return this.form.dirty && !this.form.pristine;
+    return !this.isSaving && this.form.dirty;
   }
 }
