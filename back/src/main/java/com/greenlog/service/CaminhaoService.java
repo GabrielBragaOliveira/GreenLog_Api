@@ -12,11 +12,14 @@ import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.CaminhaoMapper;
 import com.greenlog.domain.repository.CaminhaoRepository;
 import com.greenlog.domain.repository.ItinerarioRepository;
+import com.greenlog.exception.ConflitoException;
+import com.greenlog.exception.ErroValidacaoException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.greenlog.service.template.ProcessadorCadastroCaminhao;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,12 +60,53 @@ public class CaminhaoService {
 
     @Transactional
     public CaminhaoResponseDTO salvar(CaminhaoRequestDTO request) {
+        if (request.placa() == null || request.placa().isBlank()) {
+            throw new ErroValidacaoException("A placa do caminhão é obrigatória.");
+        }
+        if (request.motorista() == null || request.motorista().isBlank()) {
+            throw new ErroValidacaoException("O nome do motorista é obrigatório.");
+        }
+        if (request.capacidadeKg() == null || request.capacidadeKg() <= 0) {
+            throw new ErroValidacaoException("A capacidade deve ser maior que zero.");
+        }
+        if (request.tiposSuportadosIds() == null || request.tiposSuportadosIds().isEmpty()) {
+            throw new ErroValidacaoException("O caminhão deve suportar pelo menos um tipo de resíduo.");
+        }
+
+        Optional<Caminhao> existente = caminhaoRepository.findByPlaca(request.placa());
+
+        if (existente.isPresent()) {
+            Caminhao caminhao = existente.get();
+
+            if (!caminhao.isAtivo()) {
+                caminhao.setPlaca(request.placa());
+                caminhao.setMotorista(request.motorista());
+                caminhao.setCapacidadeKg(request.capacidadeKg());
+                caminhao.setTiposSuportados(
+                        request.tiposSuportadosIds().stream()
+                                .map(tipoResiduoService::buscarEntityPorId)
+                                .collect(Collectors.toList())
+                );
+                caminhao.setAtivo(true);
+
+                Caminhao salvo = caminhaoRepository.save(caminhao);
+                return caminhaoMapper.toResponseDTO(salvo);
+
+            } else {
+                throw new ConflitoException("Já existe um caminhão ativo com esta placa.");
+            }
+        }
+
         Caminhao novoCaminhao = caminhaoMapper.toEntity(request);
-        novoCaminhao.setTiposSuportados(request.tiposSuportadosIds().stream()
-                .map(tipoResiduoService::buscarEntityPorId)
-                .collect(Collectors.toList()));
+        novoCaminhao.setTiposSuportados(
+                request.tiposSuportadosIds().stream()
+                        .map(tipoResiduoService::buscarEntityPorId)
+                        .collect(Collectors.toList())
+        );
+        novoCaminhao.setAtivo(true);
 
         Caminhao caminhaoSalvo = processadorCadastroCaminhao.processar(novoCaminhao);
+
         return caminhaoMapper.toResponseDTO(caminhaoSalvo);
     }
 
@@ -86,5 +130,18 @@ public class CaminhaoService {
         }
 
         caminhaoRepository.delete(caminhao);
+    }
+
+    @Transactional
+    public void inativar(Long id) {
+        Caminhao caminhao = caminhaoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Caminhão não encontrado."));
+
+        if (itinerarioRepository.existsByCaminhao(caminhao)) {
+            throw new EntidadeEmUsoException("Caminhão não pode ser inativado pois está associado a um ou mais itinerários.");
+        }
+
+        caminhao.setAtivo(false);
+        caminhaoRepository.save(caminhao);
     }
 }

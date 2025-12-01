@@ -9,6 +9,8 @@ import com.greenlog.domain.dto.UsuarioRequestDTO;
 import com.greenlog.domain.dto.UsuarioResponseDTO;
 import com.greenlog.domain.entity.Usuario;
 import com.greenlog.domain.repository.UsuarioRepository;
+import com.greenlog.exception.ConflitoException;
+import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.UsuarioMapper;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.greenlog.service.template.ProcessadorCadastroUsuario;
 import com.greenlog.util.HashUtil;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -56,9 +59,38 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO salvar(UsuarioRequestDTO request) {
+        
+        if (request.nome() == null || request.nome().isBlank()) {
+            throw new ErroValidacaoException("O nome do usuário é obrigatório.");
+        }
+        if (request.email() == null || request.email().isBlank()) {
+            throw new ErroValidacaoException("O email do usuário é obrigatório.");
+        }
+        if (request.senha() == null || request.senha().isBlank()) {
+            throw new ErroValidacaoException("A senha do usuário é obrigatória.");
+        }    
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(request.email());
+
+        if (usuarioExistente.isPresent()) {
+            Usuario usuario = usuarioExistente.get();
+            
+            if (!usuario.isAtivo()) {
+                usuario.setNome(request.nome());
+                usuario.setSenha(HashUtil.hash(request.senha()));
+                usuario.setPerfil(request.perfil());
+                usuario.setAtivo(true);
+
+                Usuario usuarioSalvo = usuarioRepository.save(usuario);
+                return usuarioMapper.toResponseDTO(usuarioSalvo);
+            } else {
+                throw new ConflitoException("Já existe um usuário ativo com este e-mail.");
+            }
+        }
+
         Usuario novoUsuario = usuarioMapper.toEntity(request);
 
         novoUsuario.setSenha(HashUtil.hash(request.senha()));
+        novoUsuario.setAtivo(true);
 
         Usuario usuarioSalvo = processadorCadastroUsuario.processar(novoUsuario);
 
@@ -80,6 +112,15 @@ public class UsuarioService {
     public void excluir(Long id) {
         Usuario usuario = buscarEntityPorId(id);
         usuarioRepository.delete(usuario);
+    }
+
+    @Transactional
+    public void inativar(Long id) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
+
+        usuarioExistente.setAtivo(false);
+        usuarioRepository.save(usuarioExistente);
     }
 
     @Transactional(readOnly = true)

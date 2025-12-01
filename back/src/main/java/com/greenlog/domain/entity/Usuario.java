@@ -47,6 +47,9 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Perfil perfil;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     public Usuario() {
     }
@@ -89,6 +92,18 @@ public class Usuario {
 
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
+    }
+    
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
 
     @Override

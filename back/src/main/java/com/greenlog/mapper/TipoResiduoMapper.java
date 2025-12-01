@@ -19,7 +19,8 @@ public class TipoResiduoMapper {
     public TipoResiduoResponseDTO toResponseDTO(TipoResiduo tipoResiduo) {
         return new TipoResiduoResponseDTO(
                 tipoResiduo.getId(),
-                tipoResiduo.getNome()
+                tipoResiduo.getNome(),
+                tipoResiduo.getAtivo()
         );
     }
 

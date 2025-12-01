@@ -12,6 +12,7 @@ public record ConexaoBairroResponseDTO(
     Long id,
     BairroResponseDTO bairroOrigem,
     BairroResponseDTO bairroDestino,
-    Double distancia
+    Double distancia,
+    Boolean ativo
       
 ) {}

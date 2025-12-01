@@ -33,12 +33,12 @@ public class PontoColetaMapper {
                 ponto.getContato(),
                 ponto.getEmail(),
                 ponto.getEndereco(),
-                ponto.getHorarioFuncionamento(),
                 bairroMapper.toResponseDTO(ponto.getBairro()),
                 ponto.getTiposResiduosAceitos() == null ? null
                 : ponto.getTiposResiduosAceitos().stream()
                         .map(tipoResiduoMapper::toResponseDTO)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                ponto.getAtivo()
         );
     }
 
@@ -53,7 +53,6 @@ public class PontoColetaMapper {
         entity.setContato(request.contato());
         entity.setEmail(request.email());
         entity.setEndereco(request.endereco());
-        entity.setHorarioFuncionamento(request.horarioFuncionamento());
         return entity;
     }
 
@@ -65,6 +64,5 @@ public class PontoColetaMapper {
         entity.setNomeResponsavel(request.nomeResponsavel());
         entity.setContato(request.contato());
         entity.setEndereco(request.endereco());
-        entity.setHorarioFuncionamento(request.horarioFuncionamento());
     }
 }

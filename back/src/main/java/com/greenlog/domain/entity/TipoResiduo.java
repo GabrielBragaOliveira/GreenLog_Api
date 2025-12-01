@@ -28,6 +28,9 @@ public class TipoResiduo {
     @NotBlank(message = "O nome do tipo de resíduo é obrigatório.")
     @Column(nullable = false, unique = true)
     private String nome;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     public TipoResiduo() {
     }
@@ -46,6 +49,18 @@ public class TipoResiduo {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+    
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
 
     @Override

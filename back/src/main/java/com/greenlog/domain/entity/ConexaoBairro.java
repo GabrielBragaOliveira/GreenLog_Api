@@ -43,6 +43,9 @@ public class ConexaoBairro {
     @DecimalMin(value = "0.0", inclusive = false, message = "A distância deve ser maior que zero.")
     @Column(nullable = false)
     private Double distancia;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     public ConexaoBairro() {
     }
@@ -77,6 +80,18 @@ public class ConexaoBairro {
 
     public void setDistancia(Double distancia) {
         this.distancia = distancia;
+    }
+    
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
 
     @Override

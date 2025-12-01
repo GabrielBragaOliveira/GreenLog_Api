@@ -34,8 +34,8 @@ public class CaminhaoMapper {
                 caminhao.getTiposSuportados() == null ? null
                 : caminhao.getTiposSuportados().stream()
                         .map(tipoResiduoMapper::toResponseDTO)
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList()),
+                caminhao.getAtivo());
     }
 
     public Caminhao toEntity(CaminhaoRequestDTO request) {

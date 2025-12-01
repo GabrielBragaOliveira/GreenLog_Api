@@ -11,6 +11,7 @@ package com.greenlog.domain.dto;
 public record BairroResponseDTO(
         Long id,
         String nome,
-        String descricao
+        String descricao,
+        Boolean ativo
 
 ) {}

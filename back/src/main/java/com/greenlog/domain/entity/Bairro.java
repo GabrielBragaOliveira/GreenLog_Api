@@ -30,6 +30,9 @@ public class Bairro {
     private String nome;
 
     private String descricao;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     public Bairro() {
     }
@@ -57,6 +60,18 @@ public class Bairro {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+    
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
 
     @Override

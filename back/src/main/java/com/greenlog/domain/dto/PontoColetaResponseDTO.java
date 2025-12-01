@@ -17,8 +17,8 @@ public record PontoColetaResponseDTO(
     String contato,
     String email,
     String endereco,
-    String horarioFuncionamento,
     BairroResponseDTO bairro,
-    List<TipoResiduoResponseDTO> tiposResiduosAceitos
+    List<TipoResiduoResponseDTO> tiposResiduosAceitos,
+    Boolean ativo
         
 ) {}

@@ -27,7 +27,8 @@ public class ConexaoBairroMapper {
                 conexao.getId(),
                 bairroMapper.toResponseDTO(conexao.getBairroOrigem()),
                 bairroMapper.toResponseDTO(conexao.getBairroDestino()),
-                conexao.getDistancia()
+                conexao.getDistancia(),
+                conexao.getAtivo()
         );
     }
 

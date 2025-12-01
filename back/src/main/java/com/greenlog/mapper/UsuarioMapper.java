@@ -22,7 +22,8 @@ public class UsuarioMapper {
             usuario.getId(),
             usuario.getNome(),
             usuario.getEmail(),
-            usuario.getPerfil()
+            usuario.getPerfil(),
+            usuario.getAtivo()
         );
     }
 
