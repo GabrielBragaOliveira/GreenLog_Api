@@ -100,6 +100,6 @@ export class CaminhaoFormComponent implements OnInit, ComponenteComFormulario {
   }
 
   temMudancasNaoSalvas(): boolean {
-    return this.form.dirty && !this.form.pristine;
+    return !this.isSaving && this.form.dirty;
   }
 }
