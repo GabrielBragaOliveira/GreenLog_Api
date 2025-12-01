@@ -3,51 +3,103 @@
   <h2 class="m-0 text-800">Cálculo de Melhor Rota</h2>
 
   <p-card styleClass="shadow-2">
-    <div class="p-fluid formgrid grid align-items-end">
+    <div class="grid">
       
-      <div class="field col-12 md:col-5">
-        <label for="origem" class="font-semibold text-lg">Ponto de Partida (Origem)</label>
-        <p-dropdown 
-          id="origem"
-          [options]="bairros" 
-          [(ngModel)]="origemId" 
-          optionLabel="nome" 
-          optionValue="id" 
-          placeholder="Selecione o bairro de origem..." 
-          [filter]="true" filterBy="nome"
-          showClear="true"
-          styleClass="text-lg">
-        </p-dropdown>
+      <div class="col-12 md:col-5">
+        <div class="flex flex-column gap-3 p-3 border-round bg-green-50 surface-border border-1">
+          <div class="font-bold text-green-700 text-lg flex align-items-center gap-2">
+            <i class="pi pi-map-marker"></i> Ponto de Partida
+          </div>
+          
+          <div class="flex flex-column gap-2">
+            <label for="origemBairro" class="font-medium text-sm">1. Selecione o Bairro</label>
+            <p-dropdown 
+              id="origemBairro"
+              [options]="todosBairros" 
+              [(ngModel)]="origemBairroId" 
+              optionLabel="nome" 
+              optionValue="id" 
+              placeholder="Bairro de Origem..." 
+              [filter]="true" filterBy="nome"
+              showClear="true"
+              styleClass="w-full"
+              (onChange)="aoSelecionarOrigem()">
+            </p-dropdown>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="origemPonto" class="font-medium text-sm">2. Selecione o Ponto de Coleta</label>
+            <p-dropdown 
+              id="origemPonto"
+              [options]="pontosOrigem" 
+              [(ngModel)]="origemPontoId" 
+              optionLabel="nomeResponsavel" 
+              optionValue="id" 
+              placeholder="Selecione o ponto..." 
+              styleClass="w-full"
+              [disabled]="!origemBairroId"
+              emptyMessage="Nenhum ponto neste bairro">
+            </p-dropdown>
+          </div>
+        </div>
       </div>
 
-      <div class="field col-12 md:col-2 flex justify-content-center pb-3">
-        <i class="pi pi-arrow-right text-2xl text-500 hidden md:block"></i>
-        <i class="pi pi-arrow-down text-2xl text-500 md:hidden"></i>
+      <div class="col-12 md:col-2 flex align-items-center justify-content-center">
+        <div class="surface-200 border-circle w-3rem h-3rem flex align-items-center justify-content-center shadow-1">
+          <i class="pi pi-arrow-right text-xl text-600 hidden md:block"></i>
+          <i class="pi pi-arrow-down text-xl text-600 md:hidden"></i>
+        </div>
       </div>
 
-      <div class="field col-12 md:col-5">
-        <label for="destino" class="font-semibold text-lg">Destino Final</label>
-        <p-dropdown 
-          id="destino"
-          [options]="bairros" 
-          [(ngModel)]="destinoId" 
-          optionLabel="nome" 
-          optionValue="id" 
-          placeholder="Selecione o bairro de destino..." 
-          [filter]="true" filterBy="nome"
-          showClear="true"
-          styleClass="text-lg">
-        </p-dropdown>
+      <div class="col-12 md:col-5">
+        <div class="flex flex-column gap-3 p-3 border-round bg-blue-50 surface-border border-1">
+          <div class="font-bold text-blue-700 text-lg flex align-items-center gap-2">
+            <i class="pi pi-flag"></i> Destino Final
+          </div>
+          
+          <div class="flex flex-column gap-2">
+            <label for="destinoBairro" class="font-medium text-sm">3. Selecione o Bairro</label>
+            <p-dropdown 
+              id="destinoBairro"
+              [options]="bairrosDestinoFiltrados" 
+              [(ngModel)]="destinoBairroId" 
+              optionLabel="nome" 
+              optionValue="id" 
+              placeholder="Bairro de Destino..." 
+              [filter]="true" filterBy="nome"
+              showClear="true"
+              styleClass="w-full"
+              [disabled]="!origemBairroId"
+              (onChange)="aoSelecionarDestino()">
+            </p-dropdown>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="destinoPonto" class="font-medium text-sm">4. Selecione o Ponto de Coleta</label>
+            <p-dropdown 
+              id="destinoPonto"
+              [options]="pontosDestino" 
+              [(ngModel)]="destinoPontoId" 
+              optionLabel="nomeResponsavel" 
+              optionValue="id" 
+              placeholder="Selecione o ponto..." 
+              styleClass="w-full"
+              [disabled]="!destinoBairroId"
+              emptyMessage="Nenhum ponto neste bairro">
+            </p-dropdown>
+          </div>
+        </div>
       </div>
 
-      <div class="col-12 mt-3 flex justify-content-end">
+      <!-- BOTÃO CALCULAR -->
+      <div class="col-12 mt-4 flex justify-content-end">
         <p-button 
-          label="Calcular Rota Otimizada" 
+          label="Calcular Rota" 
           icon="pi pi-compass" 
           (click)="calcular()" 
-          [disabled]="!origemId || !destinoId || origemId === destinoId"
+          [disabled]="!origemPontoId || !destinoPontoId"
           [loading]="isCalculating"
-          styleClass="p-button-lg">
+          styleClass="p-button-lg w-full md:w-auto">
         </p-button>
       </div>
     </div>
@@ -81,7 +133,7 @@
               </span>
             </ng-template>
             <ng-template pTemplate="content" let-bairro>
-              <div class="font-semibold text-700">{{ bairro }}</div>
+              <div class="font-semibold text-700">{{ bairro.nome }}</div>
             </ng-template>
           </p-timeline>
         </div>

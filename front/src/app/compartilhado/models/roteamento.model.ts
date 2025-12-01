@@ -1,4 +1,6 @@
+import { BairroResponse } from './bairro.model';
+
 export interface ResultadoRota {
   distanciaTotal: number;
-  listaOrdenadaDeBairros: string[];
+  listaOrdenadaDeBairros: BairroResponse[]; 
 }
