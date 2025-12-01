@@ -104,7 +104,7 @@ export class UsuariosFormComponent implements OnInit {
 
     op.subscribe({
       next: () => {
-        this.form.markAsPristine(); // Garante que não pergunte ao sair
+        this.form.markAsPristine();
         this.router.navigate(['/usuarios']);
       },
       error: () => this.isSaving = false
@@ -116,7 +116,6 @@ export class UsuariosFormComponent implements OnInit {
   }
 
   temMudancasNaoSalvas(): boolean {
-
     return !this.isSaving && this.form.dirty;
   }
 }
