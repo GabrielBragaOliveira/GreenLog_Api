@@ -4,6 +4,7 @@
  */
 package com.greenlog.service.strategy;
 
+import com.greenlog.domain.dto.BairroResponseDTO;
 import com.greenlog.domain.dto.ResultadoRotaDTO;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.exception.RecursoNaoEncontradoException;
@@ -71,10 +72,16 @@ public class DijkstraStrategy implements AlgoritmoDeRota {
             atual = antecessores.get(atual);
         }
 
-        List<String> nomesBairros = caminhoIds.stream()
-                .map(id -> buscarBairroPorId.apply(id).getNome())
+        List<BairroResponseDTO> listaBairros = caminhoIds.stream()
+                .map(id -> buscarBairroPorId.apply(id)) 
+                .map(bairro -> new BairroResponseDTO(
+                        bairro.getId(),
+                        bairro.getNome(),
+                        bairro.getDescricao(),
+                        bairro.isAtivo()
+                ))
                 .collect(Collectors.toList());
 
-        return new ResultadoRotaDTO(distancias.get(idDestino), nomesBairros);
+        return new ResultadoRotaDTO(distancias.get(idDestino), listaBairros);
     }
 }

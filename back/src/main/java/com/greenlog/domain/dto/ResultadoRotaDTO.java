@@ -12,6 +12,6 @@ import java.util.List;
  */
 public record ResultadoRotaDTO(    
     Double distanciaTotal,
-    List<String> listaOrdenadaDeBairros
+    List<BairroResponseDTO> listaOrdenadaDeBairros
        
 ) {}

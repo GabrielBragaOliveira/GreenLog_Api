@@ -5,6 +5,7 @@
 package com.greenlog.service;
 
 import com.greenlog.domain.dto.ResultadoRotaDTO;
+import com.greenlog.domain.entity.Bairro;
 import com.greenlog.domain.entity.ConexaoBairro;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.domain.repository.ConexaoBairroRepository;
@@ -14,6 +15,7 @@ import com.greenlog.service.strategy.DijkstraStrategy;
 import com.greenlog.util.Adjacente;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,18 +33,34 @@ public class RoteamentoService {
     private BairroService bairroService;
     @Autowired
     private ConexaoBairroAdapter conexaoBairroAdapter;
-    private Map<Long, List<Adjacente>> grafo;
     private AlgoritmoDeRota algoritmoDeRota = new DijkstraStrategy();
+    
+    private Map<Long, List<Adjacente>> montarGrafo() {
+        List<ConexaoBairro> conexoesTodas = conexaoBairroRepository.findAll();
 
-    @Transactional(readOnly = true)
-    private void montarGrafoUsandoAdapter() {
-        List<ConexaoBairro> conexoes = conexaoBairroRepository.findAll();
-        this.grafo = conexaoBairroAdapter.adaptarParaGrafo(conexoes);
+        List<ConexaoBairro> conexoesValidas = conexoesTodas.stream()
+                .filter(c -> Boolean.TRUE.equals(c.getAtivo())) 
+                .collect(Collectors.toList());
+        
+        return conexaoBairroAdapter.adaptarParaGrafo(conexoesValidas);
     }
-
+    
+    @Transactional(readOnly = true)
     public ResultadoRotaDTO calcularMelhorRota(Long idOrigem, Long idDestino) {
 
-        montarGrafoUsandoAdapter();
+        Map<Long, List<Adjacente>> grafo = montarGrafo();
+
+        Bairro bairroCentro = bairroService.buscarEntityPorNome("Centro");
+
+        if (!idOrigem.equals(bairroCentro.getId())) {
+            throw new RegraDeNegocioException(
+                    "A origem deve ser obrigatoriamente o bairro 'Centro'.");
+        }
+        
+        if (Boolean.FALSE.equals(bairroCentro.getAtivo())) {
+            throw new RegraDeNegocioException(
+                    "O bairro Centro deve estar ativo");
+        }
 
         bairroService.buscarEntityPorId(idOrigem);
         bairroService.buscarEntityPorId(idDestino);
@@ -55,7 +73,7 @@ public class RoteamentoService {
                 idOrigem,
                 idDestino,
                 grafo,
-                bairroService::buscarEntityPorId 
+                bairroService::buscarEntityPorId
         );
     }
 }
