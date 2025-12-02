@@ -58,15 +58,9 @@ public class BairroController {
         BairroResponseDTO response = bairroService.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        bairroService.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
     
-    @PatchMapping("/{id}/inativar")
-    public ResponseEntity<Void> inativar(@PathVariable @Valid Long id) {
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
         bairroService.inativar(id);
         return ResponseEntity.noContent().build();
     }

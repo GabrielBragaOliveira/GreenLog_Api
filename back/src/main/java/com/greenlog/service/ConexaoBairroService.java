@@ -75,12 +75,6 @@ public class ConexaoBairroService {
     }
 
     @Transactional
-    public void excluir(Long id) {
-        ConexaoBairro conexao = buscarEntityPorId(id);
-        conexaoBairroRepository.delete(conexao);
-    }
-
-    @Transactional
     public void alterarStatus(Long id) {
         ConexaoBairro conexao = conexaoBairroRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Conexão de bairro não encontrada."));

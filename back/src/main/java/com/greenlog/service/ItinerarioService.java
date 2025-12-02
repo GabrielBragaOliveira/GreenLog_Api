@@ -62,6 +62,12 @@ public class ItinerarioService {
         Caminhao caminhao = caminhaoService.buscarEntityPorId(request.caminhaoId());
         Rota rota = rotaService.buscarEntityPorId(request.rotaId());
 
+        if (!caminhao.isAtivo()) {
+            throw new RegraDeNegocioException(
+                    "O caminhão " + caminhao.getPlaca() + " está inativo e não pode ser utilizado em itinerários."
+            );
+        }
+
         if (itinerarioRepository.findByCaminhaoAndData(caminhao, request.data()).isPresent()) {
             throw new RegraDeNegocioException("O caminhão " + caminhao.getPlaca() + " já possui um itinerário agendado para esta data.");
         }
@@ -103,7 +109,7 @@ public class ItinerarioService {
 
     private void validarCompatibilidadeCaminhaoRota(Caminhao caminhao, Rota rota) {
         Set<TipoResiduo> tiposSuportadosCaminhao = caminhao.getTiposSuportados().stream().collect(Collectors.toSet());
-        
+
         Set<TipoResiduo> tiposRequeridosNaRota = rota.getListaDeBairros().stream()
                 .flatMap(bairro -> pontoColetaService.buscarPontosPorBairro(bairro).stream())
                 .flatMap(ponto -> ponto.getTiposResiduosAceitos().stream())

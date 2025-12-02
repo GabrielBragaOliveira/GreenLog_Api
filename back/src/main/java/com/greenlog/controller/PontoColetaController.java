@@ -62,16 +62,10 @@ public class PontoColetaController {
         PontoColetaResponseDTO response = pontoColetaService.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        pontoColetaService.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
     
-    @PatchMapping("/{id}/inativar")
-    public ResponseEntity<Void> inativar(@PathVariable @Valid Long id) {
-        pontoColetaService.inativar(id);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
+        pontoColetaService.alterarStatus(id);
         return ResponseEntity.noContent().build();
     }
 }

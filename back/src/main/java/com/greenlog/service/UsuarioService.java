@@ -107,20 +107,19 @@ public class UsuarioService {
 
         return usuarioMapper.toResponseDTO(usuarioRepository.save(usuarioExistente));
     }
-
+    
     @Transactional
-    public void excluir(Long id) {
-        Usuario usuario = buscarEntityPorId(id);
-        usuarioRepository.delete(usuario);
-    }
+    public void alterarStatus(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado."));
 
-    @Transactional
-    public void inativar(Long id) {
-        Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
+        if (usuario.isAtivo()) {
+            usuario.setAtivo(false);
+        } else {
+            usuario.setAtivo(true);
+        }
 
-        usuarioExistente.setAtivo(false);
-        usuarioRepository.save(usuarioExistente);
+        usuarioRepository.save(usuario);
     }
 
     @Transactional(readOnly = true)

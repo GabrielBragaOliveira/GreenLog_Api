@@ -87,17 +87,16 @@ public class TipoResiduoService {
     }
 
     @Transactional
-    public void excluir(Long id) {
-        TipoResiduo tipo = buscarEntityPorId(id);
-        tipoResiduoRepository.delete(tipo);
-    }
+    public void alterarStatus(Long id) {
+        TipoResiduo tipoResiduo = tipoResiduoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tipo de Residuo não encontrado."));
 
-    @Transactional
-    public void inativar(Long id) {
-        TipoResiduo tipo = tipoResiduoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Tipo de resíduo não encontrado."));
+        if (tipoResiduo.isAtivo()) {
+            tipoResiduo.setAtivo(false);
+        } else {
+            tipoResiduo.setAtivo(true);
+        }
 
-        tipo.setAtivo(false);
-        tipoResiduoRepository.save(tipo);
+        tipoResiduoRepository.save(tipoResiduo);
     }
 }

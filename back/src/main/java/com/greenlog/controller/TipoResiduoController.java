@@ -58,16 +58,10 @@ public class TipoResiduoController {
         TipoResiduoResponseDTO response = tipoResiduoService.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        tipoResiduoService.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
     
-    @PatchMapping("/{id}/inativar")
-    public ResponseEntity<Void> inativar(@PathVariable @Valid Long id) {
-        tipoResiduoService.inativar(id);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
+        tipoResiduoService.alterarStatus(id);
         return ResponseEntity.noContent().build();
     }
 }
