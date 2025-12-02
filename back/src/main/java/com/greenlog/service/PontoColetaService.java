@@ -147,4 +147,11 @@ public class PontoColetaService {
         ponto.setAtivo(false);
         pontoColetaRepository.save(ponto);
     }
+    
+    @Transactional(readOnly = true)
+    public List<PontoColetaResponseDTO> listarPorBairro(Long bairroId) {
+        return pontoColetaRepository.findByBairroId(bairroId).stream()
+                .map(pontoColetaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 }

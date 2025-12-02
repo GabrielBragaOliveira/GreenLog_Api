@@ -47,6 +47,12 @@ public class BairroService {
         return bairroRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Bairro não encontrado: " + id));
     }
+    
+    @Transactional(readOnly = true)
+    public Bairro buscarEntityPorNome(String nome) {
+        return bairroRepository.findByNome(nome)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Bairro não encontrado: " + nome));
+    }
 
     @Transactional(readOnly = true)
     public BairroResponseDTO buscarPorId(Long id) {
