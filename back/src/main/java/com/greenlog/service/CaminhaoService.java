@@ -122,26 +122,15 @@ public class CaminhaoService {
     }
 
     @Transactional
-    public void excluir(Long id) {
-        Caminhao caminhao = buscarEntityPorId(id);
-
-        if (itinerarioRepository.existsByCaminhao(caminhao)) {
-            throw new EntidadeEmUsoException("Caminhão não pode ser excluído pois está associado a um ou mais itinerários.");
-        }
-
-        caminhaoRepository.delete(caminhao);
-    }
-
-    @Transactional
-    public void inativar(Long id) {
+    public void alternarStatus(Long id) {
         Caminhao caminhao = caminhaoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Caminhão não encontrado."));
+        if (caminhao.getAtivo()) {
+            caminhao.setAtivo(false);
 
-        if (itinerarioRepository.existsByCaminhao(caminhao)) {
-            throw new EntidadeEmUsoException("Caminhão não pode ser inativado pois está associado a um ou mais itinerários.");
+        } else {
+            caminhao.setAtivo(true);
         }
-
-        caminhao.setAtivo(false);
         caminhaoRepository.save(caminhao);
     }
 }

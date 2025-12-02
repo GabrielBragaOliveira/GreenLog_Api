@@ -58,16 +58,10 @@ public class CaminhaoController {
         CaminhaoResponseDTO response = caminhaoService.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        caminhaoService.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
     
-    @PatchMapping("/{id}/inativar")
-    public ResponseEntity<Void> inativar(@PathVariable @Valid Long id) {
-        caminhaoService.inativar(id);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
+        caminhaoService.alternarStatus(id);
         return ResponseEntity.noContent().build();
     }
 }

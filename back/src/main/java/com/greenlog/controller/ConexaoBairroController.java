@@ -59,7 +59,7 @@ public class ConexaoBairroController {
         return ResponseEntity.ok(response);
     }
     
-    @PatchMapping("/{id}/alterarStatus")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
         conexaoBairroService.alterarStatus(id);
         return ResponseEntity.noContent().build();

@@ -134,17 +134,16 @@ public class PontoColetaService {
     }
 
     @Transactional
-    public void excluir(Long id) {
-        PontoColeta ponto = buscarEntityPorId(id);
-        pontoColetaRepository.delete(ponto);
-    }
-
-    @Transactional
-    public void inativar(Long id) {
+    public void alterarStatus(Long id) {
         PontoColeta ponto = pontoColetaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Ponto de coleta não encontrado."));
 
-        ponto.setAtivo(false);
+        if (ponto.isAtivo()) {
+            ponto.setAtivo(false);
+        } else {
+            ponto.setAtivo(true);
+        }
+
         pontoColetaRepository.save(ponto);
     }
     

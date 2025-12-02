@@ -47,7 +47,7 @@ public class BairroService {
         return bairroRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Bairro não encontrado: " + id));
     }
-    
+
     @Transactional(readOnly = true)
     public Bairro buscarEntityPorNome(String nome) {
         return bairroRepository.findByNome(nome)
@@ -99,25 +99,16 @@ public class BairroService {
     }
 
     @Transactional
-    public void excluir(Long id) {
-        Bairro bairro = buscarEntityPorId(id);
-        if (conexaoBairroRepository.existsByBairroOrigemOrBairroDestino(bairro, bairro)) {
-            throw new EntidadeEmUsoException("Bairro não pode ser excluído pois está associado a uma ou mais conexões.");
-        }
-
-        bairroRepository.delete(bairro);
-    }
-
-    @Transactional
     public void inativar(Long id) {
         Bairro bairro = bairroRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Bairro não encontrado."));
 
-        if (conexaoBairroRepository.existsByBairroOrigemOrBairroDestino(bairro, bairro)) {
-            throw new EntidadeEmUsoException("Bairro não pode ser inativado pois está associado a uma ou mais conexões.");
-        }
+        if (bairro.getAtivo()) {
+            bairro.setAtivo(false);
 
-        bairro.setAtivo(false);
+        } else {
+            bairro.setAtivo(true);
+        }
         bairroRepository.save(bairro);
     }
 }
