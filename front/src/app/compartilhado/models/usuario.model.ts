@@ -5,6 +5,7 @@ export interface UsuarioResponse {
   nome: string;
   email: string;
   perfil: Perfil;
+  ativo: boolean;
 }
 
 export interface UsuarioRequest {

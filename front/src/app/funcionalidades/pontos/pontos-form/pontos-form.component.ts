@@ -18,7 +18,14 @@ import { MultiSelectModule } from 'primeng/multiselect';
 @Component({
   selector: 'app-pontos-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CardModule, InputTextModule, ButtonModule, DropdownModule, MultiSelectModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    CardModule, 
+    InputTextModule, 
+    ButtonModule, 
+    DropdownModule, 
+    MultiSelectModule],
   templateUrl: './pontos-form.component.html',
   styleUrl: './pontos-form.component.scss'
 })

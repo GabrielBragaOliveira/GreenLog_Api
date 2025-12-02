@@ -2,16 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-
-
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
 import { DropdownModule } from 'primeng/dropdown';
-
-
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
 import { UsuarioRequest } from '../../../compartilhado/models/usuario.model';
 import { Perfil } from '../../../compartilhado/models/perfil.enum';

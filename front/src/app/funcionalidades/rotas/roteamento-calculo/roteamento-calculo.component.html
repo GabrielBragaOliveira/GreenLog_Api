@@ -6,45 +6,29 @@
     <div class="grid">
       
       <div class="col-12 md:col-5">
-        <div class="flex flex-column gap-3 p-3 border-round bg-green-50 surface-border border-1">
-          <div class="font-bold text-green-700 text-lg flex align-items-center gap-2">
-            <i class="pi pi-map-marker"></i> Ponto de Partida
+        <div class="flex flex-column gap-3 p-4 border-round bg-green-50 surface-border border-1 h-full justify-content-center">
+          
+          <div class="font-bold text-green-700 text-xl flex align-items-center gap-2 mb-2">
+            <i class="pi pi-building"></i> Ponto de Partida
           </div>
           
-          <div class="flex flex-column gap-2">
-            <label for="origemBairro" class="font-medium text-sm">1. Selecione o Bairro</label>
-            <p-dropdown 
-              id="origemBairro"
-              [options]="todosBairros" 
-              [(ngModel)]="origemBairroId" 
-              optionLabel="nome" 
-              optionValue="id" 
-              placeholder="Bairro de Origem..." 
-              [filter]="true" filterBy="nome"
-              showClear="true"
-              styleClass="w-full"
-              (onChange)="aoSelecionarOrigem()">
-            </p-dropdown>
+          <div class="text-center py-4">
+            <div class="surface-0 inline-flex align-items-center justify-content-center border-circle w-4rem h-4rem mb-3 shadow-1">
+              <i class="pi pi-home text-3xl text-green-600"></i>
+            </div>
+            <div class="font-bold text-2xl text-800">{{ NOME_BAIRRO_ORIGEM }}</div>
+            <span class="text-600 text-sm">Central de Distribuição</span>
           </div>
 
-          <div class="flex flex-column gap-2">
-            <label for="origemPonto" class="font-medium text-sm">2. Selecione o Ponto de Coleta</label>
-            <p-dropdown 
-              id="origemPonto"
-              [options]="pontosOrigem" 
-              [(ngModel)]="origemPontoId" 
-              optionLabel="nomeResponsavel" 
-              optionValue="id" 
-              placeholder="Selecione o ponto..." 
-              styleClass="w-full"
-              [disabled]="!origemBairroId"
-              emptyMessage="Nenhum ponto neste bairro">
-            </p-dropdown>
+          <div class="flex align-items-center gap-2 text-sm text-green-700 bg-white p-2 border-round opacity-80">
+            <i class="pi pi-info-circle"></i>
+            <span>Origem fixa padrão do sistema.</span>
           </div>
+
         </div>
       </div>
 
-      <div class="col-12 md:col-2 flex align-items-center justify-content-center">
+      <div class="col-12 md:col-2 flex align-items-center justify-content-center py-3 md:py-0">
         <div class="surface-200 border-circle w-3rem h-3rem flex align-items-center justify-content-center shadow-1">
           <i class="pi pi-arrow-right text-xl text-600 hidden md:block"></i>
           <i class="pi pi-arrow-down text-xl text-600 md:hidden"></i>
@@ -52,13 +36,13 @@
       </div>
 
       <div class="col-12 md:col-5">
-        <div class="flex flex-column gap-3 p-3 border-round bg-blue-50 surface-border border-1">
+        <div class="flex flex-column gap-3 p-3 border-round bg-blue-50 surface-border border-1 h-full">
           <div class="font-bold text-blue-700 text-lg flex align-items-center gap-2">
             <i class="pi pi-flag"></i> Destino Final
           </div>
           
-          <div class="flex flex-column gap-2">
-            <label for="destinoBairro" class="font-medium text-sm">3. Selecione o Bairro</label>
+          <div class="flex flex-column gap-2 mt-2">
+            <label for="destinoBairro" class="font-medium text-sm">Selecione o Bairro</label>
             <p-dropdown 
               id="destinoBairro"
               [options]="bairrosDestinoFiltrados" 
@@ -69,18 +53,17 @@
               [filter]="true" filterBy="nome"
               showClear="true"
               styleClass="w-full"
-              [disabled]="!origemBairroId"
               (onChange)="aoSelecionarDestino()">
             </p-dropdown>
           </div>
 
           <div class="flex flex-column gap-2">
-            <label for="destinoPonto" class="font-medium text-sm">4. Selecione o Ponto de Coleta</label>
+            <label for="destinoPonto" class="font-medium text-sm">Selecione o Ponto de Coleta</label>
             <p-dropdown 
               id="destinoPonto"
               [options]="pontosDestino" 
               [(ngModel)]="destinoPontoId" 
-              optionLabel="nomeResponsavel" 
+              optionLabel="nomePonto"   
               optionValue="id" 
               placeholder="Selecione o ponto..." 
               styleClass="w-full"
@@ -91,13 +74,12 @@
         </div>
       </div>
 
-      <!-- BOTÃO CALCULAR -->
       <div class="col-12 mt-4 flex justify-content-end">
         <p-button 
           label="Calcular Rota" 
           icon="pi pi-compass" 
           (click)="calcular()" 
-          [disabled]="!origemPontoId || !destinoPontoId"
+          [disabled]="!origemBairroId || !destinoPontoId"
           [loading]="isCalculating"
           styleClass="p-button-lg w-full md:w-auto">
         </p-button>

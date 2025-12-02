@@ -53,6 +53,31 @@ export class CaminhaoListaComponent implements OnInit {
     });
   }
 
+  confirmarAlteracaoStatus(caminhao: CaminhaoResponse) {
+    const estaAtivo = caminhao.ativo;
+
+    this.confirmationService.confirm({
+      message: estaAtivo
+        ? `Deseja inativar o caminhão <b>${caminhao.placa}</b>? <br><small>Ele não aparecerá mais em novas rotas.</small>`
+        : `Deseja reativar o caminhão <b>${caminhao.placa}</b>? <br><small>Ele voltará a ficar disponível para uso.</small>`,
+      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
+      acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
+      acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
+      accept: () => this.alterarStatus(caminhao)
+    });
+  }
+
+  private alterarStatus(caminhao: CaminhaoResponse) {
+    this.caminhaoService.alterarStatus(caminhao.id).subscribe({
+      next: () => {
+        this.carregarDados();
+      },
+      error: () => {
+      }
+    });
+  }
+
   private excluir(id: number) {
     this.caminhaoService.excluir(id).subscribe({
       next: () => {

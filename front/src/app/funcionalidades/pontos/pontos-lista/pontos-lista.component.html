@@ -18,12 +18,13 @@
           <th>Endereço</th>
           <th>Bairro</th>
           <th>Resíduos Aceitos</th>
-          <th class="text-center w-8rem">Ações</th>
+          <th class="text-center w-8rem">Status</th>
+          <th class="text-center w-10rem">Ações</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-ponto>
-        <tr>
+        <tr [class.opacity-60]="!ponto.ativo">
           <td><span class="font-bold">{{ ponto.nomePonto }}</span></td>
           <td>{{ ponto.nomeResponsavel }}</td>
           <td class="white-space-nowrap"> {{ ponto.contato }}</td>
@@ -37,18 +38,36 @@
               }
             </div>
           </td>
+          
+          <td class="text-center">
+            <p-tag 
+              [value]="ponto.ativo ? 'ATIVO' : 'INATIVO'" 
+              [severity]="ponto.ativo ? 'success' : 'danger'"
+              styleClass="text-xs">
+            </p-tag>
+          </td>
+
           <td class="text-center">
             <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
-              [routerLink]="['editar', ponto.id]" pTooltip="Editar"></p-button>
+              [routerLink]="['editar', ponto.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
+            
+            <p-button 
+              [icon]="ponto.ativo ? 'pi pi-ban' : 'pi pi-check-circle'" 
+              [styleClass]="'p-button-rounded p-button-text ' + (ponto.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
+              (onClick)="confirmarAlteracaoStatus(ponto)" 
+              [pTooltip]="ponto.ativo ? 'Inativar' : 'Reativar'" 
+              tooltipPosition="top">
+            </p-button>
+
             <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
-              (click)="confirmarExclusao(ponto)" pTooltip="Excluir"></p-button>
+              (click)="confirmarExclusao(ponto)" pTooltip="Excluir Permanentemente" tooltipPosition="top"></p-button>
           </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center p-4">Nenhum ponto de coleta cadastrado.</td>
+          <td colspan="9" class="text-center p-4">Nenhum ponto de coleta cadastrado.</td>
         </tr>
       </ng-template>
 

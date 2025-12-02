@@ -1,14 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-
+import { TagModule } from 'primeng/tag';
 import { BairroService } from '../../../nucleo/servicos/bairro.service';
 import { BairroResponse } from '../../../compartilhado/models/bairro.model';
 
@@ -16,33 +14,30 @@ import { BairroResponse } from '../../../compartilhado/models/bairro.model';
   selector: 'app-bairros-lista',
   standalone: true,
   imports: [
-    CommonModule,
-    TableModule,
-    ButtonModule,
-    RouterModule,
-    CardModule,
-    TooltipModule,
-    ToastModule,
-    ConfirmDialogModule
-  ],
-  providers: [ConfirmationService, MessageService],
+    CommonModule, 
+    RouterLink, 
+    TableModule, 
+    ButtonModule, 
+    CardModule, 
+    TooltipModule, 
+    TagModule],
   templateUrl: './bairros-lista.component.html',
   styleUrl: './bairros-lista.component.scss'
 })
 export class BairrosListaComponent implements OnInit {
 
   private bairroService = inject(BairroService);
-  private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  
   bairros: BairroResponse[] = [];
   isLoading = true;
 
   ngOnInit(): void {
-    this.carregarBairros();
+    this.carregarDados();
   }
 
-  carregarBairros() {
+  carregarDados() {
     this.isLoading = true;
     this.bairroService.listar().subscribe({
       next: (dados) => {
@@ -53,19 +48,32 @@ export class BairrosListaComponent implements OnInit {
     });
   }
 
-  novoBairro() {
-    this.router.navigate(['/bairros/novo']);
+  confirmarAlteracaoStatus(bairro: BairroResponse) {
+    const estaAtivo = bairro.ativo;
+
+    this.confirmationService.confirm({
+      message: estaAtivo 
+        ? `Deseja inativar o bairro <b>${bairro.nome}</b>?`
+        : `Deseja reativar o bairro <b>${bairro.nome}</b>?`,
+      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
+      acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
+      acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
+      accept: () => this.alterarStatus(bairro)
+    });
   }
 
-  editarBairro(id: number) {
-    this.router.navigate([`/bairros/editar/${id}`]);
-  }
+  private alterarStatus(bairro: BairroResponse) {
+        this.bairroService.alterarStatus(bairro.id).subscribe({
+            next: () => this.carregarDados()
+        });
+    }
 
   confirmarExclusao(bairro: BairroResponse) {
     this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir o bairro <b>${bairro.nome}</b>?`,
+      message: `Tem certeza que deseja excluir permanentemente o bairro <b>${bairro.nome}</b>?`,
       header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'pi pi-trash',
       acceptLabel: 'Sim, excluir',
       rejectLabel: 'Cancelar',
       acceptButtonStyleClass: 'p-button-danger p-button-text',

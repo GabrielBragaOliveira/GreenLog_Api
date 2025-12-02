@@ -45,14 +45,20 @@ export class RoteamentoCalculoComponent implements OnInit {
   private rotaService = inject(RotaService);
   private messageService = inject(MessageService);
   
+  // Constante para definir o nome do bairro fixo
+  readonly NOME_BAIRRO_ORIGEM = 'Centro';
+
   todosBairros: BairroResponse[] = [];
   bairrosDestinoFiltrados: BairroResponse[] = [];
-  pontosOrigem: PontoColetaResponse[] = [];
-  pontosDestino: PontoColetaResponse[] = [];
+  
+  // Origem Fixa
   origemBairroId: number | null = null;
-  origemPontoId: number | null = null;
+  
+  // Destino Dinâmico
+  pontosDestino: PontoColetaResponse[] = [];
   destinoBairroId: number | null = null;
   destinoPontoId: number | null = null;
+
   isCalculating = false;
   resultado: ResultadoRota | null = null;
   showSalvarDialog = false;
@@ -66,26 +72,25 @@ export class RoteamentoCalculoComponent implements OnInit {
     this.bairroService.listar().subscribe({
       next: (dados) => {
         this.todosBairros = dados;
-        this.bairrosDestinoFiltrados = [...dados];
+        this.definirOrigemFixa();
       },
       error: () => {}
     });
   }
 
-  aoSelecionarOrigem() {
-    this.origemPontoId = null;
-    this.pontosOrigem = [];
+  private definirOrigemFixa() {
+    const bairroCentro = this.todosBairros.find(b => b.nome === this.NOME_BAIRRO_ORIGEM);
     
-    if (this.origemBairroId === this.destinoBairroId) {
-      this.destinoBairroId = null;
-      this.destinoPontoId = null;
-      this.pontosDestino = [];
-    }
-
-    if (this.origemBairroId) {
-      this.carregarPontosPorBairro(this.origemBairroId, 'origem');
+    if (bairroCentro) {
+      this.origemBairroId = bairroCentro.id;
+      // Remove o Centro da lista de destinos possíveis
       this.bairrosDestinoFiltrados = this.todosBairros.filter(b => b.id !== this.origemBairroId);
     } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Configuração',
+        detail: `Bairro de origem '${this.NOME_BAIRRO_ORIGEM}' não encontrado no cadastro.`
+      });
       this.bairrosDestinoFiltrados = [...this.todosBairros];
     }
   }
@@ -95,38 +100,31 @@ export class RoteamentoCalculoComponent implements OnInit {
     this.pontosDestino = [];
 
     if (this.destinoBairroId) {
-      this.carregarPontosPorBairro(this.destinoBairroId, 'destino');
+      this.carregarPontosDestino(this.destinoBairroId);
     }
   }
 
-  private carregarPontosPorBairro(bairroId: number, tipo: 'origem' | 'destino') {
+  private carregarPontosDestino(bairroId: number) {
     this.pontoService.buscarPorBairro(bairroId).subscribe({
       next: (pontos) => {
-        if (tipo === 'origem') {
-          this.pontosOrigem = pontos;
-          if (pontos.length === 0) this.avisoSemPontos();
-        } else {
-          this.pontosDestino = pontos;
-          if (pontos.length === 0) this.avisoSemPontos();
+        this.pontosDestino = pontos;
+        if (pontos.length === 0) {
+          this.messageService.add({
+            severity: 'info', 
+            summary: 'Aviso', 
+            detail: 'O bairro de destino não possui pontos de coleta cadastrados.'
+          });
         }
       }
     });
   }
 
-  avisoSemPontos() {
-    this.messageService.add({
-      severity: 'info', 
-      summary: 'Aviso', 
-      detail: 'O bairro selecionado não possui pontos de coleta cadastrados.'
-    });
-  }
-
   calcular() {
-    if (!this.origemBairroId || !this.destinoBairroId || !this.origemPontoId || !this.destinoPontoId) {
+    if (!this.origemBairroId || !this.destinoBairroId || !this.destinoPontoId) {
       this.messageService.add({ 
         severity: 'warn', 
         summary: 'Campos incompletos', 
-        detail: 'Por favor, selecione os bairros e os pontos de coleta específicos.' 
+        detail: 'Por favor, selecione o bairro e o ponto de coleta de destino.' 
       });
       return;
     }
@@ -152,10 +150,16 @@ export class RoteamentoCalculoComponent implements OnInit {
   }
 
   abrirModalSalvar() {
-    const nomeOrigem = this.todosBairros.find(b => b.id === this.origemBairroId)?.nome;
-    const nomeDestino = this.todosBairros.find(b => b.id === this.destinoBairroId)?.nome;
+    const nomeBairro = this.todosBairros.find(b => b.id === this.destinoBairroId)?.nome;
+    const pontoSelecionado = this.pontosDestino.find(p => p.id === this.destinoPontoId);
     
-    this.nomeRotaSalvar = `Rota ${nomeOrigem} -> ${nomeDestino}`;
+    // Formatação solicitada: "Bairro (Ponto)"
+    if (nomeBairro && pontoSelecionado) {
+      this.nomeRotaSalvar = `${nomeBairro} (${pontoSelecionado.nomePonto})`;
+    } else {
+      this.nomeRotaSalvar = '';
+    }
+    
     this.showSalvarDialog = true;
   }
 
@@ -172,15 +176,14 @@ export class RoteamentoCalculoComponent implements OnInit {
       next: () => {
         this.showSalvarDialog = false;
       },
-      error: () => {
-      }
+      error: () => {} 
     });
   }
 
   getCormarker(index: number, total: number): string {
     if (index === 0) return '#22C55E';
-    if (index === total - 1) return '#EF4444';
-    return '#64748B';
+    if (index === total - 1) return '#EF4444'; 
+    return '#64748B'; 
   }
 
   getIconeMarker(index: number, total: number): string {
