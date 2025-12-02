@@ -8,6 +8,7 @@ import { pontosRoutes } from './funcionalidades/pontos/pontos.routes';
 import { conexoesRoutes } from './funcionalidades/conexoes/conexoes.routes';
 import { bairrosRoutes } from './funcionalidades/bairros/bairro.routes';
 import { usuariosRoutes } from './funcionalidades/usuarios/usuarios.routes';
+import { tiposResiduoRoutes } from './funcionalidades/residuos/tipo-residuos.routes';
 
 export const routes: Routes = [
   {
@@ -26,6 +27,7 @@ export const routes: Routes = [
       ...conexoesRoutes,
       ...bairrosRoutes,
       ...usuariosRoutes,
+      ...tiposResiduoRoutes,
     ]
   },
   { path: '**', redirectTo: '' }
