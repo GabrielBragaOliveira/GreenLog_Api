@@ -6,6 +6,7 @@ export interface CaminhaoResponse {
   motorista: string;
   capacidadeKg: number;
   tiposSuportados: TipoResiduoResponse[];
+  ativo: boolean;
 }
 
 export interface CaminhaoRequest {

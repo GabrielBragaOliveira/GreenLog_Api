@@ -9,11 +9,19 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService } from 'primeng/api';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-conexoes-lista',
   standalone: true,
-  imports: [CommonModule, RouterLink, TableModule, ButtonModule, CardModule, TooltipModule],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    TableModule, 
+    ButtonModule, 
+    CardModule, 
+    TooltipModule, 
+    TagModule],
   templateUrl: './conexoes-lista.component.html',
   styleUrl: './conexoes-lista.component.scss'
 })
@@ -46,6 +54,27 @@ export class ConexoesListaComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       accept: () => this.excluir(conexao.id)
     });
+  }
+
+  confirmarAlteracaoStatus(conexao: ConexaoBairroResponse) {
+    const estaAtivo = conexao.ativo;
+
+    this.confirmationService.confirm({
+      message: estaAtivo 
+        ? `Deseja inativar a conexão entre <b>${conexao.bairroOrigem.nome}</b> e <b>${conexao.bairroDestino.nome}</b>?`
+        : `Deseja reativar a conexão entre <b>${conexao.bairroOrigem.nome}</b> e <b>${conexao.bairroDestino.nome}</b>?`,
+      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
+      acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
+      acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
+      accept: () => this.alterarStatus(conexao)
+    });
+  }
+
+  private alterarStatus(conexao: ConexaoBairroResponse) {
+      this.conexaoService.alterarStatus(conexao.id).subscribe({
+          next: () => this.carregarDados()
+      });
   }
 
   private excluir(id: number) {

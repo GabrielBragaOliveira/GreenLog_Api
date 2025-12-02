@@ -10,6 +10,7 @@ export interface PontoColetaResponse {
   endereco: string;
   bairro: BairroResponse;
   tiposResiduosAceitos: TipoResiduoResponse[];
+  ativo: boolean;
 }
 
 export interface PontoColetaRequest {

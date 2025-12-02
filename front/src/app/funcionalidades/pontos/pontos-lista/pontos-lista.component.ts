@@ -13,7 +13,14 @@ import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-pontos-lista',
   standalone: true,
-  imports: [CommonModule, RouterLink, TableModule, ButtonModule, CardModule, TooltipModule, TagModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    TableModule,
+    ButtonModule,
+    CardModule,
+    TooltipModule,
+    TagModule],
   templateUrl: './pontos-lista.component.html',
   styleUrl: './pontos-lista.component.scss'
 })
@@ -48,6 +55,27 @@ export class PontosListaComponent implements OnInit {
       rejectLabel: 'Cancelar',
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       accept: () => this.excluir(ponto.id)
+    });
+  }
+
+  confirmarAlteracaoStatus(ponto: PontoColetaResponse) {
+    const estaAtivo = ponto.ativo;
+
+    this.confirmationService.confirm({
+      message: estaAtivo
+        ? `Deseja inativar o ponto de coleta <b>${ponto.nomePonto}</b>? <br><small>Ele não receberá novos agendamentos.</small>`
+        : `Deseja reativar o ponto de coleta <b>${ponto.nomePonto}</b>?`,
+      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
+      acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
+      acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
+      accept: () => this.alterarStatus(ponto)
+    });
+  }
+
+  private alterarStatus(ponto: PontoColetaResponse) {
+    this.pontoService.alterarStatus(ponto.id).subscribe({
+      next: () => this.carregarDados()
     });
   }
 

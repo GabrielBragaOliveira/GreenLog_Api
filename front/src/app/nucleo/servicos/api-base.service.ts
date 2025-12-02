@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export abstract class ApiBaseService<TResponse, TRequest> {
-  
+
   protected http = inject(HttpClient);
   protected messageService = inject(MessageService);
   protected abstract endpoint: string;
@@ -51,12 +51,20 @@ export abstract class ApiBaseService<TResponse, TRequest> {
       );
   }
 
+  alterarStatus(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.getUrl()}/${id}/status`, {})
+      .pipe(
+        tap(() => this.notificarSucesso('Registro inativado com sucesso!')),
+        catchError(error => this.tratarErro(error))
+      );
+  }
+
   protected notificarSucesso(mensagem: string): void {
-    this.messageService.add({ 
-      severity: 'success', 
-      summary: 'Sucesso', 
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Sucesso',
       detail: mensagem,
-      life: 3000 
+      life: 3000
     });
   }
 
@@ -69,11 +77,11 @@ export abstract class ApiBaseService<TResponse, TRequest> {
       mensagemErro = 'Não foi possível conectar ao servidor.';
     }
 
-    this.messageService.add({ 
-      severity: 'error', 
-      summary: 'Erro', 
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
       detail: mensagemErro,
-      life: 5000 
+      life: 5000
     });
 
     return throwError(() => new Error(mensagemErro));

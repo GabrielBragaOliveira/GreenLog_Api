@@ -18,7 +18,14 @@ import { MessageModule } from 'primeng/message';
 @Component({
   selector: 'app-conexoes-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CardModule, ButtonModule, DropdownModule, InputNumberModule, MessageModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    CardModule, 
+    ButtonModule, 
+    DropdownModule, 
+    InputNumberModule, 
+    MessageModule],
   templateUrl: './conexoes-form.component.html',
   styleUrl: './conexoes-form.component.scss'
 })

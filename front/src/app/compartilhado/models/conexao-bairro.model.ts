@@ -5,6 +5,7 @@ export interface ConexaoBairroResponse {
   bairroOrigem: BairroResponse;
   bairroDestino: BairroResponse;
   distancia: number;
+  ativo: boolean;
 }
 
 export interface ConexaoBairroRequest {
