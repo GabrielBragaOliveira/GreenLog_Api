@@ -19,4 +19,5 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, Long>, JpaSp
     Optional<Caminhao> findByPlaca(String placa);
     boolean existsByPlaca(String placa);
     List<Usuario> findByAtivo(Boolean ativo);
+    List<Caminhao> findByTiposSuportados_Id(Long tipoId);
 }

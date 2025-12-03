@@ -9,9 +9,11 @@ import com.greenlog.domain.dto.BairroResponseDTO;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.mapper.BairroMapper;
 import com.greenlog.domain.repository.BairroRepository;
+import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
+import com.greenlog.service.observer.BairroSubject;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +34,10 @@ public class BairroService {
     private BairroMapper bairroMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
+    @Autowired
+    private PontoColetaRepository pontoColetaRepository;
+    @Autowired
+    private BairroSubject bairroSubject;
 
     @Transactional(readOnly = true)
     public List<BairroResponseDTO> buscarAvancado(String query) {
@@ -112,16 +118,12 @@ public class BairroService {
     }
 
     @Transactional
-    public void inativar(Long id) {
-        Bairro bairro = bairroRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Bairro não encontrado."));
+    public void alterarStatus(Long id) {
+        Bairro bairro = buscarEntityPorId(id);
 
-        if (bairro.getAtivo()) {
-            bairro.setAtivo(false);
-
-        } else {
-            bairro.setAtivo(true);
-        }
+        bairro.setAtivo(!bairro.getAtivo());
         bairroRepository.save(bairro);
+
+        bairroSubject.notifyObservers(bairro);
     }
 }
