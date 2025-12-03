@@ -12,7 +12,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +35,12 @@ public class PontoColetaController {
 
     public PontoColetaController(PontoColetaService pontoColetaService) {
         this.pontoColetaService = pontoColetaService;
+    }
+    
+    @GetMapping("/busca")
+    public ResponseEntity<List<PontoColetaResponseDTO>> buscaAvancada(@RequestParam("q") String query) {
+        List<PontoColetaResponseDTO> resultado = pontoColetaService.buscarAvancado(query);
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping

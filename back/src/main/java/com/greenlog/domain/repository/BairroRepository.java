@@ -9,12 +9,13 @@ import com.greenlog.domain.entity.Usuario;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  *
  * @author Kayqu
  */
-public interface BairroRepository extends JpaRepository<Bairro, Long> {
+public interface BairroRepository extends JpaRepository<Bairro, Long>, JpaSpecificationExecutor<Bairro>{
     Optional<Bairro> findByNome(String nome);
     boolean existsByNome(String nome);
     List<Usuario> findByAtivo(Boolean ativo);

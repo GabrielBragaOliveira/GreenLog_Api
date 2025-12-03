@@ -10,16 +10,14 @@ import com.greenlog.domain.entity.Rota;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  *
  * @author Kayqu
  */
-public interface ItinerarioRepository extends JpaRepository<Itinerario, Long> {
-// Implementa a regra de negócio: Caminhão só pode ter 1 itinerário por dia.
+public interface ItinerarioRepository extends JpaRepository<Itinerario, Long>, JpaSpecificationExecutor<Itinerario>{
 Optional<Itinerario> findByCaminhaoAndData(Caminhao caminhao, LocalDate data);
-
-// Usado na regra de negócio para impedir a exclusão do Caminhão/Rota se estiver em uso
 boolean existsByCaminhao(Caminhao caminhao);
 boolean existsByRota(Rota rota);
 }

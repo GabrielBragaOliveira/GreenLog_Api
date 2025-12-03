@@ -90,7 +90,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body, status);
     }
+    
+    @ExceptionHandler(QueryInvalidaException.class)
+    public ResponseEntity<Object> handleQueryInvalida(QueryInvalidaException ex, WebRequest request) {
+        
+        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
+        
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("erro", "Erro de Sintaxe na Busca");
+        body.put("mensagem", ex.getMessage());
 
+        return new ResponseEntity<>(body, status);
+    }
+ 
     // Você pode adicionar mais handlers aqui para:
     // 1. ConstraintViolationException (Erros de Bean Validation)
     // 2. DataIntegrityViolationException (Erros de unicidade/FK do banco)
