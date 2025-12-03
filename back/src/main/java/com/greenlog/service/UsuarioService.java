@@ -32,12 +32,27 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
     @Autowired
     private UsuarioMapper usuarioMapper;
-
     @Autowired
     private ProcessadorCadastroUsuario processadorCadastroUsuario;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> buscarAvancado(String query) {
+        List<Usuario> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = usuarioRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, usuarioRepository);
+        }
+
+        return resultados.stream()
+                .map(usuarioMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> listar() {

@@ -9,12 +9,13 @@ import com.greenlog.domain.entity.Usuario;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  *
  * @author Kayqu
  */
-public interface CaminhaoRepository extends JpaRepository<Caminhao, Long> {
+public interface CaminhaoRepository extends JpaRepository<Caminhao, Long>, JpaSpecificationExecutor<Caminhao> {
     Optional<Caminhao> findByPlaca(String placa);
     boolean existsByPlaca(String placa);
     List<Usuario> findByAtivo(Boolean ativo);

@@ -10,12 +10,13 @@ import com.greenlog.domain.entity.Usuario;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  *
  * @author Kayqu
  */
-public interface PontoColetaRepository extends JpaRepository<PontoColeta, Long> {
+public interface PontoColetaRepository extends JpaRepository<PontoColeta, Long>, JpaSpecificationExecutor<PontoColeta> {
     List<PontoColeta> findByBairro(Bairro bairro);
     boolean existsByBairro(Bairro bairro);
     Optional<PontoColeta> findBynomePonto(String nomePonto);

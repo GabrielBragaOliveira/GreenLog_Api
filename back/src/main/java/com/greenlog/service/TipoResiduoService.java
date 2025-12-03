@@ -30,6 +30,23 @@ public class TipoResiduoService {
     private TipoResiduoRepository tipoResiduoRepository;
     @Autowired
     private TipoResiduoMapper tipoResiduoMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<TipoResiduoResponseDTO> buscarAvancado(String query) {
+        List<TipoResiduo> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = tipoResiduoRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, tipoResiduoRepository);
+        }
+
+        return resultados.stream()
+                .map(tipoResiduoMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<TipoResiduoResponseDTO> listar() {

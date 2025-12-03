@@ -10,8 +10,6 @@ import com.greenlog.domain.entity.Bairro;
 import com.greenlog.mapper.BairroMapper;
 import com.greenlog.domain.repository.BairroRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
-import com.greenlog.exception.EntidadeEmUsoException;
-import com.greenlog.domain.repository.ConexaoBairroRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
 import java.util.List;
@@ -31,9 +29,24 @@ public class BairroService {
     @Autowired
     private BairroRepository bairroRepository;
     @Autowired
-    private ConexaoBairroRepository conexaoBairroRepository;
-    @Autowired
     private BairroMapper bairroMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<BairroResponseDTO> buscarAvancado(String query) {
+        List<Bairro> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = bairroRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, bairroRepository);
+        }
+
+        return resultados.stream()
+                .map(bairroMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<BairroResponseDTO> listar() {

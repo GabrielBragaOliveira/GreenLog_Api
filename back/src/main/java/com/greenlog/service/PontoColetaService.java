@@ -35,6 +35,23 @@ public class PontoColetaService {
     private TipoResiduoService tipoResiduoService;
     @Autowired
     private PontoColetaMapper pontoColetaMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<PontoColetaResponseDTO> buscarAvancado(String query) {
+        List<PontoColeta> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = pontoColetaRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, pontoColetaRepository);
+        }
+
+        return resultados.stream()
+                .map(pontoColetaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<PontoColetaResponseDTO> listar() {

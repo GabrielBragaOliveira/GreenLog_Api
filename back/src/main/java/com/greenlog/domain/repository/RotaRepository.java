@@ -7,12 +7,12 @@ package com.greenlog.domain.repository;
 import com.greenlog.domain.entity.Rota;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 /**
  *
  * @author Kayqu
  */
-public interface RotaRepository extends JpaRepository<Rota, Long> {
+public interface RotaRepository extends JpaRepository<Rota, Long>, JpaSpecificationExecutor<Rota> {
     Optional<Rota> findByNome(String nome);
     boolean existsByNome(String nome);
 }

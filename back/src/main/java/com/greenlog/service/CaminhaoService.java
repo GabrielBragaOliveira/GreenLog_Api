@@ -39,6 +39,23 @@ public class CaminhaoService {
     private CaminhaoMapper caminhaoMapper;
     @Autowired
     private ProcessadorCadastroCaminhao processadorCadastroCaminhao;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<CaminhaoResponseDTO> buscarAvancado(String query) {
+        List<Caminhao> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = caminhaoRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, caminhaoRepository);
+        }
+
+        return resultados.stream()
+                .map(caminhaoMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<CaminhaoResponseDTO> listar() {
