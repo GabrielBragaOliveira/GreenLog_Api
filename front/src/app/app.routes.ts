@@ -8,7 +8,8 @@ import { pontosRoutes } from './funcionalidades/pontos/pontos.routes';
 import { conexoesRoutes } from './funcionalidades/conexoes/conexoes.routes';
 import { bairrosRoutes } from './funcionalidades/bairros/bairro.routes';
 import { usuariosRoutes } from './funcionalidades/usuarios/usuarios.routes';
-import { tiposResiduoRoutes } from './funcionalidades/residuos/tipo-residuos.routes';
+import { adminGuard } from './nucleo/guards/admin.guard';
+import { mapaRoutes } from './funcionalidades/mapa/mapa.routes';
 
 export const routes: Routes = [
   {
@@ -22,12 +23,18 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'rotas', pathMatch: 'full' },
       ...roteamentoRoutes,
-      ...caminhaoRoutes,
-      ...pontosRoutes,
-      ...conexoesRoutes,
-      ...bairrosRoutes,
-      ...usuariosRoutes,
-      ...tiposResiduoRoutes,
+      ...mapaRoutes,
+      {
+        path: '',
+        canActivate: [adminGuard],
+        children: [
+          ...caminhaoRoutes,
+          ...pontosRoutes,
+          ...conexoesRoutes,
+          ...bairrosRoutes,
+          ...usuariosRoutes,
+        ]
+      }
     ]
   },
   { path: '**', redirectTo: '' }
