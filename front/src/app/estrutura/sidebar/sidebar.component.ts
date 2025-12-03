@@ -41,6 +41,7 @@ export class SidebarComponent implements OnInit {
         label: 'Operacional',
         icon: 'pi pi-fw pi-compass',
         items: [
+          { label: 'Mapa Interativo', icon: 'pi pi-share-alt', routerLink: ['/mapa'] },
           { label: 'Planejar Rotas', icon: 'pi pi-map', routerLink: ['/rotas'] },
           { label: 'Itinerários', icon: 'pi pi-calendar', routerLink: ['/itinerarios'] }
         ]
