@@ -67,7 +67,7 @@ public class BairroController {
     
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
-        bairroService.inativar(id);
+        bairroService.alterarStatus(id);
         return ResponseEntity.noContent().build();
     }
 }

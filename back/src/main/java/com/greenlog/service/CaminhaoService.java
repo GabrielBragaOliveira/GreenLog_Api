@@ -7,13 +7,14 @@ package com.greenlog.service;
 import com.greenlog.domain.dto.CaminhaoRequestDTO;
 import com.greenlog.domain.dto.CaminhaoResponseDTO;
 import com.greenlog.domain.entity.Caminhao;
-import com.greenlog.exception.EntidadeEmUsoException;
+import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.CaminhaoMapper;
 import com.greenlog.domain.repository.CaminhaoRepository;
 import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
+import com.greenlog.exception.RegraDeNegocioException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -142,12 +143,27 @@ public class CaminhaoService {
     public void alternarStatus(Long id) {
         Caminhao caminhao = caminhaoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Caminhão não encontrado."));
-        if (caminhao.getAtivo()) {
-            caminhao.setAtivo(false);
 
-        } else {
-            caminhao.setAtivo(true);
+        boolean novoStatus = !caminhao.getAtivo();
+
+        if (novoStatus) {
+            boolean possuiTiposInativos = false;
+
+            for (TipoResiduo t : caminhao.getTiposSuportados()) {
+                if (!t.isAtivo()) {
+                    possuiTiposInativos = true;
+                    break;
+                }
+            }
+
+            if (possuiTiposInativos) {
+                throw new RegraDeNegocioException(
+                        "Não é possível ativar o caminhão: ele possui tipos de resíduo inativos."
+                );
+            }
         }
+
+        caminhao.setAtivo(novoStatus);
         caminhaoRepository.save(caminhao);
     }
 }

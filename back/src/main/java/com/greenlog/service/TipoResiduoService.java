@@ -7,11 +7,14 @@ package com.greenlog.service;
 import com.greenlog.domain.dto.TipoResiduoRequestDTO;
 import com.greenlog.domain.dto.TipoResiduoResponseDTO;
 import com.greenlog.domain.entity.TipoResiduo;
+import com.greenlog.domain.repository.CaminhaoRepository;
+import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.TipoResiduoMapper;
 import com.greenlog.domain.repository.TipoResiduoRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
+import com.greenlog.service.observer.TipoResiduoSubject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -29,9 +32,15 @@ public class TipoResiduoService {
     @Autowired
     private TipoResiduoRepository tipoResiduoRepository;
     @Autowired
+    private CaminhaoRepository caminhaoRepository;
+    @Autowired
+    private PontoColetaRepository pontoColetaRepository;
+    @Autowired
     private TipoResiduoMapper tipoResiduoMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
+    @Autowired
+    private TipoResiduoSubject tipoResiduoSubject;
 
     @Transactional(readOnly = true)
     public List<TipoResiduoResponseDTO> buscarAvancado(String query) {
@@ -105,15 +114,11 @@ public class TipoResiduoService {
 
     @Transactional
     public void alterarStatus(Long id) {
-        TipoResiduo tipoResiduo = tipoResiduoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Tipo de Residuo não encontrado."));
+        TipoResiduo tipo = buscarEntityPorId(id);
 
-        if (tipoResiduo.isAtivo()) {
-            tipoResiduo.setAtivo(false);
-        } else {
-            tipoResiduo.setAtivo(true);
-        }
+        tipo.setAtivo(!tipo.isAtivo());
+        tipoResiduoRepository.save(tipo);
 
-        tipoResiduoRepository.save(tipoResiduo);
+        tipoResiduoSubject.notifyObservers(tipo);
     }
 }
