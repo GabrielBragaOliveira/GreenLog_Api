@@ -1,0 +1,79 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.greenlog.service;
+
+import com.greenlog.domain.dto.ResultadoRotaDTO;
+import com.greenlog.domain.entity.Bairro;
+import com.greenlog.domain.entity.ConexaoBairro;
+import com.greenlog.exception.RegraDeNegocioException;
+import com.greenlog.domain.repository.ConexaoBairroRepository;
+import com.greenlog.service.adapter.ConexaoBairroAdapter;
+import com.greenlog.service.strategy.AlgoritmoDeRota;
+import com.greenlog.service.strategy.DijkstraStrategy;
+import com.greenlog.util.Adjacente;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ *
+ * @author Kayqu
+ */
+@Service
+public class RoteamentoService {
+
+    @Autowired
+    private ConexaoBairroRepository conexaoBairroRepository;
+    @Autowired
+    private BairroService bairroService;
+    @Autowired
+    private ConexaoBairroAdapter conexaoBairroAdapter;
+    private AlgoritmoDeRota algoritmoDeRota = new DijkstraStrategy();
+    
+    private Map<Long, List<Adjacente>> montarGrafo() {
+        List<ConexaoBairro> conexoesTodas = conexaoBairroRepository.findAll();
+
+        List<ConexaoBairro> conexoesValidas = conexoesTodas.stream()
+                .filter(c -> Boolean.TRUE.equals(c.getAtivo())) 
+                .collect(Collectors.toList());
+        
+        return conexaoBairroAdapter.adaptarParaGrafo(conexoesValidas);
+    }
+    
+    @Transactional(readOnly = true)
+    public ResultadoRotaDTO calcularMelhorRota(Long idOrigem, Long idDestino) {
+
+        Map<Long, List<Adjacente>> grafo = montarGrafo();
+
+        Bairro bairroCentro = bairroService.buscarEntityPorNome("Centro");
+
+        if (!idOrigem.equals(bairroCentro.getId())) {
+            throw new RegraDeNegocioException(
+                    "A origem deve ser obrigatoriamente o bairro 'Centro'.");
+        }
+        
+        if (Boolean.FALSE.equals(bairroCentro.getAtivo())) {
+            throw new RegraDeNegocioException(
+                    "O bairro Centro deve estar ativo");
+        }
+
+        bairroService.buscarEntityPorId(idOrigem);
+        bairroService.buscarEntityPorId(idDestino);
+
+        if (idOrigem.equals(idDestino)) {
+            throw new RegraDeNegocioException("Os bairros de origem e destino não podem ser iguais.");
+        }
+
+        return algoritmoDeRota.calcular(
+                idOrigem,
+                idDestino,
+                grafo,
+                bairroService::buscarEntityPorId
+        );
+    }
+}

@@ -1,0 +1,99 @@
+<div class="flex justify-content-center">
+  <p-card [header]="isEdicao ? 'Editar Ponto de Coleta' : 'Novo Ponto de Coleta'" styleClass="w-full md:w-8 shadow-2">
+    
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
+      
+      <div class="formgrid grid">
+        
+        <div class="field col-12">
+          <label for="nomePonto" class="font-semibold">Nome do Ponto <span class="text-red-500">*</span></label>
+          <input pInputText id="nomePonto" formControlName="nomePonto" placeholder="Ex: Ecoponto Central" class="w-full" />
+          @if (form.get('nomePonto')?.hasError('required') && form.get('nomePonto')?.touched) {
+            <small class="text-red-500 block mt-1">O nome do ponto é obrigatório.</small>
+          }
+          @if (form.get('nomePonto')?.hasError('maxlength') && form.get('nomePonto')?.touched) {
+             <small class="text-red-500 block mt-1">O nome deve ter no máximo 100 caracteres.</small>
+          }
+        </div>
+
+        <div class="field col-12 md:col-4">
+          <label for="responsavel" class="font-semibold">Nome Responsável <span class="text-red-500">*</span></label>
+          <input pInputText id="responsavel" formControlName="nomeResponsavel" class="w-full" />
+          @if (form.get('nomeResponsavel')?.hasError('required') && form.get('nomeResponsavel')?.touched) {
+            <small class="text-red-500 block mt-1">O nome é obrigatório.</small>
+          }
+        </div>
+
+        <div class="field col-12 md:col-4">
+          <label for="email" class="font-semibold">Email <span class="text-red-500">*</span></label>
+          <input pInputText id="email" formControlName="email" placeholder="exemplo@email.com" class="w-full" />
+          @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
+            <small class="text-red-500 block mt-1">O email é obrigatório.</small>
+          }
+          @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+            <small class="text-red-500 block mt-1">Formato de email inválido.</small>
+          }
+        </div>
+
+        <div class="field col-12 md:col-4">
+          <label for="contato" class="font-semibold">Contato</label> <input pInputText id="contato" formControlName="contato" placeholder="(99) 99999-9999" class="w-full" />
+          @if (form.get('contato')?.hasError('pattern') && form.get('contato')?.touched) {
+            <small class="text-red-500 block mt-1">Use (99) 99999-9999.</small>
+          }
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label for="endereco" class="font-semibold">Endereço <span class="text-red-500">*</span></label>
+        <input pInputText id="endereco" formControlName="endereco" class="w-full" />
+        @if (form.get('endereco')?.hasError('required') && form.get('endereco')?.touched) {
+            <small class="text-red-500 block mt-1">O endereço é obrigatório.</small>
+        }
+      </div>
+
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="bairro" class="font-semibold">Bairro <span class="text-red-500">*</span></label>
+          <p-dropdown 
+            id="bairro"
+            [options]="bairros" 
+            formControlName="bairroId" 
+            optionLabel="nome" 
+            optionValue="id" 
+            placeholder="Selecione..." 
+            styleClass="w-full"
+            [filter]="true" filterBy="nome"
+            appendTo="body"> </p-dropdown>
+           @if (form.get('bairroId')?.hasError('required') && form.get('bairroId')?.touched) {
+            <small class="text-red-500 block mt-1">O bairro é obrigatório.</small>
+          }
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="tipos" class="font-semibold">Resíduos Aceitos <span class="text-red-500">*</span></label>
+          <p-multiSelect 
+            id="tipos"
+            [options]="tiposResiduos" 
+            formControlName="tiposResiduosIds" 
+            optionLabel="nome" 
+            optionValue="id"
+            placeholder="Selecione..."
+            display="chip"
+            styleClass="w-full"
+            appendTo="body">
+          </p-multiSelect>
+          @if (form.get('tiposResiduosIds')?.hasError('required') && form.get('tiposResiduosIds')?.touched) {
+            <small class="text-red-500 block mt-1">Selecione ao menos um tipo.</small>
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-content-end gap-2 mt-3">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" type="button" (click)="cancelar()"></p-button>
+        <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="isSaving"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+</div>

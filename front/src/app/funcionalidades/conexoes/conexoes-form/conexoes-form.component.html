@@ -1,0 +1,61 @@
+<div class="flex justify-content-center">
+  <p-card [header]="isEdicao ? 'Editar Conexão' : 'Nova Conexão'" styleClass="w-full md:w-7 shadow-2">
+    
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="flex flex-column gap-4">
+      
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="origem" class="font-semibold">Bairro Origem <span class="text-red-500">*</span></label>
+          <p-dropdown 
+            id="origem"
+            [options]="bairros" 
+            formControlName="bairroOrigemId" 
+            optionLabel="nome" 
+            optionValue="id" 
+            placeholder="Selecione..." 
+            styleClass="w-full"
+            [filter]="true">
+          </p-dropdown>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="destino" class="font-semibold">Bairro Destino <span class="text-red-500">*</span></label>
+          <p-dropdown 
+            id="destino"
+            [options]="bairros" 
+            formControlName="bairroDestinoId" 
+            optionLabel="nome" 
+            optionValue="id" 
+            placeholder="Selecione..." 
+            styleClass="w-full"
+            [filter]="true">
+          </p-dropdown>
+        </div>
+      </div>
+
+      @if (form.errors?.['origemIgualDestino'] && (form.touched || form.dirty)) {
+        <p-message severity="error" text="O bairro de origem não pode ser igual ao de destino." styleClass="w-full block"></p-message>
+      }
+
+      <div class="field">
+        <label for="distancia" class="font-semibold">Distância (km) <span class="text-red-500">*</span></label>
+        <p-inputNumber 
+          id="distancia" 
+          formControlName="distancia" 
+          mode="decimal" 
+          [minFractionDigits]="1" 
+          [maxFractionDigits]="2" 
+          [min]="0.1" 
+          styleClass="w-full" 
+          class="w-full">
+        </p-inputNumber>
+      </div>
+
+      <div class="flex justify-content-end gap-2 mt-3">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" type="button" (click)="cancelar()"></p-button>
+        <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="isSaving"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+</div>
