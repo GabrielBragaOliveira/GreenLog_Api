@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CaminhaoService } from '../../../nucleo/servicos/caminhao.service';
 import { CaminhaoResponse } from '../../../compartilhado/models/caminhao.model';
@@ -10,11 +11,16 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @Component({
   selector: 'app-caminhao-lista',
   standalone: true,
-  imports: [CommonModule, RouterLink, TableModule, ButtonModule, CardModule, TooltipModule, ConfirmDialogModule, TagModule],
+  imports: [
+    CommonModule, RouterLink, FormsModule,
+    TableModule, ButtonModule, CardModule, TooltipModule, 
+    ConfirmDialogModule, TagModule, InputTextareaModule
+  ],
   templateUrl: './caminhao-lista.component.html',
   styleUrl: './caminhao-lista.component.scss'
 })
@@ -25,20 +31,47 @@ export class CaminhaoListaComponent implements OnInit {
 
   caminhoes: CaminhaoResponse[] = [];
   isLoading = true;
+  queryManual: string = '';
+
+  atalhos = [
+    { label: 'Placa', valor: 'placa=""' },
+    { label: 'Motorista', valor: 'motorista=""' },
+    { label: 'Capacidade', valor: 'capacidadeKg>=""' },
+    { label: 'Ativos', valor: 'ativo=true' },
+    { label: 'Inativos', valor: 'ativo=false' },
+    { label: 'E (AND)', valor: ' AND ' },
+    { label: 'OU (OR)', valor: ' OR ' }
+  ];
 
   ngOnInit() {
-    this.carregarDados();
+    this.buscar();
   }
 
-  carregarDados() {
+  adicionarAtalho(snippet: string) {
+    this.queryManual += snippet;
+  }
+
+  buscar() {
     this.isLoading = true;
-    this.caminhaoService.listar().subscribe({
+    const buscaFinal = this.queryManual.trim();
+
+    console.log('Executando Query:', buscaFinal);
+
+    this.caminhaoService.listar(buscaFinal).subscribe({
       next: (dados) => {
         this.caminhoes = dados;
         this.isLoading = false;
       },
-      error: () => this.isLoading = false
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Erro na execução da query:', err);
+      }
     });
+  }
+
+  limparFiltros() {
+    this.queryManual = '';
+    this.buscar();
   }
 
   confirmarExclusao(caminhao: CaminhaoResponse) {
@@ -55,11 +88,10 @@ export class CaminhaoListaComponent implements OnInit {
 
   confirmarAlteracaoStatus(caminhao: CaminhaoResponse) {
     const estaAtivo = caminhao.ativo;
-
     this.confirmationService.confirm({
       message: estaAtivo
-        ? `Deseja inativar o caminhão <b>${caminhao.placa}</b>? <br><small>Ele não aparecerá mais em novas rotas.</small>`
-        : `Deseja reativar o caminhão <b>${caminhao.placa}</b>? <br><small>Ele voltará a ficar disponível para uso.</small>`,
+        ? `Deseja inativar o caminhão <b>${caminhao.placa}</b>?`
+        : `Deseja reativar o caminhão <b>${caminhao.placa}</b>?`,
       header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
@@ -70,11 +102,8 @@ export class CaminhaoListaComponent implements OnInit {
 
   private alterarStatus(caminhao: CaminhaoResponse) {
     this.caminhaoService.alterarStatus(caminhao.id).subscribe({
-      next: () => {
-        this.carregarDados();
-      },
-      error: () => {
-      }
+      next: () => this.buscar(),
+      error: () => {}
     });
   }
 
@@ -88,7 +117,7 @@ export class CaminhaoListaComponent implements OnInit {
           this.messageService.add({
             severity: 'warn',
             summary: 'Não é possível excluir',
-            detail: 'Este caminhão possui itinerários ou rotas associadas e não pode ser removido.',
+            detail: 'Registro em uso.',
             life: 5000
           });
         }

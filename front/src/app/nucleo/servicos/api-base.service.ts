@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, catchError, throwError, tap } from 'rxjs';
 import { MessageService } from 'primeng/api';
@@ -17,8 +17,16 @@ export abstract class ApiBaseService<TResponse, TRequest> {
     return `${environment.apiUrl}/${this.endpoint}`;
   }
 
-  listar(): Observable<TResponse[]> {
-    return this.http.get<TResponse[]>(this.getUrl())
+  listar(busca?: string): Observable<TResponse[]> {
+    let params = new HttpParams();
+    let url = this.getUrl();
+
+    if (busca) {
+      url = `${this.getUrl()}/busca`;
+      params = params.set('q', busca);
+    }
+
+    return this.http.get<TResponse[]>(url, { params })
       .pipe(catchError(error => this.tratarErro(error)));
   }
 

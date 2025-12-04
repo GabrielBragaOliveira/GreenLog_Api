@@ -9,6 +9,9 @@ import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+
 
 @Component({
   selector: 'app-pontos-lista',
@@ -20,7 +23,10 @@ import { ConfirmationService } from 'primeng/api';
     ButtonModule,
     CardModule,
     TooltipModule,
-    TagModule],
+    TagModule,
+    FormsModule,
+    InputTextareaModule
+  ],
   templateUrl: './pontos-lista.component.html',
   styleUrl: './pontos-lista.component.scss'
 })
@@ -30,9 +36,47 @@ export class PontosListaComponent implements OnInit {
 
   pontos: PontoColetaResponse[] = [];
   isLoading = true;
+  queryManual: string = '';
+
+  atalhos = [
+    { label: 'Nome Do Ponto', valor: 'nomePonto=""' },
+    { label: 'Responsável', valor: 'nomeResponsavel=""' },
+    { label: 'Contato', valor: 'contato=""' },
+    { label: 'Email do Responsável', valor: 'email=""' },
+    { label: 'Bairro', valor: 'bairro.nome=""' },
+    { label: 'Resíduos Aceitos', valor: 'tiposResiduosAceitos.nome=""' },
+    { label: 'Ativo', valor: 'ativo=true' },
+    { label: 'Inativo', valor: 'ativo=false' },
+    { label: 'E (AND)', valor: ' AND ' },
+    { label: 'OU (OR)', valor: ' OR ' }
+  ];
 
   ngOnInit() {
     this.carregarDados();
+  }
+
+  adicionarAtalho(snippet: string) {
+    this.queryManual += snippet;
+  }
+
+  buscar() {
+    this.isLoading = true;
+    const query = this.queryManual.trim();
+    this.pontoService.listar(query).subscribe({
+      next: (dados) => {
+        this.pontos = dados;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Erro na busca:', err);
+      }
+    });
+  }
+
+  limparFiltros() {
+    this.queryManual = '';
+    this.buscar();
   }
 
   carregarDados() {
