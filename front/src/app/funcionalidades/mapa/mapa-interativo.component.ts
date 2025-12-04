@@ -210,7 +210,6 @@ export class MapaInterativoComponent implements OnInit, OnDestroy {
 
         const edgeUpdates = this.todasConexoes.map(c => ({
             id: c.id,
-            // Garante que a inativa volte a ser vermelha/tracejada e a ativa cinza
             color: {
                 color: c.ativo ? this.EDGE_COLOR : this.EDGE_COLOR_INACTIVE,
                 opacity: 1
