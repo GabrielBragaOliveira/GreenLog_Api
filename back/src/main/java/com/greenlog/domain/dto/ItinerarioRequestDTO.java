@@ -4,8 +4,11 @@
  */
 package com.greenlog.domain.dto;
 
+import com.greenlog.enums.StatusItinerarioEnum;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  *
@@ -19,6 +22,9 @@ public record ItinerarioRequestDTO(
     Long caminhaoId,
 
     @NotNull(message = "O ID da rota é obrigatório.")
-    Long rotaId
+    Long rotaId,
+    
+    @NotEmpty(message = "Deve haver pelo menos um tipo de resíduo aceito.")
+    List<Long> tiposResiduosIds
       
 ) {}

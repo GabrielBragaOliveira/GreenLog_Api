@@ -10,6 +10,7 @@ import com.greenlog.domain.entity.Rota;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.RotaMapper;
 import com.greenlog.domain.repository.RotaRepository;
+import com.greenlog.service.observer.RotaSubject;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class RotaService {
     private RotaMapper rotaMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
+    @Autowired
+    private RotaSubject rotaSubject;
 
     @Transactional(readOnly = true)
     public List<RotaResponseDTO> buscarAvancado(String query) {
@@ -94,4 +97,15 @@ public class RotaService {
         Rota rota = buscarEntityPorId(id);
         rotaRepository.delete(rota);
     }
+
+    @Transactional
+    public void alterarStatus(Long id) {
+        Rota rota = rotaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Ponto de coleta não encontrado."));
+
+        rota.setAtivo(!rota.isAtivo());
+        rotaRepository.save(rota);
+        rotaSubject.notifyObservers(rota);
+    }
+
 }
