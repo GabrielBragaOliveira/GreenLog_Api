@@ -55,6 +55,7 @@ export class SidebarComponent implements OnInit {
         items: [
           { label: 'Bairros', icon: 'pi pi-building', routerLink: ['/bairros'] },
           { label: 'Conexões', icon: 'pi pi-share-alt', routerLink: ['/conexoes'] },
+          { label: 'Rotas', icon: 'pi pi-map', routerLink: ['/gestao-rotas'] },
           { label: 'Caminhões', icon: 'pi pi-truck', routerLink: ['/caminhoes'] },
           { label: 'Pontos de Coleta', icon: 'pi pi-map-marker', routerLink: ['/pontos-coleta'] },
           { label: 'Tipos de Resíduo', icon: 'pi pi-trash', routerLink: ['/tipos-residuo'] },

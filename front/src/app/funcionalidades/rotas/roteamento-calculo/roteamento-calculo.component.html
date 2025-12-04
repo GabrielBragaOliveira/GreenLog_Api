@@ -4,14 +4,11 @@
 
   <p-card styleClass="shadow-2">
     <div class="grid">
-      
       <div class="col-12 md:col-5">
         <div class="flex flex-column gap-3 p-4 border-round bg-green-50 surface-border border-1 h-full justify-content-center">
-          
           <div class="font-bold text-green-700 text-xl flex align-items-center gap-2 mb-2">
             <i class="pi pi-building"></i> Ponto de Partida
           </div>
-          
           <div class="text-center py-4">
             <div class="surface-0 inline-flex align-items-center justify-content-center border-circle w-4rem h-4rem mb-3 shadow-1">
               <i class="pi pi-home text-3xl text-green-600"></i>
@@ -19,12 +16,10 @@
             <div class="font-bold text-2xl text-800">{{ NOME_BAIRRO_ORIGEM }}</div>
             <span class="text-600 text-sm">Central de Distribuição</span>
           </div>
-
           <div class="flex align-items-center gap-2 text-sm text-green-700 bg-white p-2 border-round opacity-80">
             <i class="pi pi-info-circle"></i>
             <span>Origem fixa padrão do sistema.</span>
           </div>
-
         </div>
       </div>
 
@@ -76,7 +71,7 @@
 
       <div class="col-12 mt-4 flex justify-content-end">
         <p-button 
-          label="Calcular Rota" 
+          label="Calcular Rota Otimizada" 
           icon="pi pi-compass" 
           (click)="calcular()" 
           [disabled]="!origemBairroId || !destinoPontoId"
@@ -88,13 +83,15 @@
   </p-card>
 
   @if (resultado) {
-    <p-panel header="Resultado da Análise" styleClass="shadow-2 border-green-500 border-left-3">
-      <div class="flex flex-column md:flex-row justify-content-between gap-4">
+    <p-panel header="Trajeto Otimizado" styleClass="shadow-2 border-green-500 border-left-3">
+      <div class="flex flex-column gap-4">
         
-        <div class="flex-1">
-          <div class="text-500 mb-2">Distância Total Estimada</div>
-          <div class="text-4xl font-bold text-green-700 mb-4">
-            {{ resultado.distanciaTotal }} <span class="text-xl text-600">km</span>
+        <div class="flex flex-column md:flex-row justify-content-between align-items-center gap-4 border-bottom-1 surface-border pb-3">
+          <div>
+            <div class="text-500 mb-1 text-sm">Distância Total Estimada</div>
+            <div class="text-4xl font-bold text-green-700">
+              {{ resultado.distanciaTotal }} <span class="text-xl text-600">km</span>
+            </div>
           </div>
           
           <p-button 
@@ -105,19 +102,17 @@
           </p-button>
         </div>
 
-        <div class="flex-2 bg-green-50 p-4 border-round-md">
-          <h3 class="mt-0 mb-3 text-700 text-sm uppercase">Itinerário Sugerido</h3>
-          
-          <p-timeline [value]="resultado.listaOrdenadaDeBairros" align="alternate">
-            <ng-template pTemplate="marker" let-bairro let-i="index">
-              <span class="custom-marker shadow-2" [style.backgroundColor]="getCormarker(i, resultado.listaOrdenadaDeBairros.length)">
-                <i [class]="getIconeMarker(i, resultado.listaOrdenadaDeBairros.length)"></i>
-              </span>
-            </ng-template>
-            <ng-template pTemplate="content" let-bairro>
-              <div class="font-semibold text-700">{{ bairro.nome }}</div>
-            </ng-template>
-          </p-timeline>
+        <div class="relative w-full border-1 surface-border border-round bg-gray-50 overflow-hidden">
+             <div #networkContainer class="network-container w-full"></div>
+             
+             <div class="absolute top-0 right-0 m-2 p-2 bg-white-alpha-90 shadow-1 border-round text-sm">
+                <div class="flex align-items-center gap-2 mb-1">
+                    <span class="w-1rem h-1rem border-circle bg-green-500 block"></span> Início
+                </div>
+                <div class="flex align-items-center gap-2">
+                    <span class="w-1rem h-1rem border-circle bg-red-500 block"></span> Fim
+                </div>
+             </div>
         </div>
 
       </div>
