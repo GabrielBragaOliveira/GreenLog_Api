@@ -1,0 +1,99 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-4 py-4">
+      <div class="flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="text-900 font-bold m-0">Gerenciamento de Rotas</h2>
+          <p class="text-500 m-0">Visualize e gerencie as rotas cadastradas no sistema.</p>
+        </div>
+        <p-button icon="pi pi-refresh" [text]="true" (onClick)="carregarRotas()" pTooltip="Recarregar lista"
+          tooltipPosition="left">
+        </p-button>
+      </div>
+
+      <p-table [value]="rotas()" [loading]="loading()" responsiveLayout="scroll" [paginator]="true" [rows]="10"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} rotas"
+        styleClass="p-datatable-sm">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 50%">Nome da Rota</th>
+            <th style="width: 30%">Abrangência</th>
+            <th style="width: 20%" class="text-center">Ações</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rota>
+          <tr>
+            <td>
+              <span class="p-column-title">Nome</span>
+              <span class="font-medium text-lg">{{ rota.nome }}</span>
+            </td>
+
+            <td>
+              <span class="p-column-title">Abrangência</span>
+              <p-tag [value]="rota.listaDeBairros?.length + ' Bairros'" severity="info" icon="pi pi-map-marker">
+              </p-tag>
+            </td>
+
+            <td class="text-center">
+              <div class="flex justify-content-center gap-2">
+                <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-info p-button-outlined p-button-sm"
+                  (onClick)="verDetalhes(rota)" pTooltip="Ver bairros da rota" tooltipPosition="top">
+                </p-button>
+
+                <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"
+                  (onClick)="confirmarExclusao(rota)" pTooltip="Excluir rota" tooltipPosition="top">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="3" class="text-center p-4">
+              <div class="flex flex-column align-items-center">
+                <i class="pi pi-map text-500 text-3xl mb-3"></i>
+                <span class="text-500">Nenhuma rota cadastrada encontrada.</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog [(visible)]="exibirDetalhes" [header]="rotaSelecionada()?.nome" [modal]="true" [style]="{ width: '450px' }"
+  [draggable]="false" [resizable]="false">
+
+  @if (rotaSelecionada(); as rota) {
+  <div class="flex flex-column gap-3 pt-2">
+    <div>
+      <h5 class="mb-2 text-700">Bairros inclusos nesta rota:</h5>
+      @if (rota.listaDeBairros && rota.listaDeBairros.length > 0) {
+      <p-listbox [options]="rota.listaDeBairros" optionLabel="nome" [readonly]="true"
+        [listStyle]="{'max-height': '300px'}" styleClass="w-full border-0 surface-100">
+        <ng-template let-bairro pTemplate="item">
+          <div class="flex align-items-center gap-3 py-1">
+            <span class="flex align-items-center justify-content-center bg-white border-circle w-2rem h-2rem shadow-1">
+              <i class="pi pi-map-marker text-primary"></i>
+            </span>
+            <span class="font-medium text-700">{{ bairro.nome }}</span>
+          </div>
+        </ng-template>
+      </p-listbox>
+      } @else {
+      <div class="text-center p-3 surface-50 border-round">
+        <span class="text-orange-500">Nenhum bairro vinculado.</span>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fechar" icon="pi pi-times" (onClick)="exibirDetalhes.set(false)" [text]="true"></p-button>
+  </ng-template>
+</p-dialog>
