@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -7,6 +8,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { ListboxModule } from 'primeng/listbox';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { CardModule } from 'primeng/card';
 import { RotaService } from '../../../nucleo/servicos/rota.service';
 import { RotaResponse } from '../../../compartilhado/models/rota.model';
 
@@ -20,7 +23,10 @@ import { RotaResponse } from '../../../compartilhado/models/rota.model';
     TooltipModule,
     DialogModule,
     TagModule,
-    ListboxModule
+    ListboxModule,
+    FormsModule,
+    InputTextareaModule,
+    CardModule
   ],
   templateUrl: './rota-lista.component.html',
   styles: [`
@@ -33,26 +39,51 @@ export class RotaListaComponent implements OnInit {
   private rotaService = inject(RotaService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+
   rotas = signal<RotaResponse[]>([]);
   loading = signal<boolean>(false);
   exibirDetalhes = signal<boolean>(false);
   rotaSelecionada = signal<RotaResponse | null>(null);
+  queryManual: string = '';
+
+  atalhos = [
+    { label: 'Nome da Rota', valor: 'nome=""' },
+    { label: 'Bairro Incluso', valor: 'listaDeBairros.nome=""' },
+    { label: 'E (AND)', valor: ' AND ' },
+    { label: 'OU (OR)', valor: ' OR ' }
+  ];
 
   ngOnInit() {
-    this.carregarRotas();
+    this.buscar();
   }
 
-  carregarRotas() {
+  adicionarAtalho(snippet: string) {
+    this.queryManual += snippet;
+  }
+
+  buscar() {
     this.loading.set(true);
-    this.rotaService.listar().subscribe({
+    const query = this.queryManual.trim();
+    
+    this.rotaService.listar(query).subscribe({
       next: (dados) => {
         this.rotas.set(dados);
         this.loading.set(false);
       },
-      error: (erro) => {
+      error: (err) => {
         this.loading.set(false);
+        console.error('Erro na busca de rotas:', err);
       }
     });
+  }
+
+  limparFiltros() {
+    this.queryManual = '';
+    this.buscar();
+  }
+
+  carregarRotas() {
+    this.buscar();
   }
 
   verDetalhes(rota: RotaResponse) {
@@ -79,7 +110,8 @@ export class RotaListaComponent implements OnInit {
     this.loading.set(true);
     this.rotaService.excluir(id).subscribe({
       next: () => {
-        this.carregarRotas(); 
+        this.buscar();
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Rota excluída.' });
       },
       error: () => {
         this.loading.set(false);
