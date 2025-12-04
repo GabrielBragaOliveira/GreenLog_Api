@@ -15,5 +15,7 @@ public final class RegexConstants {
     // (99) 99999-9999 ou 9999-9999
     public static final String TELEFONE_REGEX = "^\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}$";
     
+    public static final String SENHA_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,}$";
+    
     private RegexConstants() {}
 }
