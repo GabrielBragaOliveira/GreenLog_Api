@@ -9,9 +9,11 @@ import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.domain.dto.PontoColetaRequestDTO;
 import com.greenlog.domain.dto.PontoColetaResponseDTO;
 import com.greenlog.domain.entity.Bairro;
+import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.exception.RecursoNaoEncontradoException;
+import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.PontoColetaMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,23 @@ public class PontoColetaService {
     private TipoResiduoService tipoResiduoService;
     @Autowired
     private PontoColetaMapper pontoColetaMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<PontoColetaResponseDTO> buscarAvancado(String query) {
+        List<PontoColeta> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = pontoColetaRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, pontoColetaRepository);
+        }
+
+        return resultados.stream()
+                .map(pontoColetaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<PontoColetaResponseDTO> listar() {
@@ -138,15 +157,34 @@ public class PontoColetaService {
         PontoColeta ponto = pontoColetaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Ponto de coleta não encontrado."));
 
-        if (ponto.isAtivo()) {
-            ponto.setAtivo(false);
-        } else {
-            ponto.setAtivo(true);
+        boolean novoStatus = !ponto.isAtivo();
+
+        if (novoStatus) {
+            if (!ponto.getBairro().isAtivo()) {
+                throw new RegraDeNegocioException(
+                        "Não é possível ativar o ponto de coleta: o bairro associado está inativo."
+                );
+            }
+            boolean possuiTipoInativo = false;
+
+            for (TipoResiduo t : ponto.getTiposResiduosAceitos()) {
+                if (!t.isAtivo()) {
+                    possuiTipoInativo = true;
+                    break;
+                }
+            }
+
+            if (possuiTipoInativo) {
+                throw new RegraDeNegocioException(
+                        "Não é possível ativar o ponto de coleta: ele possui tipos de resíduo inativos."
+                );
+            }
         }
 
+        ponto.setAtivo(novoStatus);
         pontoColetaRepository.save(ponto);
     }
-    
+
     @Transactional(readOnly = true)
     public List<PontoColetaResponseDTO> listarPorBairro(Long bairroId) {
         return pontoColetaRepository.findByBairroId(bairroId).stream()

@@ -29,6 +29,23 @@ public class RotaService {
     private BairroService bairroService;
     @Autowired
     private RotaMapper rotaMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<RotaResponseDTO> buscarAvancado(String query) {
+        List<Rota> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = rotaRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, rotaRepository);
+        }
+
+        return resultados.stream()
+                .map(rotaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<RotaResponseDTO> listar() {

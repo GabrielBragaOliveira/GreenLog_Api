@@ -38,6 +38,23 @@ public class ItinerarioService {
     private PontoColetaService pontoColetaService;
     @Autowired
     private ItinerarioMapper itinerarioMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<ItinerarioResponseDTO> buscarAvancado(String query) {
+        List<Itinerario> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = itinerarioRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, itinerarioRepository);
+        }
+
+        return resultados.stream()
+                .map(itinerarioMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<ItinerarioResponseDTO> listar() {

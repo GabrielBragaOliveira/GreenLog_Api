@@ -30,6 +30,23 @@ public class ConexaoBairroService {
     private BairroService bairroService;
     @Autowired
     private ConexaoBairroMapper conexaoBairroMapper;
+    @Autowired
+    private BuscaAvancadaService buscaAvancadaService;
+
+    @Transactional(readOnly = true)
+    public List<ConexaoBairroResponseDTO> buscarAvancado(String query) {
+        List<ConexaoBairro> resultados;
+
+        if (query == null || query.isBlank()) {
+            resultados = conexaoBairroRepository.findAll();
+        } else {
+            resultados = buscaAvancadaService.executarBusca(query, conexaoBairroRepository);
+        }
+
+        return resultados.stream()
+                .map(conexaoBairroMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<ConexaoBairroResponseDTO> listar() {

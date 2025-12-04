@@ -10,21 +10,15 @@ import com.greenlog.domain.entity.Usuario;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  *
  * @author Kayqu
  */
-public interface ConexaoBairroRepository extends JpaRepository<ConexaoBairro, Long> {
-
-    // Usado no algoritmo de Dijkstra para montar o grafo (arestas de saída)
+public interface ConexaoBairroRepository extends JpaRepository<ConexaoBairro, Long>, JpaSpecificationExecutor<ConexaoBairro> {
     List<ConexaoBairro> findByBairroOrigem(Bairro bairroOrigem);
-    
-    // Usado na regra de negócio para impedir a exclusão de um Bairro que está em uso
     boolean existsByBairroOrigemOrBairroDestino(Bairro bairroOrigem, Bairro bairroDestino);
-    
-    // Usado para garantir que não haja conexões duplicadas (ex: A -> B e A -> B)
     Optional<ConexaoBairro> findByBairroOrigemAndBairroDestino(Bairro origem, Bairro destino);
-    
     List<Usuario> findByAtivo(Boolean ativo);
 }
