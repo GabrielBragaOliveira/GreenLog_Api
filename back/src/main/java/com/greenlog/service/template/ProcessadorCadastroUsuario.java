@@ -6,6 +6,8 @@ package com.greenlog.service.template;
 
 import com.greenlog.domain.entity.Usuario;
 import com.greenlog.domain.repository.UsuarioRepository;
+import com.greenlog.exception.RegraDeNegocioException;
+import com.greenlog.util.ValidadorRegexSingleton;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,10 +25,11 @@ public class ProcessadorCadastroUsuario extends ProcessadorDeCadastro<Usuario> {
 
     @Override
     protected void validarRegrasEspecificas(Usuario usuario) {
+        
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new IllegalArgumentException("Erro: O email já está em uso.");
         }
-        // Validações adicionais de força de senha, etc.
+        
     }
 
     @Override
