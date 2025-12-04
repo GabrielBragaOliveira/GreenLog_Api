@@ -39,6 +39,9 @@ public class Rota {
             joinColumns = @JoinColumn(name = "rota_id"),
             inverseJoinColumns = @JoinColumn(name = "bairro_id"))
     private List<Bairro> listaDeBairros;
+    
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     public Rota() {
     }
@@ -65,6 +68,18 @@ public class Rota {
 
     public void setListaDeBairros(List<Bairro> listaDeBairros) {
         this.listaDeBairros = listaDeBairros;
+    }
+    
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
     }
 
     @Override

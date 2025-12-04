@@ -14,6 +14,7 @@ import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.ItinerarioMapper;
 import com.greenlog.domain.repository.ItinerarioRepository;
+import com.greenlog.enums.StatusItinerarioEnum;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +35,8 @@ public class ItinerarioService {
     private CaminhaoService caminhaoService;
     @Autowired
     private RotaService rotaService;
+    @Autowired
+    private TipoResiduoService tipoResiduoService;
     @Autowired
     private PontoColetaService pontoColetaService;
     @Autowired
@@ -89,11 +92,15 @@ public class ItinerarioService {
             throw new RegraDeNegocioException("O caminhão " + caminhao.getPlaca() + " já possui um itinerário agendado para esta data.");
         }
 
-        validarCompatibilidadeCaminhaoRota(caminhao, rota);
-
         Itinerario novoItinerario = itinerarioMapper.toEntity(request);
         novoItinerario.setCaminhao(caminhao);
         novoItinerario.setRota(rota);
+        novoItinerario.setTiposResiduosAceitos(
+                request.tiposResiduosIds().stream()
+                        .map(tipoResiduoService::buscarEntityPorId)
+                        .collect(Collectors.toList())
+        );
+        novoItinerario.setStatusItinerarioEnum(StatusItinerarioEnum.PENDENTE);
 
         return itinerarioMapper.toResponseDTO(itinerarioRepository.save(novoItinerario));
     }
@@ -111,7 +118,6 @@ public class ItinerarioService {
             }
         }
 
-        validarCompatibilidadeCaminhaoRota(novoCaminhao, novaRota);
         itinerarioMapper.updateEntityFromDTO(request, itinerarioExistente);
         itinerarioExistente.setCaminhao(novoCaminhao);
         itinerarioExistente.setRota(novaRota);
