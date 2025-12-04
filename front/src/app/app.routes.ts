@@ -11,6 +11,7 @@ import { usuariosRoutes } from './funcionalidades/usuarios/usuarios.routes';
 import { tiposResiduoRoutes } from './funcionalidades/residuos/tipo-residuos.routes';
 import { adminGuard } from './nucleo/guards/admin.guard';
 import { mapaRoutes } from './funcionalidades/mapa/mapa.routes';
+import { ItinerarioRoutes } from './funcionalidades/itinerarios/itinerario.routes';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'rotas', pathMatch: 'full' },
       ...roteamentoRoutes,
       ...mapaRoutes,
+      ...ItinerarioRoutes,
       {
         path: '',
         canActivate: [adminGuard],
