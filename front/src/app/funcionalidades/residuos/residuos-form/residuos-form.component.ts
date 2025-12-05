@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { TipoResiduoService } from '../../../nucleo/servicos/tipo-residuo.service';
 import { TipoResiduoRequest } from '../../../compartilhado/models/tipo-residuo.model';
+import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
 
 @Component({
   selector: 'app-residuos-form',
@@ -26,7 +27,7 @@ import { TipoResiduoRequest } from '../../../compartilhado/models/tipo-residuo.m
   templateUrl: './residuos-form.component.html',
   styleUrl: './residuos-form.component.scss'
 })
-export class ResiduosFormComponent implements OnInit {
+export class ResiduosFormComponent implements OnInit, ComponenteComFormulario {
 
   private fb = inject(FormBuilder);
   private tipoResiduoService = inject(TipoResiduoService); // Injeção corrigida

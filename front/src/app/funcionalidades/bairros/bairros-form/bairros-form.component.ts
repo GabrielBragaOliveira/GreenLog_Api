@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { BairroService } from '../../../nucleo/servicos/bairro.service';
 import { BairroRequest } from '../../../compartilhado/models/bairro.model';
+import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
 
 @Component({
   selector: 'app-bairros-form',
@@ -27,7 +28,7 @@ import { BairroRequest } from '../../../compartilhado/models/bairro.model';
   templateUrl: './bairros-form.component.html',
   styleUrl: './bairros-form.component.scss'
 })
-export class BairrosFormComponent implements OnInit {
+export class BairrosFormComponent implements OnInit, ComponenteComFormulario {
 
 
   private fb = inject(FormBuilder);
@@ -90,7 +91,7 @@ export class BairrosFormComponent implements OnInit {
   cancelar() {
     this.router.navigate(['/bairros']);
   }
-  
+
   temMudancasNaoSalvas(): boolean {
     return !this.isSaving && this.form.dirty;
   }

@@ -16,12 +16,12 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
   selector: 'app-conexoes-lista',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterLink, 
-    TableModule, 
-    ButtonModule, 
-    CardModule, 
-    TooltipModule, 
+    CommonModule,
+    RouterLink,
+    TableModule,
+    ButtonModule,
+    CardModule,
+    TooltipModule,
     TagModule,
     FormsModule,
     InputTextareaModule
@@ -57,7 +57,7 @@ export class ConexoesListaComponent implements OnInit {
 
   buscar() {
     this.isLoading = true;
-    const query = this.queryManual.trim(); 
+    const query = this.queryManual.trim();
     this.conexaoService.listar(query).subscribe({
       next: (dados) => {
         this.conexoes = dados;
@@ -84,23 +84,11 @@ export class ConexoesListaComponent implements OnInit {
     });
   }
 
-  confirmarExclusao(conexao: ConexaoBairroResponse) {
-    this.confirmationService.confirm({
-      message: `Excluir conexão de <b>${conexao.bairroOrigem.nome}</b> para <b>${conexao.bairroDestino.nome}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(conexao.id)
-    });
-  }
-
   confirmarAlteracaoStatus(conexao: ConexaoBairroResponse) {
     const estaAtivo = conexao.ativo;
 
     this.confirmationService.confirm({
-      message: estaAtivo 
+      message: estaAtivo
         ? `Deseja inativar a conexão entre <b>${conexao.bairroOrigem.nome}</b> e <b>${conexao.bairroDestino.nome}</b>?`
         : `Deseja reativar a conexão entre <b>${conexao.bairroOrigem.nome}</b> e <b>${conexao.bairroDestino.nome}</b>?`,
       header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',

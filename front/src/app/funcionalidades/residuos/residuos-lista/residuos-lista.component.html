@@ -15,11 +15,11 @@
           <i class="pi pi-eraser"></i> Limpar terminal
         </span>
       </div>
-      
-      <textarea 
-        pInputTextarea 
-        [(ngModel)]="queryManual" 
-        rows="3" 
+
+      <textarea
+        pInputTextarea
+        [(ngModel)]="queryManual"
+        rows="3"
         class="w-full font-mono text-lg surface-0"
         placeholder='Digite sua busca... Ex: nome="Orgânico" AND ativo=true'
         (keydown.control.enter)="buscar()">
@@ -27,23 +27,23 @@
 
       <div class="flex gap-2 align-items-center flex-wrap bg-white p-2 border-round border-1 surface-border">
         <span class="text-xs text-500 font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
-        
+
         @for (atalho of atalhos; track atalho.label) {
-          <button 
-            pButton 
-            type="button" 
-            [label]="atalho.label" 
+          <button
+            pButton
+            type="button"
+            [label]="atalho.label"
             class="p-button-text p-button-sm p-button-secondary text-xs py-1"
             (click)="adicionarAtalho(atalho.valor)">
           </button>
         }
-        
+
         <div class="flex-grow-1"></div>
-        
-        <p-button 
-          label="Executar Query" 
-          icon="pi pi-search" 
-          styleClass="p-button-sm" 
+
+        <p-button
+          label="Executar Query"
+          icon="pi pi-search"
+          styleClass="p-button-sm"
           (onClick)="buscar()">
         </p-button>
       </div>
@@ -89,9 +89,6 @@
               tooltipPosition="top">
             </p-button>
 
-            <p-button
-              icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
-              (onClick)="confirmarExclusao(residuo)" pTooltip="Excluir Permanentemente" tooltipPosition="top"></p-button>
           </td>
         </tr>
       </ng-template>

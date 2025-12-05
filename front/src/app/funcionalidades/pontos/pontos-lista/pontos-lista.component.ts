@@ -90,18 +90,6 @@ export class PontosListaComponent implements OnInit {
     });
   }
 
-  confirmarExclusao(ponto: PontoColetaResponse) {
-    this.confirmationService.confirm({
-      message: `Deseja realmente excluir o ponto de coleta <b>${ponto.nomePonto}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(ponto.id)
-    });
-  }
-
   confirmarAlteracaoStatus(ponto: PontoColetaResponse) {
     const estaAtivo = ponto.ativo;
 

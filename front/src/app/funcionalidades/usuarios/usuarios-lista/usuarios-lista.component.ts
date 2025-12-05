@@ -35,7 +35,7 @@ export class UsuariosListaComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
-  
+
   usuarios: UsuarioResponse[] = [];
   isLoading = true;
   PerfilEnum = Perfil;
@@ -61,7 +61,7 @@ export class UsuariosListaComponent implements OnInit {
 
   buscar() {
     this.isLoading = true;
-    const query = this.queryManual.trim(); 
+    const query = this.queryManual.trim();
     this.usuarioService.listar(query).subscribe({
       next: (dados) => {
         this.usuarios = dados;
@@ -94,7 +94,7 @@ export class UsuariosListaComponent implements OnInit {
     const estaAtivo = usuario.ativo;
 
     this.confirmationService.confirm({
-      message: estaAtivo 
+      message: estaAtivo
         ? `Deseja inativar o usuário <b>${usuario.nome}</b>? <br><small>Ele perderá o acesso ao sistema.</small>`
         : `Deseja reativar o usuário <b>${usuario.nome}</b>? <br><small>Ele poderá fazer login novamente.</small>`,
       header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
@@ -108,18 +108,6 @@ export class UsuariosListaComponent implements OnInit {
   private alterarStatus(usuario: UsuarioResponse) {
     this.usuarioService.alterarStatus(usuario.id).subscribe({
       next: () => this.carregarUsuarios()
-    });
-  }
-
-  confirmarExclusao(usuario: UsuarioResponse) {
-    this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir permanentemente o usuário <b>${usuario.nome}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(usuario.id)
     });
   }
 

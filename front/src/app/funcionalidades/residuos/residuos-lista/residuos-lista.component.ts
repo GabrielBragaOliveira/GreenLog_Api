@@ -57,7 +57,7 @@ export class ResiduosListaComponent implements OnInit {
 
   buscar() {
     this.isLoading = true;
-    const query = this.queryManual.trim(); 
+    const query = this.queryManual.trim();
     this.tipoResiduoService.listar(query).subscribe({
       next: (dados) => {
         this.residuos = dados;
@@ -104,18 +104,6 @@ export class ResiduosListaComponent implements OnInit {
   private alterarStatus(residuo: TipoResiduoResponse) {
     this.tipoResiduoService.alterarStatus(residuo.id).subscribe({
       next: () => this.carregarResiduos()
-    });
-  }
-
-  confirmarExclusao(residuo: TipoResiduoResponse) {
-    this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir permanentemente o tipo <b>${residuo.nome}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(residuo.id)
     });
   }
 

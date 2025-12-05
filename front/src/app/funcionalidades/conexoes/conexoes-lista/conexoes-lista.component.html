@@ -14,11 +14,11 @@
           <i class="pi pi-eraser"></i> Limpar terminal
         </span>
       </div>
-      
-      <textarea 
-        pInputTextarea 
-        [(ngModel)]="queryManual" 
-        rows="3" 
+
+      <textarea
+        pInputTextarea
+        [(ngModel)]="queryManual"
+        rows="3"
         class="w-full font-mono text-lg surface-0"
         placeholder='Digite sua busca... Ex: Origem="Recanto Verde" AND ativo=true'
         (keydown.control.enter)="buscar()">
@@ -26,23 +26,23 @@
 
       <div class="flex gap-2 align-items-center flex-wrap bg-white p-2 border-round border-1 surface-border">
         <span class="text-xs text-500 font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
-        
+
         @for (atalho of atalhos; track atalho.label) {
-          <button 
-            pButton 
-            type="button" 
-            [label]="atalho.label" 
+          <button
+            pButton
+            type="button"
+            [label]="atalho.label"
             class="p-button-text p-button-sm p-button-secondary text-xs py-1"
             (click)="adicionarAtalho(atalho.valor)">
           </button>
         }
-        
+
         <div class="flex-grow-1"></div>
-        
-        <p-button 
-          label="Executar Query" 
-          icon="pi pi-search" 
-          styleClass="p-button-sm" 
+
+        <p-button
+          label="Executar Query"
+          icon="pi pi-search"
+          styleClass="p-button-sm"
           (onClick)="buscar()">
         </p-button>
       </div>
@@ -55,7 +55,7 @@
 
   <p-card styleClass="shadow-2">
     <p-table [value]="conexoes" [loading]="isLoading" [rows]="10" [paginator]="true" styleClass="p-datatable-sm" responsiveLayout="stack">
-      
+
       <ng-template pTemplate="header">
         <tr>
           <th>Origem</th>
@@ -69,38 +69,36 @@
 
       <ng-template pTemplate="body" let-conexao>
         <tr [class.opacity-60]="!conexao.ativo">
-          
+
           <td class="font-semibold">{{ conexao.bairroOrigem.nome }}</td>
           <td class="text-center text-500"><i class="pi pi-arrow-right"></i></td>
           <td class="font-semibold">{{ conexao.bairroDestino.nome }}</td>
           <td>{{ conexao.distancia }} km</td>
-          
+
           <td class="text-center">
-            <p-tag 
-              [value]="conexao.ativo ? 'ATIVO' : 'INATIVO'" 
+            <p-tag
+              [value]="conexao.ativo ? 'ATIVO' : 'INATIVO'"
               [severity]="conexao.ativo ? 'success' : 'danger'"
               styleClass="text-xs">
             </p-tag>
           </td>
 
           <td class="text-center">
-            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" 
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
                       [routerLink]="['editar', conexao.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
-            
-            <p-button 
-              [icon]="conexao.ativo ? 'pi pi-ban' : 'pi pi-check-circle'" 
+
+            <p-button
+              [icon]="conexao.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (conexao.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
-              (onClick)="confirmarAlteracaoStatus(conexao)" 
-              [pTooltip]="conexao.ativo ? 'Inativar' : 'Reativar'" 
+              (onClick)="confirmarAlteracaoStatus(conexao)"
+              [pTooltip]="conexao.ativo ? 'Inativar' : 'Reativar'"
               tooltipPosition="top">
             </p-button>
 
-            <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" 
-                      (click)="confirmarExclusao(conexao)" pTooltip="Excluir Permanentemente" tooltipPosition="top"></p-button>
           </td>
         </tr>
       </ng-template>
-      
+
       <ng-template pTemplate="emptymessage">
         <tr>
             <td colspan="6" class="text-center p-4">Nenhuma conexão cadastrada.</td>
