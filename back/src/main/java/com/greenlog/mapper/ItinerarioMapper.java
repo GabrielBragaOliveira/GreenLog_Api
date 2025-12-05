@@ -7,7 +7,6 @@ package com.greenlog.mapper;
 import com.greenlog.domain.dto.ItinerarioRequestDTO;
 import com.greenlog.domain.dto.ItinerarioResponseDTO;
 import com.greenlog.domain.entity.Itinerario;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,10 +32,7 @@ public class ItinerarioMapper {
                 itinerario.getData(),
                 caminhaoMapper.toResponseDTO(itinerario.getCaminhao()),
                 rotaMapper.toResponseDTO(itinerario.getRota()),
-                itinerario.getTiposResiduosAceitos() == null ? null
-                : itinerario.getTiposResiduosAceitos().stream()
-                        .map(tipoResiduoMapper::toResponseDTO)
-                        .collect(Collectors.toList()),
+                itinerario.getTipoResiduo() != null ? tipoResiduoMapper.toResponseDTO(itinerario.getTipoResiduo()) : null,
                 itinerario.getStatusItinerarioEnum()
         );
     }
@@ -45,7 +41,6 @@ public class ItinerarioMapper {
         if (request == null) {
             return null;
         }
-
         Itinerario entity = new Itinerario();
         entity.setData(request.data());
         return entity;

@@ -79,18 +79,11 @@ public class TipoResiduoObserver implements StatusObserver {
         }
     }
     
-    @Transactional
+   @Transactional
     public void cancelarItinerarios(Long tipoId) {
-
-        List<Itinerario> itinerarios = itinerarioRepository.findByTiposResiduosAceitos_Id(tipoId);
-
+        List<Itinerario> itinerarios = itinerarioRepository.findByTipoResiduo_Id(tipoId);
         for (Itinerario itinerario : itinerarios) {
-
-            boolean possuiTipoAtivo = itinerario.getTiposResiduosAceitos()
-                    .stream()
-                    .anyMatch(TipoResiduo::isAtivo);
-
-            if (!possuiTipoAtivo) {
+            if (!itinerario.getTipoResiduo().isAtivo()) {
                 itinerario.setStatusItinerarioEnum(StatusItinerarioEnum.CANCELADO);
                 itinerarioRepository.save(itinerario);
             }

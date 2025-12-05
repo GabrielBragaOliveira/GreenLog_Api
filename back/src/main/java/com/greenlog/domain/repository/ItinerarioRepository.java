@@ -18,14 +18,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @author Kayqu
  */
 public interface ItinerarioRepository extends JpaRepository<Itinerario, Long>, JpaSpecificationExecutor<Itinerario> {
-
     Optional<Itinerario> findByCaminhaoAndData(Caminhao caminhao, LocalDate data);
-
     boolean existsByCaminhao(Caminhao caminhao);
-
     boolean existsByRota(Rota rota);
-
     List<Itinerario> findByRota(Rota rota);
-
-    List<Itinerario> findByTiposResiduosAceitos_Id(Long tipoResiduoId);
+    List<Itinerario> findByTipoResiduo_Id(Long tipoResiduoId);
 }

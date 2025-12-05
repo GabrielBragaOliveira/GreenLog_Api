@@ -17,7 +17,7 @@ public record ItinerarioResponseDTO(
     LocalDate data,
     CaminhaoResponseDTO caminhao,
     RotaResponseDTO rota,
-    List<TipoResiduoResponseDTO> tiposResiduosAceitos,
+    TipoResiduoResponseDTO tipoResiduo,
     StatusItinerarioEnum statusItinerarioEnum
         
 ) {}

@@ -6,12 +6,14 @@ package com.greenlog.service;
 
 import com.greenlog.domain.dto.CaminhaoRequestDTO;
 import com.greenlog.domain.dto.CaminhaoResponseDTO;
+import com.greenlog.domain.entity.Bairro;
 import com.greenlog.domain.entity.Caminhao;
+import com.greenlog.domain.entity.PontoColeta;
+import com.greenlog.domain.entity.Rota;
 import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.CaminhaoMapper;
 import com.greenlog.domain.repository.CaminhaoRepository;
-import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.exception.RegraDeNegocioException;
@@ -20,7 +22,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.greenlog.service.template.ProcessadorCadastroCaminhao;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -33,8 +38,6 @@ public class CaminhaoService {
     @Autowired
     private CaminhaoRepository caminhaoRepository;
     @Autowired
-    private ItinerarioRepository itinerarioRepository;
-    @Autowired
     private TipoResiduoService tipoResiduoService;
     @Autowired
     private CaminhaoMapper caminhaoMapper;
@@ -42,6 +45,10 @@ public class CaminhaoService {
     private ProcessadorCadastroCaminhao processadorCadastroCaminhao;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
+    @Autowired
+    private RotaService rotaService;
+    @Autowired
+    private PontoColetaService pontoColetaService;
 
     @Transactional(readOnly = true)
     public List<CaminhaoResponseDTO> buscarAvancado(String query) {
@@ -165,5 +172,29 @@ public class CaminhaoService {
 
         caminhao.setAtivo(novoStatus);
         caminhaoRepository.save(caminhao);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CaminhaoResponseDTO> buscarCompativeisComRota(Long rotaId) {
+        Rota rota = rotaService.buscarEntityPorId(rotaId);
+
+        Set<TipoResiduo> residuosDaRota = new HashSet<>();
+        for (Bairro bairro : rota.getListaDeBairros()) {
+            List<PontoColeta> pontos = pontoColetaService.buscarPontosPorBairro(bairro);
+            for (PontoColeta ponto : pontos) {
+                residuosDaRota.addAll(ponto.getTiposResiduosAceitos());
+            }
+        }
+
+        if (residuosDaRota.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Caminhao> caminhõesAtivos = caminhaoRepository.findByAtivo(true);
+
+        return caminhõesAtivos.stream()
+                .filter(c -> !Collections.disjoint(c.getTiposSuportados(), residuosDaRota))
+                .map(caminhaoMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 }
