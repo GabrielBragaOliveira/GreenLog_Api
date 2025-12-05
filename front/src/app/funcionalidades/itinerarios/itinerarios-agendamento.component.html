@@ -1,120 +1,95 @@
 <p-toast position="top-right"></p-toast>
 <p-confirmPopup></p-confirmPopup>
 
-<div class="flex flex-column md:flex-row h-screen-calc bg-gray-50 p-4 gap-4 overflow-hidden">
-
-  <div class="w-full md:w-3 flex flex-column gap-3 fadein animation-duration-300">
+<div class="flex flex-column md:flex-row h-screen-calc bg-gray-50 p-4 gap-4 overflow-hidden" style="height: calc(100vh - 9rem);">
     
-    <p-button 
-      label="Novo Agendamento" 
-      icon="pi pi-plus"
-      styleClass="w-full p-button-success shadow-2"
-      (onClick)="novoAgendamento()">
-    </p-button>
-
-    <div class="surface-card shadow-2 border-round p-3">
-      <p-calendar 
-        [(ngModel)]="dataSelecionada" 
-        [inline]="true" 
-        styleClass="w-full border-none"
-        [showWeek]="false">
-      </p-calendar>
-    </div>
-
-    <div class="surface-card shadow-2 border-round p-3 flex flex-column gap-3">
-      <span class="text-600 font-semibold text-sm uppercase">Legenda</span>
-      
-      <div class="flex align-items-center gap-2">
-        <span class="w-1rem h-1rem border-round bg-green-100 border-1 border-green-300"></span>
-        <span class="text-sm text-700">Agendamento Confirmado</span>
-      </div>
-      <div class="flex align-items-center gap-2">
-        <span class="w-1rem h-1rem border-round bg-gray-100 border-1 border-gray-300"></span>
-        <span class="text-sm text-700">Disponível</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="flex-1 flex flex-column surface-card shadow-2 border-round overflow-hidden">
-    
-    <div class="flex border-bottom-1 surface-border bg-gray-50">
-      <div class="w-12rem p-3 font-bold text-700 flex align-items-center border-right-1 surface-border">
-        <i class="pi pi-truck mr-2"></i> Veículo
-      </div>
-      
-      <div class="flex-1 grid grid-nogutter">
-        @for (dia of diasDaSemana(); track dia.isoString) {
-          <div class="col flex flex-column align-items-center justify-content-center p-2 border-right-1 surface-border"
-               [class.bg-green-50]="dia.hoje">
-            <span class="text-500 text-xs font-semibold mb-1">{{ dia.diaSemana }}</span>
-            <span class="text-xl font-bold text-800" [class.text-green-600]="dia.hoje">{{ dia.diaMes }}</span>
-          </div>
-        }
-      </div>
-    </div>
-
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-      
-      @if (isLoading()) {
-        <div class="flex align-items-center justify-content-center h-full">
-            <i class="pi pi-spin pi-spinner text-4xl text-green-500"></i>
+    <div class="w-full md:w-3 flex flex-column gap-3 fadein animation-duration-300">
+        <p-button label="Novo Agendamento" icon="pi pi-plus" styleClass="w-full p-button-success shadow-2" (onClick)="novoAgendamento()"></p-button>
+        
+        <div class="surface-card shadow-2 border-round p-3">
+            <p-calendar [(ngModel)]="dataSelecionada" [inline]="true" styleClass="w-full border-none" [showWeek]="false"></p-calendar>
         </div>
-      } @else {
-        @for (linha of dadosCronograma(); track linha.caminhao.id) {
-          <div class="flex border-bottom-1 surface-border hover:surface-50 transition-colors transition-duration-150">
-            
-            <div class="w-12rem p-3 flex flex-column justify-content-center border-right-1 surface-border">
-               <span class="font-bold text-800">{{ linha.caminhao.placa }}</span>
-               <span class="text-sm text-500 mt-1 flex align-items-center gap-1">
-                 <i class="pi pi-user text-xs"></i> {{ linha.caminhao.motorista }}
-               </span>
-               <span class="text-xs text-500 mt-1">Cap: {{ linha.caminhao.capacidadeKg }}kg</span>
-            </div>
 
-            <div class="flex-1 grid grid-nogutter">
-              @for (dia of diasDaSemana(); track dia.isoString) {
-                <div class="col border-right-1 surface-border p-1 relative h-6rem">
-                  
-                  @if (linha.agendamentos[dia.isoString]; as agenda) {
-                    <div class="h-full w-full bg-green-50 border-1 border-green-200 border-round p-2 cursor-pointer shadow-1 hover:shadow-2 transition-all flex flex-column justify-content-between group">
-                      
-                      <div class="flex justify-content-between align-items-start">
-                        <span class="text-xs font-bold text-green-700">Rota #{{ agenda.rota.id }}</span>
-                        <button pButton icon="pi pi-times" 
-                                class="p-button-rounded p-button-text p-button-danger p-button-xs w-1rem h-1rem" 
-                                (click)="confirmarExclusao($event, agenda.id)"></button>
-                      </div>
-                      
-                      <div class="text-sm text-800 font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis" [pTooltip]="agenda.rota.nome">
-                        {{ agenda.rota.nome }}
-                      </div>
-                    </div>
-
-                  } @else {
-                    <div class="h-full w-full flex align-items-center justify-content-center opacity-0 hover:opacity-100 transition-duration-200">
-                      <button pButton icon="pi pi-plus" 
-                              class="p-button-rounded p-button-secondary p-button-text" 
-                              pTooltip="Agendar para este dia"
-                              (click)="novoAgendamento(linha.caminhao, dia.data)">
-                      </button>
-                    </div>
-                  }
-
-                </div>
-              }
-            </div>
-          </div>
-        }
-      }
+        <div class="surface-card shadow-2 border-round p-3 flex flex-column gap-3">
+             <span class="text-600 font-semibold text-sm uppercase">Legenda</span>
+             <div class="flex align-items-center gap-2">
+                <span class="w-1rem h-1rem border-round bg-green-100 border-1 border-green-300"></span>
+                <span class="text-sm text-700">Agendamento Confirmado</span>
+             </div>
+             <div class="flex align-items-center gap-2">
+                <span class="w-1rem h-1rem border-round bg-gray-100 border-1 border-gray-300"></span>
+                <span class="text-sm text-700">Disponível</span>
+             </div>
+        </div>
     </div>
-  </div>
+
+    <div class="flex-1 flex flex-column surface-card shadow-2 border-round overflow-hidden">
+        <div class="flex border-bottom-1 surface-border bg-gray-50">
+             <div class="w-12rem p-3 font-bold text-700 flex align-items-center border-right-1 surface-border">
+                <i class="pi pi-truck mr-2"></i> Veículo
+             </div>
+             <div class="flex-1 grid grid-nogutter">
+                @for (dia of diasDaSemana(); track dia.isoString) {
+                  <div class="col flex flex-column align-items-center justify-content-center p-2 border-right-1 surface-border" [class.bg-green-50]="dia.hoje">
+                    <span class="text-500 text-xs font-semibold mb-1">{{ dia.diaSemana }}</span>
+                    <span class="text-xl font-bold text-800" [class.text-green-600]="dia.hoje">{{ dia.diaMes }}</span>
+                  </div>
+                }
+             </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
+             @if (isLoading()) {
+                <div class="flex align-items-center justify-content-center h-full">
+                    <i class="pi pi-spin pi-spinner text-4xl text-green-500"></i>
+                </div>
+             } @else {
+                @for (linha of dadosCronograma(); track linha.caminhao.id) {
+                   <div class="flex border-bottom-1 surface-border hover:surface-50 transition-colors transition-duration-150">
+                      <div class="w-12rem p-3 flex flex-column justify-content-center border-right-1 surface-border">
+                         <span class="font-bold text-800">{{ linha.caminhao.placa }}</span>
+                         <span class="text-sm text-500 mt-1">{{ linha.caminhao.motorista }}</span>
+                         <span class="text-xs text-500 mt-1">Cap: {{ linha.caminhao.capacidadeKg }}kg</span>
+                      </div>
+                      
+                      <div class="flex-1 grid grid-nogutter">
+                         @for (dia of diasDaSemana(); track dia.isoString) {
+                            <div class="col border-right-1 surface-border p-1 relative h-6rem">
+                               @if (linha.agendamentos[dia.isoString]; as agenda) {
+                                  <div class="h-full w-full bg-green-50 border-1 border-green-200 border-round p-2 cursor-pointer shadow-1 hover:shadow-2 transition-all flex flex-column justify-content-between group">
+                                     <div class="flex justify-content-between align-items-start">
+                                        <span class="text-xs font-bold text-green-700">Rota #{{ agenda.rota.id }}</span>
+                                        <button pButton icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger p-button-xs w-1rem h-1rem" (click)="confirmarExclusao($event, agenda.id)"></button>
+                                     </div>
+                                     <div class="text-sm text-800 font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis" [pTooltip]="agenda.rota.nome">
+                                        {{ agenda.rota.nome }}
+                                     </div>
+                                     @if (agenda.tipoResiduo) {
+                                        <div class="mt-1">
+                                            <p-tag [value]="agenda.tipoResiduo.nome" severity="info" styleClass="text-xs py-0"></p-tag>
+                                        </div>
+                                     }
+                                  </div>
+                               } @else {
+                                  <div class="h-full w-full flex align-items-center justify-content-center opacity-0 hover:opacity-100 transition-duration-200">
+                                     <button pButton icon="pi pi-plus" class="p-button-rounded p-button-secondary p-button-text" (click)="novoAgendamento(linha.caminhao, dia.data)"></button>
+                                  </div>
+                               }
+                            </div>
+                         }
+                      </div>
+                   </div>
+                }
+             }
+        </div>
+    </div>
 </div>
 
 <p-dialog 
   header="Novo Agendamento" 
   [(visible)]="modalVisivel" 
   [modal]="true" 
-  [style]="{width: '450px'}" 
+  [style]="{width: '500px'}" 
   [draggable]="false" 
   [resizable]="false">
   
@@ -126,16 +101,39 @@
     </div>
 
     <div class="field">
-      <label class="font-semibold block mb-2">Caminhão</label>
+      <label class="font-semibold block mb-2">Rota</label>
       <p-dropdown 
-        [options]="caminhoes()" 
+        [options]="rotas()" 
+        formControlName="rotaId" 
+        optionLabel="nome" 
+        optionValue="id" 
+        placeholder="Selecione a rota..."
+        styleClass="w-full"
+        appendTo="body"
+        [filter]="true" filterBy="nome"
+        (onChange)="aoSelecionarRota()">
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label class="font-semibold block mb-2">
+        Caminhão Compatível
+        @if (isLoadingCompatibilidade()) {
+            <i class="pi pi-spin pi-spinner text-green-500 ml-2"></i>
+        }
+      </label>
+      <p-dropdown 
+        [options]="caminhoesFiltrados()" 
         formControlName="caminhaoId" 
         optionLabel="placa" 
         optionValue="id" 
-        placeholder="Selecione..."
+        placeholder="Selecione um caminhão..."
         styleClass="w-full"
         appendTo="body"
-        [filter]="true" filterBy="placa">
+        [filter]="true" filterBy="placa"
+        (onChange)="aoSelecionarCaminhao()"
+        emptyMessage="Nenhum caminhão atende esta rota">
+        
         <ng-template pTemplate="selectedItem" let-item>
             <div *ngIf="item">{{ item.placa }} - {{ item.motorista }}</div>
         </ng-template>
@@ -143,29 +141,45 @@
             <div>
                 <div class="font-bold">{{ item.placa }}</div>
                 <div class="text-sm text-500">{{ item.motorista }}</div>
+                <div class="flex gap-1 mt-1 flex-wrap">
+                    @for(tipo of item.tiposSuportados; track tipo.id) {
+                        <p-tag [value]="tipo.nome" severity="info" styleClass="text-xs"></p-tag>
+                    }
+                </div>
             </div>
         </ng-template>
       </p-dropdown>
     </div>
 
     <div class="field">
-      <label class="font-semibold block mb-2">Rota</label>
+      <label class="font-semibold block mb-2">Tipo de Resíduo da Viagem</label>
       <p-dropdown 
-        [options]="rotas()" 
-        formControlName="rotaId" 
+        [options]="residuosFinais()" 
+        formControlName="tipoResiduoId" 
         optionLabel="nome" 
         optionValue="id" 
-        placeholder="Selecione..."
+        placeholder="Selecione o material..."
         styleClass="w-full"
         appendTo="body"
-        [filter]="true" filterBy="nome">
+        emptyMessage="Sem compatibilidade de resíduo">
+        
+        <ng-template pTemplate="selectedItem" let-item>
+            <div *ngIf="item" class="flex align-items-center gap-2">
+                <i class="pi pi-box text-green-500"></i>
+                <span class="font-bold">{{ item.nome }}</span>
+            </div>
+        </ng-template>
       </p-dropdown>
+      
+      <small class="block mt-1 text-500" *ngIf="!!form.get('tipoResiduoId')?.enabled">
+         Este caminhão coletará apenas este tipo de material nesta rota.
+      </small>
     </div>
 
   </form>
 
   <ng-template pTemplate="footer">
     <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="modalVisivel = false"></button>
-    <button pButton label="Salvar" icon="pi pi-check" class="p-button-success" (click)="salvar()" [loading]="isSaving"></button>
+    <button pButton label="Salvar" icon="pi pi-check" class="p-button-success" (click)="salvar()" [loading]="isSaving" [disabled]="form.invalid"></button>
   </ng-template>
 </p-dialog>
