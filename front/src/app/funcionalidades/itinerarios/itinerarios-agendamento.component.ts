@@ -1,8 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-
-// PrimeNG Imports
+import { forkJoin } from 'rxjs';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -14,41 +13,30 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService, MessageService } from 'primeng/api';
-
-// Services & Models
 import { CaminhaoService } from '../../nucleo/servicos/caminhao.service';
 import { ItinerarioService } from '../../nucleo/servicos/itinerario.service';
 import { RotaService } from '../../nucleo/servicos/rota.service';
+import { PontoColetaService } from '../../nucleo/servicos/ponto-coleta.service';
 import { CaminhaoResponse } from '../../compartilhado/models/caminhao.model';
 import { ItinerarioResponse, ItinerarioRequest } from '../../compartilhado/models/itinerario.model';
 import { RotaResponse } from '../../compartilhado/models/rota.model';
-import { forkJoin } from 'rxjs';
+import { TipoResiduoResponse } from '../../compartilhado/models/tipo-residuo.model';
 
 export interface DiaCalendario {
   data: Date;
   diaMes: number;
   diaSemana: string;
   hoje: boolean;
-  isoString: string; // Adicionado para facilitar a chave do map
+  isoString: string;
 }
 
 @Component({
   selector: 'app-itinerario-scheduler',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    CalendarModule,
-    ButtonModule,
-    CheckboxModule,
-    TooltipModule,
-    TagModule,
-    CardModule,
-    DialogModule,
-    DropdownModule,
-    ToastModule,
-    ConfirmPopupModule
+    CommonModule, FormsModule, ReactiveFormsModule,
+    CalendarModule, ButtonModule, CheckboxModule, TooltipModule,
+    TagModule, CardModule, DialogModule, DropdownModule, ToastModule, ConfirmPopupModule
   ],
   providers: [DatePipe, ConfirmationService, MessageService],
   templateUrl: './itinerarios-agendamento.component.html',
@@ -56,76 +44,68 @@ export interface DiaCalendario {
 })
 export class ItinerarioSchedulerComponent implements OnInit {
   
-  // Injeções
   private itinerarioService = inject(ItinerarioService);
   private caminhaoService = inject(CaminhaoService);
   private rotaService = inject(RotaService);
+  private pontoService = inject(PontoColetaService);
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
 
-  // Estado (Signals)
   dataSelecionada = signal<Date>(new Date());
-  caminhoes = signal<CaminhaoResponse[]>([]);
   rotas = signal<RotaResponse[]>([]);
-  itinerarios = signal<ItinerarioResponse[]>([]);
+  itinerarios = signal<ItinerarioResponse[]>([]); 
   isLoading = signal(true);
 
-  // Controle do Dialog de Cadastro
+  caminhoesFiltrados = signal<CaminhaoResponse[]>([]);
+  residuosFinais = signal<TipoResiduoResponse[]>([]);
+  isLoadingCompatibilidade = signal(false);
+  private residuosDaRotaSelecionada: TipoResiduoResponse[] = [];
+
   modalVisivel = false;
   isSaving = false;
 
-  // Formulário Reativo
   form = this.fb.group({
     data: [null as Date | null, [Validators.required]],
-    caminhaoId: [null as number | null, [Validators.required]],
-    rotaId: [null as number | null, [Validators.required]]
+    rotaId: [null as number | null, [Validators.required]],
+    caminhaoId: [{ value: null as number | null, disabled: true }, [Validators.required]],
+    tipoResiduoId: [{ value: null as number | null, disabled: true }, [Validators.required]]
   });
 
-  // --- Computeds (Lógica da Grid) ---
-
-  // 1. Gera a semana baseada na data selecionada
   diasDaSemana = computed<DiaCalendario[]>(() => {
     const start = new Date(this.dataSelecionada());
-    // Ajusta para o início da semana (Domingo) se quiser, ou mantém data atual como inicio
-    // Aqui mantive a lógica de "A partir de hoje"
-    
     const dias: DiaCalendario[] = [];
     const hoje = new Date();
-    
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
-      
       dias.push({
         data: d,
         diaMes: d.getDate(),
         diaSemana: this.getDiaSemana(d),
         hoje: d.toDateString() === hoje.toDateString(),
-        isoString: d.toISOString().split('T')[0] // YYYY-MM-DD
+        isoString: d.toISOString().split('T')[0]
       });
     }
     return dias;
   });
 
-  // 2. Monta a Matriz Caminhão x Dia
+  todosCaminhoesGrid = signal<CaminhaoResponse[]>([]);
+
   dadosCronograma = computed(() => {
-    const listaCaminhoes = this.caminhoes();
+    const listaCaminhoes = this.todosCaminhoesGrid();
     const listaItinerarios = this.itinerarios();
     const dias = this.diasDaSemana();
 
     return listaCaminhoes.filter(c => c.ativo).map(caminhao => {
       const agendamentos: { [key: string]: ItinerarioResponse | null } = {};
-
       dias.forEach(dia => {
-        // Encontra itinerário para este caminhão nesta data específica
         const match = listaItinerarios.find(it => 
           it.caminhao.id === caminhao.id && 
-          it.data.toString() === dia.isoString // Comparação segura de string YYYY-MM-DD
+          it.data.toString() === dia.isoString 
         );
         agendamentos[dia.isoString] = match || null;
       });
-
       return { caminhao, agendamentos };
     });
   });
@@ -136,15 +116,13 @@ export class ItinerarioSchedulerComponent implements OnInit {
 
   carregarDados() {
     this.isLoading.set(true);
-    
-    // Carrega tudo necessário em paralelo
     forkJoin({
       caminhoes: this.caminhaoService.listar(),
       rotas: this.rotaService.listar(),
-      itinerarios: this.itinerarioService.listar() // Idealmente seria buscarPorPeriodo no backend
+      itinerarios: this.itinerarioService.listar()
     }).subscribe({
       next: (dados) => {
-        this.caminhoes.set(dados.caminhoes);
+        this.todosCaminhoesGrid.set(dados.caminhoes);
         this.rotas.set(dados.rotas);
         this.itinerarios.set(dados.itinerarios);
         this.isLoading.set(false);
@@ -153,80 +131,129 @@ export class ItinerarioSchedulerComponent implements OnInit {
     });
   }
 
-  // --- Ações de UI ---
-
   novoAgendamento(caminhaoPreSelecionado?: CaminhaoResponse, dataPreSelecionada?: Date) {
     this.form.reset();
     
-    // Pré-preenche se clicou no botão (+) da grid
-    if (caminhaoPreSelecionado) {
-      this.form.patchValue({ caminhaoId: caminhaoPreSelecionado.id });
-    }
+    this.caminhoesFiltrados.set([]);
+    this.residuosFinais.set([]);
+    this.form.get('caminhaoId')?.disable();
+    this.form.get('tipoResiduoId')?.disable();
+
     if (dataPreSelecionada) {
       this.form.patchValue({ data: dataPreSelecionada });
     } else {
       this.form.patchValue({ data: this.dataSelecionada() });
     }
-
     this.modalVisivel = true;
+  }
+
+  aoSelecionarRota() {
+    const rotaId = this.form.get('rotaId')?.value;
+    
+    this.form.patchValue({ caminhaoId: null, tipoResiduoId: null });
+    this.form.get('caminhaoId')?.disable();
+    this.form.get('tipoResiduoId')?.disable();
+    this.caminhoesFiltrados.set([]);
+    this.residuosFinais.set([]);
+    this.residuosDaRotaSelecionada = [];
+
+    if (!rotaId) return;
+
+    this.isLoadingCompatibilidade.set(true);
+
+    const rota = this.rotas().find(r => r.id === rotaId);
+    if (rota && rota.listaDeBairros.length > 0) {
+        const requests = rota.listaDeBairros.map(b => this.pontoService.buscarPorBairro(b.id));
+        forkJoin(requests).subscribe(respostas => {
+            const todosPontos = respostas.flat();
+            const mapRes = new Map<number, TipoResiduoResponse>();
+            todosPontos.forEach(p => p.tiposResiduosAceitos.forEach(t => mapRes.set(t.id, t)));
+            this.residuosDaRotaSelecionada = Array.from(mapRes.values());
+        });
+    }
+
+    this.caminhaoService.buscarCompativeisComRota(rotaId).subscribe({
+      next: (caminhoes) => {
+        this.caminhoesFiltrados.set(caminhoes);
+        this.isLoadingCompatibilidade.set(false);
+        this.form.get('caminhaoId')?.enable();
+        
+        if(caminhoes.length === 0) {
+            this.messageService.add({severity:'warn', summary:'Aviso', detail:'Nenhum caminhão atende esta rota.'});
+        }
+      },
+      error: () => this.isLoadingCompatibilidade.set(false)
+    });
+  }
+
+  aoSelecionarCaminhao() {
+    const caminhaoId = this.form.get('caminhaoId')?.value;
+    
+    this.form.patchValue({ tipoResiduoId: null });
+    this.form.get('tipoResiduoId')?.disable();
+    this.residuosFinais.set([]);
+
+    if (!caminhaoId) return;
+
+    const caminhao = this.caminhoesFiltrados().find(c => c.id === caminhaoId);
+
+    if (caminhao && this.residuosDaRotaSelecionada.length > 0) {
+        const intersecao = this.residuosDaRotaSelecionada.filter(resRota => 
+            caminhao.tiposSuportados.some(resCam => resCam.id === resRota.id)
+        );
+
+        this.residuosFinais.set(intersecao);
+        this.form.get('tipoResiduoId')?.enable();
+
+        if (intersecao.length === 1) {
+            this.form.patchValue({ tipoResiduoId: intersecao[0].id });
+        }
+    }
   }
 
   salvar() {
     if (this.form.invalid) return;
-
     this.isSaving = true;
-    const val = this.form.value;
     
-    // Converter Date para String YYYY-MM-DD
-    // Ajuste de fuso horário simples para garantir o dia correto
+    const val = this.form.value;
     const dataObj = val.data!;
     const ano = dataObj.getFullYear();
     const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
     const dia = String(dataObj.getDate()).padStart(2, '0');
-    const dataFormatada = `${ano}-${mes}-${dia}`;
 
     const request: ItinerarioRequest = {
-      data: dataFormatada,
+      data: `${ano}-${mes}-${dia}`,
+      rotaId: val.rotaId!,
       caminhaoId: val.caminhaoId!,
-      rotaId: val.rotaId!
+      tipoResiduoId: val.tipoResiduoId!
     };
 
     this.itinerarioService.salvar(request).subscribe({
-      next: (novoItinerario) => {
-        // Atualiza a lista localmente para refletir na grid instantaneamente
-        this.itinerarios.update(lista => [...lista, novoItinerario]);
+      next: (novo) => {
+        this.itinerarios.update(lista => [...lista, novo]);
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Agendamento criado!' });
         this.modalVisivel = false;
         this.isSaving = false;
       },
-      error: (err) => {
-        this.isSaving = false;
-        // O ApiBaseService já exibe toast, mas se quiser tratar específico:
-        if(err.status === 409) {
-           // Conflito de agenda
-        }
-      }
+      error: () => this.isSaving = false
     });
   }
-
+  
   confirmarExclusao(event: Event, id: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Cancelar este agendamento?',
-      icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sim',
-      rejectLabel: 'Não',
       acceptButtonStyleClass: 'p-button-danger p-button-sm',
       accept: () => {
         this.itinerarioService.excluir(id).subscribe(() => {
-          this.itinerarios.update(lista => lista.filter(i => i.id !== id));
-          this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'Itinerário removido.' });
+          this.itinerarios.update(l => l.filter(i => i.id !== id));
+          this.messageService.add({severity:'info', summary:'Cancelado', detail:'Itinerário removido.'});
         });
       }
     });
   }
 
-  // --- Helpers ---
   private getDiaSemana(date: Date): string {
     const dias = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
     return dias[date.getDay()];

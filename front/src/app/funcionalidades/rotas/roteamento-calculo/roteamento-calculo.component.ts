@@ -235,9 +235,9 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
           levelSeparation: 160
         }
       },
-      physics: false,
+      physics: true,
       interaction: {
-        dragNodes: false,
+        dragNodes: true,
         zoomView: true,
         dragView: true
       }
