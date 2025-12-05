@@ -15,11 +15,11 @@
           <i class="pi pi-eraser"></i> Limpar terminal
         </span>
       </div>
-      
-      <textarea 
-        pInputTextarea 
-        [(ngModel)]="queryManual" 
-        rows="3" 
+
+      <textarea
+        pInputTextarea
+        [(ngModel)]="queryManual"
+        rows="3"
         class="w-full font-mono text-lg surface-0"
         placeholder='Digite sua busca... Ex: Nome Do Ponto="Ponto Coleta 1" AND ativo=true'
         (keydown.control.enter)="buscar()">
@@ -27,23 +27,23 @@
 
       <div class="flex gap-2 align-items-center flex-wrap bg-white p-2 border-round border-1 surface-border">
         <span class="text-xs text-500 font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
-        
+
         @for (atalho of atalhos; track atalho.label) {
-          <button 
-            pButton 
-            type="button" 
-            [label]="atalho.label" 
+          <button
+            pButton
+            type="button"
+            [label]="atalho.label"
             class="p-button-text p-button-sm p-button-secondary text-xs py-1"
             (click)="adicionarAtalho(atalho.valor)">
           </button>
         }
-        
+
         <div class="flex-grow-1"></div>
-        
-        <p-button 
-          label="Executar Query" 
-          icon="pi pi-search" 
-          styleClass="p-button-sm" 
+
+        <p-button
+          label="Executar Query"
+          icon="pi pi-search"
+          styleClass="p-button-sm"
           (onClick)="buscar()">
         </p-button>
       </div>
@@ -87,10 +87,10 @@
               }
             </div>
           </td>
-          
+
           <td class="text-center">
-            <p-tag 
-              [value]="ponto.ativo ? 'ATIVO' : 'INATIVO'" 
+            <p-tag
+              [value]="ponto.ativo ? 'ATIVO' : 'INATIVO'"
               [severity]="ponto.ativo ? 'success' : 'danger'"
               styleClass="text-xs">
             </p-tag>
@@ -99,17 +99,15 @@
           <td class="text-center">
             <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
               [routerLink]="['editar', ponto.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
-            
-            <p-button 
-              [icon]="ponto.ativo ? 'pi pi-ban' : 'pi pi-check-circle'" 
+
+            <p-button
+              [icon]="ponto.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (ponto.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
-              (onClick)="confirmarAlteracaoStatus(ponto)" 
-              [pTooltip]="ponto.ativo ? 'Inativar' : 'Reativar'" 
+              (onClick)="confirmarAlteracaoStatus(ponto)"
+              [pTooltip]="ponto.ativo ? 'Inativar' : 'Reativar'"
               tooltipPosition="top">
             </p-button>
 
-            <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
-              (click)="confirmarExclusao(ponto)" pTooltip="Excluir Permanentemente" tooltipPosition="top"></p-button>
           </td>
         </tr>
       </ng-template>

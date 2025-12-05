@@ -18,7 +18,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
   standalone: true,
   imports: [
     CommonModule, RouterLink, FormsModule,
-    TableModule, ButtonModule, CardModule, TooltipModule, 
+    TableModule, ButtonModule, CardModule, TooltipModule,
     ConfirmDialogModule, TagModule, InputTextareaModule
   ],
   templateUrl: './caminhao-lista.component.html',
@@ -72,18 +72,6 @@ export class CaminhaoListaComponent implements OnInit {
   limparFiltros() {
     this.queryManual = '';
     this.buscar();
-  }
-
-  confirmarExclusao(caminhao: CaminhaoResponse) {
-    this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir o caminhão de placa <b>${caminhao.placa}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(caminhao.id)
-    });
   }
 
   confirmarAlteracaoStatus(caminhao: CaminhaoResponse) {

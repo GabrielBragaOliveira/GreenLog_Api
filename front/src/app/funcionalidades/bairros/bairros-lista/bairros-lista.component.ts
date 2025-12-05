@@ -58,7 +58,7 @@ export class BairrosListaComponent implements OnInit {
 
   buscar() {
     this.isLoading = true;
-    const query = this.queryManual.trim(); 
+    const query = this.queryManual.trim();
     this.bairroService.listar(query).subscribe({
       next: (dados) => {
         this.bairros = dados;
@@ -97,33 +97,4 @@ export class BairrosListaComponent implements OnInit {
     });
   }
 
-  confirmarExclusao(bairro: BairroResponse) {
-    this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir permanentemente o bairro <b>${bairro.nome}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(bairro.id)
-    });
-  }
-
-  private excluir(id: number) {
-    this.bairroService.excluir(id).subscribe({
-      next: () => {
-        this.bairros = this.bairros.filter(b => b.id !== id);
-      },
-      error: (err) => {
-        if (err.status === 409) {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Não é possível excluir',
-            detail: 'Este bairro possui registros vinculados e não pode ser removido.',
-            life: 5000
-          });
-        }
-      }
-    });
-  }
 }
