@@ -36,7 +36,7 @@ public class CaminhaoController {
     public CaminhaoController(CaminhaoService caminhaoService) {
         this.caminhaoService = caminhaoService;
     }
-    
+
     @GetMapping("/busca")
     public ResponseEntity<List<CaminhaoResponseDTO>> buscaAvancada(@RequestParam("q") String query) {
         List<CaminhaoResponseDTO> resultado = caminhaoService.buscarAvancado(query);
@@ -64,10 +64,15 @@ public class CaminhaoController {
         CaminhaoResponseDTO response = caminhaoService.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
- 
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> alterarStatus(@PathVariable @Valid Long id) {
         caminhaoService.alternarStatus(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/compativeis/rota/{rotaId}")
+    public ResponseEntity<List<CaminhaoResponseDTO>> listarCompativeisPorRota(@PathVariable Long rotaId) {
+        return ResponseEntity.ok(caminhaoService.buscarCompativeisComRota(rotaId));
     }
 }

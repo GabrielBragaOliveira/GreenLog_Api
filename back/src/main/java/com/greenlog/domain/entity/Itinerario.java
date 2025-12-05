@@ -14,14 +14,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -51,14 +49,11 @@ public class Itinerario {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rota_id", nullable = false)
     private Rota rota;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "itinerario_tipo_residuo",
-            joinColumns = @JoinColumn(name = "itinerario_id"),
-            inverseJoinColumns = @JoinColumn(name = "tipo_residuo_id")
-    )
-    private List<TipoResiduo> tiposResiduosAceitos;
+    
+    @NotNull(message = "A Tipo de Resido é obrigatória.")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_residuo_id", nullable = false)
+    private TipoResiduo tipoResiduo;
 
     @NotNull(message = "O Statusf é obrigatório.")
     @Enumerated(EnumType.STRING)
@@ -100,12 +95,12 @@ public class Itinerario {
         this.rota = rota;
     }
 
-    public List<TipoResiduo> getTiposResiduosAceitos() {
-        return tiposResiduosAceitos;
+    public TipoResiduo getTipoResiduo() {
+        return tipoResiduo;
     }
 
-    public void setTiposResiduosAceitos(List<TipoResiduo> tiposResiduosAceitos) {
-        this.tiposResiduosAceitos = tiposResiduosAceitos;
+    public void setTipoResiduo(TipoResiduo tipoResiduo) {
+        this.tipoResiduo = tipoResiduo;
     }
 
     public StatusItinerarioEnum getStatusItinerarioEnum() {
