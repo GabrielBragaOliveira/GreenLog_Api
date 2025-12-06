@@ -85,27 +85,13 @@ public class CaminhaoService {
 
     @Transactional
     public CaminhaoResponseDTO salvar(CaminhaoRequestDTO request) {
-        String placa = request.placa() != null ? request.placa().trim() : null;
 
-        if (placa == null || placa.isBlank()) {
-            throw new ErroValidacaoException("A placa do caminhão é obrigatória.");
-        }
-        if (request.motorista() == null || request.motorista().isBlank()) {
-            throw new ErroValidacaoException("O nome do motorista é obrigatório.");
-        }
-        if (request.capacidadeKg() == null || request.capacidadeKg() <= 0) {
-            throw new ErroValidacaoException("A capacidade deve ser maior que zero.");
-        }
-        if (request.tiposSuportadosIds() == null || request.tiposSuportadosIds().isEmpty()) {
-            throw new ErroValidacaoException("O caminhão deve suportar pelo menos um tipo de resíduo.");
-        }
-
-        Optional<Caminhao> existente = caminhaoRepository.findByPlaca(placa);
+        Optional<Caminhao> existente = caminhaoRepository.findByPlaca(request.placa());
 
         if (existente.isPresent()) {
             Caminhao caminhao = existente.get();
             if (!caminhao.isAtivo()) {
-                caminhao.setPlaca(placa);
+                caminhao.setPlaca(request.placa());
                 caminhao.setMotorista(request.motorista());
                 caminhao.setCapacidadeKg(request.capacidadeKg());
                 caminhao.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
@@ -114,9 +100,8 @@ public class CaminhaoService {
                 Caminhao salvo = caminhaoRepository.save(caminhao);
                 return caminhaoMapper.toResponseDTO(salvo);
 
-            } else {
-                throw new ConflitoException("Já existe um caminhão ativo com esta placa.");
-            }
+            } else throw new ConflitoException("Já existe um caminhão ativo com esta placa.");
+            
         }
 
         Caminhao novoCaminhao = caminhaoMapper.toEntity(request);
@@ -124,7 +109,6 @@ public class CaminhaoService {
         novoCaminhao.setAtivo(true);
 
         Caminhao caminhaoSalvo = processadorCadastroCaminhao.processar(novoCaminhao);
-
         return caminhaoMapper.toResponseDTO(caminhaoSalvo);
     }
 
@@ -132,13 +116,12 @@ public class CaminhaoService {
     public CaminhaoResponseDTO atualizar(Long id, CaminhaoRequestDTO request) {
         Caminhao caminhaoExistente = buscarEntityPorId(id);
 
-        if (caminhaoRepository.existsByPlacaAndIdNot(request.placa(), id)) {
-            throw new ErroValidacaoException("Já existe um caminhão cadastrado com esta placa.");
-        }
         caminhaoMapper.updateEntityFromDTO(request, caminhaoExistente);
-        caminhaoExistente.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
 
-        return caminhaoMapper.toResponseDTO(caminhaoRepository.save(caminhaoExistente));
+        if (request.tiposSuportadosIds() != null) caminhaoExistente.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
+    
+        Caminhao salvo = processadorCadastroCaminhao.processar(caminhaoExistente);
+        return caminhaoMapper.toResponseDTO(salvo);
     }
 
     @Transactional

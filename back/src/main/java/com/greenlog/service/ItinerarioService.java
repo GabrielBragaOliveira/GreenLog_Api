@@ -15,6 +15,7 @@ import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.ItinerarioMapper;
 import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.enums.StatusItinerarioEnum;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,11 @@ public class ItinerarioService {
 
     @Transactional
     public ItinerarioResponseDTO salvar(ItinerarioRequestDTO request) {
+
+        if (request.data().isBefore(LocalDate.now())) {
+            throw new RegraDeNegocioException("A data do itinerário não pode ser anterior à data de hoje.");
+        }
+
         Caminhao caminhao = caminhaoService.buscarEntityPorId(request.caminhaoId());
         Rota rota = rotaService.buscarEntityPorId(request.rotaId());
         TipoResiduo tipoResiduo = tipoResiduoService.buscarEntityPorId(request.tipoResiduoId());
@@ -105,6 +111,10 @@ public class ItinerarioService {
     @Transactional
     public ItinerarioResponseDTO atualizar(Long id, ItinerarioRequestDTO request) {
         Itinerario itinerarioExistente = buscarEntityPorId(id);
+
+        if (!request.data().equals(itinerarioExistente.getData()) && request.data().isBefore(LocalDate.now())) {
+            throw new RegraDeNegocioException("A nova data do itinerário não pode ser anterior à data de hoje.");
+        }
 
         Caminhao novoCaminhao = caminhaoService.buscarEntityPorId(request.caminhaoId());
         Rota novaRota = rotaService.buscarEntityPorId(request.rotaId());
