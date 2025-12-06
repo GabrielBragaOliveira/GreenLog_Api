@@ -33,7 +33,6 @@ public class ProcessadorCadastroPontoColeto extends ProcessadorDeCadastro<PontoC
         if (pontoColeta.getEmail().trim() == null || pontoColeta.getEmail().trim().isBlank()) throw new RegraDeNegocioException("O email é obrigatório.");
         if (pontoColeta.getEndereco() == null || pontoColeta.getEndereco().isBlank()) throw new RegraDeNegocioException("O endereço é obrigatório.");
         if (pontoColeta.getBairro() == null) throw new RegraDeNegocioException("O bairro é obrigatório.");
-        
         if (pontoColetaRepository.existsByNomePontoAndIdNot(pontoColeta.getNomePonto().trim(), pontoColeta.getId())) throw new ErroValidacaoException("Já existe um ponto de coleta com este nome.");
         if (!ValidadorRegexSingleton.getInstance().isNomeENumeroValida(pontoColeta.getNomePonto().trim())) throw new RegraDeNegocioException("Erro: Nome do Ponto inválido. Deve conter apenas letras, números e ter no mínimo 3 caracteres.");
         if (!ValidadorRegexSingleton.getInstance().isNomeValida(pontoColeta.getNomeResponsavel().trim())) throw new RegraDeNegocioException("Erro: Nome do Responsável inválido. Deve conter apenas letras e ter no mínimo 3 caracteres.");

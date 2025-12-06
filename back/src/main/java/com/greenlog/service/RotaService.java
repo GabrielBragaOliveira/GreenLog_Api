@@ -10,7 +10,6 @@ import com.greenlog.domain.entity.Rota;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.RotaMapper;
 import com.greenlog.domain.repository.RotaRepository;
-import com.greenlog.service.observer.RotaSubject;
 import com.greenlog.service.template.ProcessadorCadastroRota;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,8 +32,6 @@ public class RotaService {
     private RotaMapper rotaMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
-    @Autowired
-    private RotaSubject rotaSubject;
     @Autowired
     private ProcessadorCadastroRota processadorCadastroRota;
 
@@ -109,7 +106,5 @@ public class RotaService {
 
         rota.setAtivo(!rota.isAtivo());
         rotaRepository.save(rota);
-        rotaSubject.notifyObservers(rota);
     }
-
 }

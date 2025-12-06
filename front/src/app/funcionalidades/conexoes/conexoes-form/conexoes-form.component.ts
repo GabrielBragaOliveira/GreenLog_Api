@@ -1,14 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
-
 import { ConexaoService } from '../../../nucleo/servicos/conexao.service';
 import { BairroService } from '../../../nucleo/servicos/bairro.service';
 import { BairroResponse } from '../../../compartilhado/models/bairro.model';
 import { ConexaoBairroRequest } from '../../../compartilhado/models/conexao-bairro.model';
-
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
@@ -19,13 +16,13 @@ import { MessageModule } from 'primeng/message';
   selector: 'app-conexoes-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    CardModule, 
-    ButtonModule, 
-    DropdownModule, 
-    InputNumberModule, 
-    MessageModule],
+    ReactiveFormsModule,
+    CardModule,
+    ButtonModule,
+    DropdownModule,
+    InputNumberModule,
+    MessageModule
+  ],
   templateUrl: './conexoes-form.component.html',
   styleUrl: './conexoes-form.component.scss'
 })
@@ -37,7 +34,6 @@ export class ConexoesFormComponent implements OnInit, ComponenteComFormulario {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // Validador personalizado
   validadorOrigemDestino: ValidatorFn = (control: AbstractControl) => {
     const origem = control.get('bairroOrigemId')?.value;
     const destino = control.get('bairroDestinoId')?.value;
@@ -85,11 +81,11 @@ export class ConexoesFormComponent implements OnInit, ComponenteComFormulario {
     this.isSaving = true;
     const request = this.form.value as ConexaoBairroRequest;
 
-    const op = (this.isEdicao && this.idEdicao)
+    const operacao = (this.isEdicao && this.idEdicao)
       ? this.conexaoService.atualizar(this.idEdicao, request)
       : this.conexaoService.salvar(request);
 
-    op.subscribe({
+    operacao.subscribe({
       next: () => {
         this.form.markAsPristine();
         this.router.navigate(['/conexoes']);

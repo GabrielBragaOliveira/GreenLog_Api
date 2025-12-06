@@ -1,29 +1,29 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ConfirmationService } from 'primeng/api';
+
 import { BairroService } from '../../../nucleo/servicos/bairro.service';
 import { BairroResponse } from '../../../compartilhado/models/bairro.model';
-import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @Component({
   selector: 'app-bairros-lista',
   standalone: true,
   imports: [
-    CommonModule,
     RouterLink,
+    FormsModule,
     TableModule,
     ButtonModule,
     CardModule,
     TooltipModule,
     TagModule,
-    FormsModule,
     InputTextareaModule
   ],
   templateUrl: './bairros-lista.component.html',
@@ -33,7 +33,6 @@ export class BairrosListaComponent implements OnInit {
 
   private bairroService = inject(BairroService);
   private confirmationService = inject(ConfirmationService);
-  private messageService = inject(MessageService);
 
   bairros: BairroResponse[] = [];
   isLoading = true;
@@ -83,7 +82,7 @@ export class BairrosListaComponent implements OnInit {
       message: estaAtivo
         ? `Deseja inativar o bairro <b>${bairro.nome}</b>?`
         : `Deseja reativar o bairro <b>${bairro.nome}</b>?`,
-      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      header: estaAtivo ? 'Inativar' : 'Reativar',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
       acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
@@ -96,5 +95,4 @@ export class BairrosListaComponent implements OnInit {
       next: () => this.buscar()
     });
   }
-
 }

@@ -1,30 +1,27 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PontoColetaService } from '../../../nucleo/servicos/ponto-coleta.service';
-import { PontoColetaResponse } from '../../../compartilhado/models/ponto-coleta.model';
+import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-import { ConfirmationService } from 'primeng/api';
-import { FormsModule } from '@angular/forms';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-
+import { ConfirmationService } from 'primeng/api';
+import { PontoColetaService } from '../../../nucleo/servicos/ponto-coleta.service';
+import { PontoColetaResponse } from '../../../compartilhado/models/ponto-coleta.model';
 
 @Component({
   selector: 'app-pontos-lista',
   standalone: true,
   imports: [
-    CommonModule,
     RouterLink,
+    FormsModule,
     TableModule,
     ButtonModule,
     CardModule,
     TooltipModule,
     TagModule,
-    FormsModule,
     InputTextareaModule
   ],
   templateUrl: './pontos-lista.component.html',
@@ -42,9 +39,9 @@ export class PontosListaComponent implements OnInit {
     { label: 'Nome Do Ponto', valor: 'nomePonto=""' },
     { label: 'Responsável', valor: 'nomeResponsavel=""' },
     { label: 'Contato', valor: 'contato=""' },
-    { label: 'Email do Responsável', valor: 'email=""' },
+    { label: 'Email', valor: 'email=""' },
     { label: 'Bairro', valor: 'bairro.nome=""' },
-    { label: 'Resíduos Aceitos', valor: 'tiposResiduosAceitos.nome=""' },
+    { label: 'Resíduos', valor: 'tiposResiduosAceitos.nome=""' },
     { label: 'Ativo', valor: 'ativo=true' },
     { label: 'Inativo', valor: 'ativo=false' },
     { label: 'E (AND)', valor: ' AND ' },
@@ -53,6 +50,17 @@ export class PontosListaComponent implements OnInit {
 
   ngOnInit() {
     this.carregarDados();
+  }
+
+  carregarDados() {
+    this.isLoading = true;
+    this.pontoService.listar().subscribe({
+      next: (dados) => {
+        this.pontos = dados;
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false
+    });
   }
 
   adicionarAtalho(snippet: string) {
@@ -79,25 +87,14 @@ export class PontosListaComponent implements OnInit {
     this.buscar();
   }
 
-  carregarDados() {
-    this.isLoading = true;
-    this.pontoService.listar().subscribe({
-      next: (dados) => {
-        this.pontos = dados;
-        this.isLoading = false;
-      },
-      error: () => this.isLoading = false
-    });
-  }
-
   confirmarAlteracaoStatus(ponto: PontoColetaResponse) {
     const estaAtivo = ponto.ativo;
 
     this.confirmationService.confirm({
       message: estaAtivo
-        ? `Deseja inativar o ponto de coleta <b>${ponto.nomePonto}</b>? <br><small>Ele não receberá novos agendamentos.</small>`
-        : `Deseja reativar o ponto de coleta <b>${ponto.nomePonto}</b>?`,
-      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+        ? `Deseja inativar o ponto <b>${ponto.nomePonto}</b>? <br><small>Ele não receberá novos agendamentos.</small>`
+        : `Deseja reativar o ponto <b>${ponto.nomePonto}</b>?`,
+      header: estaAtivo ? 'Inativar' : 'Reativar',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
       acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
@@ -108,13 +105,6 @@ export class PontosListaComponent implements OnInit {
   private alterarStatus(ponto: PontoColetaResponse) {
     this.pontoService.alterarStatus(ponto.id).subscribe({
       next: () => this.carregarDados()
-    });
-  }
-
-  private excluir(id: number | undefined) {
-    if (!id) return;
-    this.pontoService.excluir(id).subscribe(() => {
-      this.pontos = this.pontos.filter(p => p.id !== id);
     });
   }
 }

@@ -14,7 +14,6 @@ import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.ItinerarioMapper;
 import com.greenlog.domain.repository.ItinerarioRepository;
-import com.greenlog.enums.StatusItinerarioEnum;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -103,8 +102,6 @@ public class ItinerarioService {
         novoItinerario.setCaminhao(caminhao);
         novoItinerario.setRota(rota);
         novoItinerario.setTipoResiduo(tipoResiduo);
-        novoItinerario.setStatusItinerarioEnum(StatusItinerarioEnum.PENDENTE);
-
         return itinerarioMapper.toResponseDTO(itinerarioRepository.save(novoItinerario));
     }
 

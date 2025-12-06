@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
@@ -16,7 +15,14 @@ import { MultiSelectModule } from 'primeng/multiselect';
 @Component({
   selector: 'app-caminhao-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CardModule, InputTextModule, InputNumberModule, ButtonModule, MultiSelectModule],
+  imports: [
+    ReactiveFormsModule,
+    CardModule,
+    InputTextModule,
+    InputNumberModule,
+    ButtonModule,
+    MultiSelectModule
+  ],
   templateUrl: './caminhao-form.component.html',
   styleUrl: './caminhao-form.component.scss'
 })
@@ -27,7 +33,6 @@ export class CaminhaoFormComponent implements OnInit, ComponenteComFormulario {
   private tipoResiduoService = inject(TipoResiduoService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-
   readonly PLACA_REGEX = /^[A-Z]{3}-?\d{4}|^[A-Z]{3}[0-9]{1}[A-Z]{1}[0-9]{2}$/;
 
   form = this.fb.group({
@@ -106,8 +111,6 @@ export class CaminhaoFormComponent implements OnInit, ComponenteComFormulario {
   converterParaMaiusculas(event: Event) {
     const input = event.target as HTMLInputElement;
     const valor = input.value.toUpperCase();
-    
-    // Atualiza o input visualmente e o FormControl
     if (input.value !== valor) {
       input.value = valor;
       this.form.get('placa')?.setValue(valor);
