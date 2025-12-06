@@ -33,13 +33,13 @@ import { DataSet } from 'vis-data';
   selector: 'app-roteamento-calculo',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    DropdownModule, 
-    ButtonModule, 
-    CardModule, 
-    PanelModule, 
-    DialogModule, 
+    CommonModule,
+    FormsModule,
+    DropdownModule,
+    ButtonModule,
+    CardModule,
+    PanelModule,
+    DialogModule,
     InputTextModule,
     DividerModule
   ],
@@ -47,7 +47,7 @@ import { DataSet } from 'vis-data';
   styleUrl: './roteamento-calculo.component.scss'
 })
 export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
-  
+
   // Injeções
   private roteamentoService = inject(RoteamentoService);
   private bairroService = inject(BairroService);
@@ -55,7 +55,7 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
   private rotaService = inject(RotaService);
   private conexaoService = inject(ConexaoService); // <--- INJETADO
   private messageService = inject(MessageService);
-  
+
   @ViewChild('networkContainer') networkContainer!: ElementRef;
   private network: Network | null = null;
 
@@ -65,7 +65,7 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
   todosBairros: BairroResponse[] = [];
   todasConexoes: ConexaoBairroResponse[] = []; // <--- Cache das conexões
   bairrosDestinoFiltrados: BairroResponse[] = [];
-  
+
   // Seleção
   origemBairroId: number | null = null;
   pontosDestino: PontoColetaResponse[] = [];
@@ -147,7 +147,7 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.resultado = res;
         this.isCalculating = false;
-        
+
         if (res.listaOrdenadaDeBairros.length === 0) {
           this.messageService.add({ severity: 'warn', summary: 'Sem rota', detail: 'Caminho não encontrado.' });
         } else {
@@ -166,78 +166,101 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
     const edges = new DataSet<any>([]);
 
     bairros.forEach((bairro, index) => {
-      const isOrigem = index === 0;
-      const isDestino = index === bairros.length - 1;
+      // Verifica se o nó já existe
+      if (!nodes.get(bairro.id)) {
 
-      // Adiciona o Nó (Bairro)
-      nodes.add({
-        id: bairro.id,
-        label: bairro.nome,
-        title: bairro.descricao || 'Bairro da Rota',
-        shape: 'dot',
-        color: isOrigem ? '#22C55E' : (isDestino ? '#EF4444' : '#3B82F6'),
-        size: isOrigem || isDestino ? 35 : 25,
-        font: { 
-          color: '#374151', 
-          size: 14, 
-          face: 'Inter', 
-          strokeWidth: 3, 
-          strokeColor: '#ffffff' 
-        },
-        borderWidth: 2
-      });
+        // --- LÓGICA DE CORES E TAMANHOS ---
+        const isOrigem = bairro.id === this.origemBairroId;
+        const isDestinoAlvo = bairro.id === this.destinoBairroId;
 
-      // Lógica da Aresta (Conexão)
+        let corFundo = '#4B5563'; // Cinza Escuro (Intermediário)
+        let tamanho = 20;         // Pequeno
+
+        if (isOrigem) {
+          corFundo = '#22C55E'; // Verde (Origem)
+          tamanho = 30;         // Grande
+        } else if (isDestinoAlvo) {
+          corFundo = '#3B82F6'; // Azul (Destino Final)
+          tamanho = 30;         // Grande
+        }
+
+        nodes.add({
+          id: bairro.id,
+          label: bairro.nome,
+          title: bairro.descricao || 'Bairro da Rota',
+          level: index, // <--- TRUQUE: Força a posição horizontal baseada na ordem de chegada
+          shape: 'dot',
+          color: corFundo,
+          size: tamanho,
+          font: {
+            color: '#374151',
+            size: 14,
+            face: 'Inter',
+            strokeWidth: 3,
+            strokeColor: '#ffffff'
+          },
+          borderWidth: 2
+        });
+      }
+
+      // --- ARESTAS ---
       if (index < bairros.length - 1) {
         const proximoBairro = bairros[index + 1];
-        
-        // Buscamos a distância na nossa lista de conexões carregada
-        const conexao = this.todasConexoes.find(c => 
+
+        const conexao = this.todasConexoes.find(c =>
           c.bairroOrigem.id === bairro.id && c.bairroDestino.id === proximoBairro.id
         );
 
-        // Define o texto da aresta
         const labelDistancia = conexao ? `${conexao.distancia} km` : '?';
 
         edges.add({
           from: bairro.id,
           to: proximoBairro.id,
-          label: labelDistancia, // <--- EXIBE A DISTÂNCIA
+          label: labelDistancia,
           arrows: 'to',
           color: { color: '#64748B' },
           width: 3,
-          font: { 
-            align: 'top', // Texto fica acima da linha
+          font: {
+            align: 'top',
             size: 12,
             color: '#475569',
-            background: 'rgba(255, 255, 255, 0.7)' // Fundo branco suave para leitura
+            background: 'rgba(255, 255, 255, 0.7)'
+          },
+          smooth: {
+            enabled: true,
+            type: 'curvedCW',
+            roundness: 0.2
           }
         });
       }
     });
 
     const options: Options = {
-      nodes: { shadow: true },
-      edges: { 
-        shadow: false, 
-        smooth: { 
-          enabled: true, 
-          type: 'cubicBezier', 
-          forceDirection: 'horizontal', 
-          roundness: 0.4 
-        } 
+      nodes: {
+        shadow: true,
+        fixed: true // Impede que o usuário bagunce a posição calculada
+      },
+      edges: {
+        shadow: false,
+        smooth: {
+          enabled: true,
+          type: 'dynamic',
+          forceDirection: 'none',
+          roundness: 0.5
+        }
       },
       layout: {
         hierarchical: {
           enabled: true,
-          direction: 'LR',
+          direction: 'LR',       // <--- Força Esquerda -> Direita
           sortMethod: 'directed',
-          levelSeparation: 160
+          levelSeparation: 200,  // Distância horizontal entre os nós
+          nodeSpacing: 150       // Distância vertical (se houvesse ramificações)
         }
       },
-      physics: true,
+      physics: false, // <--- IMPORTANTE: Desliga a física para manter a linha reta estática
       interaction: {
-        dragNodes: true,
+        dragNodes: false, // Opcional: Trava os nós no lugar
         zoomView: true,
         dragView: true
       }
@@ -245,7 +268,11 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
 
     const data = { nodes, edges };
     this.network = new Network(this.networkContainer.nativeElement, data, options);
-    this.network.fit();
+
+    // Ajusta o zoom para caber tudo na tela
+    setTimeout(() => {
+      this.network?.fit();
+    }, 100);
   }
 
   abrirModalSalvar() {
@@ -268,7 +295,7 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
     };
     this.rotaService.salvar(novaRota).subscribe({
       next: () => this.showSalvarDialog = false,
-      error: () => {} 
+      error: () => { }
     });
   }
 }
