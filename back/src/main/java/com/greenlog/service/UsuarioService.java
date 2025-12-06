@@ -75,17 +75,11 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO salvar(UsuarioRequestDTO request) {
-        
-        if (request.nome() == null || request.nome().isBlank()) {
-            throw new ErroValidacaoException("O nome do usuário é obrigatório.");
-        }
-        if (request.email() == null || request.email().isBlank()) {
-            throw new ErroValidacaoException("O email do usuário é obrigatório.");
-        }
+
         if (request.senha() == null || request.senha().isBlank()) {
             throw new ErroValidacaoException("A senha do usuário é obrigatória.");
         }
-        
+
         if (!ValidadorRegexSingleton.getInstance().isSenhaValida(request.senha())) {
             throw new RegraDeNegocioException("Erro: Formato da Senha inválido. Ultilizar pelo menos um maiusculo, um minusculo, um numero e um caractere especial");
         }
@@ -93,7 +87,7 @@ public class UsuarioService {
 
         if (usuarioExistente.isPresent()) {
             Usuario usuario = usuarioExistente.get();
-            
+
             if (!usuario.isAtivo()) {
                 usuario.setNome(request.nome());
                 usuario.setSenha(HashUtil.hash(request.senha()));
@@ -102,16 +96,13 @@ public class UsuarioService {
 
                 Usuario usuarioSalvo = usuarioRepository.save(usuario);
                 return usuarioMapper.toResponseDTO(usuarioSalvo);
-            } else {
-                throw new ConflitoException("Já existe um usuário ativo com este e-mail.");
-            }
+            } else throw new ConflitoException("Já existe um usuário ativo com este e-mail.");
         }
 
         Usuario novoUsuario = usuarioMapper.toEntity(request);
 
         novoUsuario.setSenha(HashUtil.hash(request.senha()));
         novoUsuario.setAtivo(true);
-
         Usuario usuarioSalvo = processadorCadastroUsuario.processar(novoUsuario);
 
         return usuarioMapper.toResponseDTO(usuarioSalvo);
@@ -120,17 +111,19 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO request) {
         Usuario usuarioExistente = buscarEntityPorId(id);
-        usuarioMapper.updateEntityFromDTO(request, usuarioExistente);
-        if (!usuarioExistente.isAtivo()) {
-            throw new ErroValidacaoException("Não é possível atualizar os dados de um Usuario inativo. Ative-o primeiro.");
-        }
+
         if (request.senha() != null && !request.senha().isEmpty()) {
-            usuarioExistente.setSenha(request.senha());
+            if (!ValidadorRegexSingleton.getInstance().isSenhaValida(request.senha())) throw new RegraDeNegocioException("Erro: Formato da Senha inválido...");
+            usuarioExistente.setSenha(HashUtil.hash(request.senha()));
         }
 
-        return usuarioMapper.toResponseDTO(usuarioRepository.save(usuarioExistente));
+        usuarioMapper.updateEntityFromDTO(request, usuarioExistente);
+        if (!usuarioExistente.isAtivo()) throw new ErroValidacaoException("Não é possível atualizar inativo.");
+
+        Usuario salvo = processadorCadastroUsuario.processar(usuarioExistente);
+        return usuarioMapper.toResponseDTO(salvo);
     }
-    
+
     @Transactional
     public void alterarStatus(Long id) {
         Usuario usuario = usuarioRepository.findById(id)

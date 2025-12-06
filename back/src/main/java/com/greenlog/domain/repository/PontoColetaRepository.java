@@ -24,4 +24,5 @@ public interface PontoColetaRepository extends JpaRepository<PontoColeta, Long>,
     Optional<PontoColeta> findByNomePonto(String nomePonto);
     List<PontoColeta> findByBairroIdAndAtivo(Long bairroId, Boolean ativo);
     List<PontoColeta> findByTiposResiduosAceitos_Id(Long tipoId);
+    boolean existsByNomePontoAndIdNot(String nomePonto, Long id);
 }

@@ -15,6 +15,7 @@ import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.PontoColetaMapper;
+import com.greenlog.service.template.ProcessadorCadastroPontoColeto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -39,6 +40,8 @@ public class PontoColetaService {
     private PontoColetaMapper pontoColetaMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
+    @Autowired
+    private ProcessadorCadastroPontoColeto processadorCadastroPontoColeto;
 
     @Transactional(readOnly = true)
     public List<PontoColetaResponseDTO> buscarAvancado(String query) {
@@ -80,33 +83,14 @@ public class PontoColetaService {
 
     @Transactional
     public PontoColetaResponseDTO salvar(PontoColetaRequestDTO request) {
-
-        if (request.nomePonto() == null || request.nomePonto().isBlank()) {
-            throw new ErroValidacaoException("O nome do ponto é obrigatório.");
-        }
-        if (request.nomeResponsavel() == null || request.nomeResponsavel().isBlank()) {
-            throw new ErroValidacaoException("O nome do responsável é obrigatório.");
-        }
-        if (request.contato() == null || request.contato().isBlank()) {
-            throw new ErroValidacaoException("O contato é obrigatório.");
-        }
-        if (request.email() == null || request.email().isBlank()) {
-            throw new ErroValidacaoException("O email é obrigatório.");
-        }
-        if (request.endereco() == null || request.endereco().isBlank()) {
-            throw new ErroValidacaoException("O endereço é obrigatório.");
-        }
-        if (request.bairroId() == null) {
-            throw new ErroValidacaoException("O bairro é obrigatório.");
-        }
-
+        
         Optional<PontoColeta> existente = pontoColetaRepository.findByNomePonto(request.nomePonto());
 
         if (existente.isPresent()) {
             PontoColeta ponto = existente.get();
 
             if (!ponto.isAtivo()) {
-                ponto.setNomePonto(request.nomePonto());
+                ponto.setNomePonto(request.nomePonto().trim());
                 ponto.setNomeResponsavel(request.nomeResponsavel());
                 ponto.setContato(request.contato());
                 ponto.setEmail(request.email());
@@ -119,11 +103,10 @@ public class PontoColetaService {
                 );
                 ponto.setAtivo(true);
 
-                pontoColetaRepository.save(ponto);
+                processadorCadastroPontoColeto.processar(ponto);
                 return pontoColetaMapper.toResponseDTO(ponto);
-            } else {
-                throw new ConflitoException("Já existe um ponto de coleta ativo com este nome.");
-            }
+                
+            } else throw new ConflitoException("Já existe um ponto de coleta ativo com este nome.");
         }
 
         PontoColeta novo = pontoColetaMapper.toEntity(request);
@@ -134,8 +117,7 @@ public class PontoColetaService {
                         .collect(Collectors.toList())
         );
         novo.setAtivo(true);
-
-        PontoColeta salvo = pontoColetaRepository.save(novo);
+        PontoColeta salvo = processadorCadastroPontoColeto.processar(novo);
         return pontoColetaMapper.toResponseDTO(salvo);
     }
 
@@ -143,13 +125,13 @@ public class PontoColetaService {
     public PontoColetaResponseDTO atualizar(Long id, PontoColetaRequestDTO request) {
         PontoColeta pontoExistente = buscarEntityPorId(id);
 
-        pontoColetaMapper.updateEntityFromDTO(request, pontoExistente);
-        pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
-        pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
-                .map(tipoResiduoService::buscarEntityPorId)
-                .collect(Collectors.toList()));
+        if (request.bairroId() != null) pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
+        if (request.tiposResiduosIds() != null) pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
+            .map(tipoResiduoService::buscarEntityPorId)
+            .collect(Collectors.toList()));
 
-        return pontoColetaMapper.toResponseDTO(pontoColetaRepository.save(pontoExistente));
+        PontoColeta pontoSalvo = processadorCadastroPontoColeto.processar(pontoExistente);
+        return pontoColetaMapper.toResponseDTO(pontoSalvo);
     }
 
     @Transactional

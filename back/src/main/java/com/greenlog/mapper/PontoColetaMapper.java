@@ -60,7 +60,7 @@ public class PontoColetaMapper {
         if (request == null || entity == null) {
             return;
         }
-        entity.setNomePonto(request.nomePonto());
+        entity.setNomePonto(request.nomePonto().trim());
         entity.setNomeResponsavel(request.nomeResponsavel());
         entity.setContato(request.contato());
         entity.setEndereco(request.endereco());
