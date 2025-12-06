@@ -28,7 +28,7 @@ public class CaminhaoMapper {
     public CaminhaoResponseDTO toResponseDTO(Caminhao caminhao) {
         return new CaminhaoResponseDTO(
                 caminhao.getId(),
-                caminhao.getPlaca(),
+                caminhao.getPlaca().trim(),
                 caminhao.getMotorista(),
                 caminhao.getCapacidadeKg(),
                 caminhao.getTiposSuportados() == null ? null
@@ -55,7 +55,7 @@ public class CaminhaoMapper {
         if (request == null || entity == null) {
             return;
         }
-        entity.setPlaca(request.placa());
+        entity.setPlaca(request.placa().trim());
         entity.setMotorista(request.motorista());
         entity.setCapacidadeKg(request.capacidadeKg());
     }

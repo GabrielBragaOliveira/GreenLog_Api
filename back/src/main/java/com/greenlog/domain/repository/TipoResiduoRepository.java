@@ -19,4 +19,5 @@ public interface TipoResiduoRepository extends JpaRepository<TipoResiduo, Long>,
     Optional<TipoResiduo> findByNome(String nome);
     boolean existsByNome(String nome);
     List<Usuario> findByAtivo(Boolean ativo);
+    boolean existsByNomeAndIdNot(String nome, Long id);
 }
