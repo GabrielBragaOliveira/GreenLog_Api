@@ -13,6 +13,7 @@ import java.util.List;
 public record RotaResponseDTO(    
     Long id,
     String nome,
-    List<BairroResponseDTO> listaDeBairros
+    List<BairroResponseDTO> listaDeBairros,
+    Boolean ativo
         
 ) {}

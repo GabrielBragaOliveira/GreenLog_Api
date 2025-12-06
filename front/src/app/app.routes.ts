@@ -12,6 +12,7 @@ import { tiposResiduoRoutes } from './funcionalidades/residuos/tipo-residuos.rou
 import { adminGuard } from './nucleo/guards/admin.guard';
 import { mapaRoutes } from './funcionalidades/mapa/mapa.routes';
 import { ItinerarioRoutes } from './funcionalidades/itinerarios/itinerario.routes';
+import { rotaRoutes } from './funcionalidades/rotas/rota.routes';
 
 export const routes: Routes = [
   {
@@ -31,6 +32,7 @@ export const routes: Routes = [
         path: '',
         canActivate: [adminGuard],
         children: [
+          ...rotaRoutes,
           ...caminhaoRoutes,
           ...pontosRoutes,
           ...conexoesRoutes,

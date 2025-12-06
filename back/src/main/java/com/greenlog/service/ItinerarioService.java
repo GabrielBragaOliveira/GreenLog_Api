@@ -14,8 +14,8 @@ import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.ItinerarioMapper;
 import com.greenlog.domain.repository.ItinerarioRepository;
+import com.greenlog.enums.StatusItinerarioEnum;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ public class ItinerarioService {
     @Autowired
     private RotaService rotaService;
     @Autowired
-    private PontoColetaService pontoColetaService;
+    private TipoResiduoService tipoResiduoService;
     @Autowired
     private ItinerarioMapper itinerarioMapper;
     @Autowired
@@ -78,22 +78,26 @@ public class ItinerarioService {
     public ItinerarioResponseDTO salvar(ItinerarioRequestDTO request) {
         Caminhao caminhao = caminhaoService.buscarEntityPorId(request.caminhaoId());
         Rota rota = rotaService.buscarEntityPorId(request.rotaId());
+        TipoResiduo tipoResiduo = tipoResiduoService.buscarEntityPorId(request.tipoResiduoId());
 
         if (!caminhao.isAtivo()) {
-            throw new RegraDeNegocioException(
-                    "O caminhão " + caminhao.getPlaca() + " está inativo e não pode ser utilizado em itinerários."
-            );
+            throw new RegraDeNegocioException("Caminhão inativo.");
         }
 
         if (itinerarioRepository.findByCaminhaoAndData(caminhao, request.data()).isPresent()) {
             throw new RegraDeNegocioException("O caminhão " + caminhao.getPlaca() + " já possui um itinerário agendado para esta data.");
         }
 
-        validarCompatibilidadeCaminhaoRota(caminhao, rota);
-
+        if (!caminhao.getTiposSuportados().contains(tipoResiduo)) {
+            throw new RegraDeNegocioException(
+                    "O caminhão " + caminhao.getPlaca() + " não suporta o tipo de resíduo selecionado: " + tipoResiduo.getNome()
+            );
+        }
         Itinerario novoItinerario = itinerarioMapper.toEntity(request);
         novoItinerario.setCaminhao(caminhao);
         novoItinerario.setRota(rota);
+        novoItinerario.setTipoResiduo(tipoResiduo);
+        novoItinerario.setStatusItinerarioEnum(StatusItinerarioEnum.PENDENTE);
 
         return itinerarioMapper.toResponseDTO(itinerarioRepository.save(novoItinerario));
     }
@@ -111,7 +115,6 @@ public class ItinerarioService {
             }
         }
 
-        validarCompatibilidadeCaminhaoRota(novoCaminhao, novaRota);
         itinerarioMapper.updateEntityFromDTO(request, itinerarioExistente);
         itinerarioExistente.setCaminhao(novoCaminhao);
         itinerarioExistente.setRota(novaRota);
@@ -122,29 +125,5 @@ public class ItinerarioService {
     public void excluir(Long id) {
         Itinerario itinerario = buscarEntityPorId(id);
         itinerarioRepository.delete(itinerario);
-    }
-
-    private void validarCompatibilidadeCaminhaoRota(Caminhao caminhao, Rota rota) {
-        Set<TipoResiduo> tiposSuportadosCaminhao = caminhao.getTiposSuportados().stream().collect(Collectors.toSet());
-
-        Set<TipoResiduo> tiposRequeridosNaRota = rota.getListaDeBairros().stream()
-                .flatMap(bairro -> pontoColetaService.buscarPontosPorBairro(bairro).stream())
-                .flatMap(ponto -> ponto.getTiposResiduosAceitos().stream())
-                .collect(Collectors.toSet());
-
-        boolean compativel = tiposRequeridosNaRota.stream()
-                .allMatch(tiposSuportadosCaminhao::contains);
-
-        if (!compativel) {
-            String tiposNaoSuportados = tiposRequeridosNaRota.stream()
-                    .filter(tipo -> !tiposSuportadosCaminhao.contains(tipo))
-                    .map(TipoResiduo::getNome)
-                    .collect(Collectors.joining(", "));
-
-            throw new RegraDeNegocioException(
-                    String.format("O caminhão (%s) não suporta os tipos de resíduo exigidos pela rota. Resíduos não suportados: %s",
-                            caminhao.getPlaca(), tiposNaoSuportados)
-            );
-        }
     }
 }

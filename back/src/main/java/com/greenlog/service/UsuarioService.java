@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.greenlog.service.template.ProcessadorCadastroUsuario;
 import com.greenlog.util.HashUtil;
+import com.greenlog.util.ValidadorRegexSingleton;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -83,7 +84,11 @@ public class UsuarioService {
         }
         if (request.senha() == null || request.senha().isBlank()) {
             throw new ErroValidacaoException("A senha do usuário é obrigatória.");
-        }    
+        }
+        
+        if (!ValidadorRegexSingleton.getInstance().isSenhaValida(request.senha())) {
+            throw new RegraDeNegocioException("Erro: Formato da Senha inválido. Ultilizar pelo menos um maiusculo, um minusculo, um numero e um caractere especial");
+        }
         Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(request.email());
 
         if (usuarioExistente.isPresent()) {
@@ -116,6 +121,9 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO request) {
         Usuario usuarioExistente = buscarEntityPorId(id);
         usuarioMapper.updateEntityFromDTO(request, usuarioExistente);
+        if (!usuarioExistente.isAtivo()) {
+            throw new ErroValidacaoException("Não é possível atualizar os dados de um Usuario inativo. Ative-o primeiro.");
+        }
         if (request.senha() != null && !request.senha().isEmpty()) {
             usuarioExistente.setSenha(request.senha());
         }

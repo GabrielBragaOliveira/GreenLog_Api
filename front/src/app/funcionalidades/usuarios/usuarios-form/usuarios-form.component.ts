@@ -11,6 +11,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
 import { UsuarioRequest } from '../../../compartilhado/models/usuario.model';
 import { Perfil } from '../../../compartilhado/models/perfil.enum';
+import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
 
 @Component({
   selector: 'app-usuarios-form',
@@ -29,7 +30,7 @@ import { Perfil } from '../../../compartilhado/models/perfil.enum';
   templateUrl: './usuarios-form.component.html',
   styleUrl: './usuarios-form.component.scss'
 })
-export class UsuariosFormComponent implements OnInit {
+export class UsuariosFormComponent implements OnInit, ComponenteComFormulario {
 
   private fb = inject(FormBuilder);
   private usuarioService = inject(UsuarioService);

@@ -53,7 +53,7 @@ export class CaminhaoFormComponent implements OnInit, ComponenteComFormulario {
   }
 
   carregarTiposResiduo() {
-    this.tipoResiduoService.listar().subscribe(tipos => {
+    this.tipoResiduoService.listar().subscribe(tipos => { 
       this.tiposResiduos = tipos;
     });
   }
@@ -101,5 +101,16 @@ export class CaminhaoFormComponent implements OnInit, ComponenteComFormulario {
 
   temMudancasNaoSalvas(): boolean {
     return !this.isSaving && this.form.dirty;
+  }
+
+  converterParaMaiusculas(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const valor = input.value.toUpperCase();
+    
+    // Atualiza o input visualmente e o FormControl
+    if (input.value !== valor) {
+      input.value = valor;
+      this.form.get('placa')?.setValue(valor);
+    }
   }
 }

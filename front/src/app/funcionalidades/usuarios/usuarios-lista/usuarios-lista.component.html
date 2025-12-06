@@ -1,18 +1,67 @@
 <div class="flex flex-column gap-3">
-  
+
   <div class="flex justify-content-between align-items-center">
     <h2 class="m-0 text-800">Gestão de Usuários</h2>
     <p-button label="Novo Usuário" icon="pi pi-plus" routerLink="novo"></p-button>
   </div>
 
+  <p-card styleClass="shadow-1 surface-50 mb-3">
+    <div class="flex flex-column gap-2">
+      <div class="flex justify-content-between align-items-center">
+        <label class="font-bold text-sm text-700 flex align-items-center gap-2">
+          <i class="pi pi-terminal"></i> Busca Avançada (Console)
+        </label>
+        <span class="text-xs text-500 cursor-pointer hover:text-primary transition-colors" (click)="limparFiltros()">
+          <i class="pi pi-eraser"></i> Limpar terminal
+        </span>
+      </div>
+
+      <textarea
+        pInputTextarea
+        [(ngModel)]="queryManual"
+        rows="3"
+        class="w-full font-mono text-lg surface-0"
+        placeholder='Digite sua busca... Ex: nome="Gabriel Praga" AND ativo=true'
+        (keydown.control.enter)="buscar()">
+      </textarea>
+
+      <div class="flex gap-2 align-items-center flex-wrap bg-white p-2 border-round border-1 surface-border">
+        <span class="text-xs text-500 font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
+
+        @for (atalho of atalhos; track atalho.label) {
+          <button
+            pButton
+            type="button"
+            [label]="atalho.label"
+            class="p-button-text p-button-sm p-button-secondary text-xs py-1"
+            (click)="adicionarAtalho(atalho.valor)">
+          </button>
+        }
+
+        <div class="flex-grow-1"></div>
+
+        <p-button
+          label="Executar Query"
+          icon="pi pi-search"
+          styleClass="p-button-sm"
+          (onClick)="buscar()">
+        </p-button>
+      </div>
+
+      <small class="text-500 ml-1">
+        Dica: Use <b>Ctrl + Enter</b> para buscar. Textos devem estar entre aspas duplas.
+      </small>
+    </div>
+  </p-card>
+
   <p-card styleClass="shadow-2">
-    <p-table 
-      [value]="usuarios" 
-      [loading]="isLoading" 
-      [rows]="10" 
-      [paginator]="true" 
+    <p-table
+      [value]="usuarios"
+      [loading]="isLoading"
+      [rows]="10"
+      [paginator]="true"
       [rowHover]="true"
-      responsiveLayout="stack" 
+      responsiveLayout="stack"
       styleClass="p-datatable-sm">
 
       <ng-template pTemplate="header">
@@ -27,17 +76,17 @@
 
       <ng-template pTemplate="body" let-usuario>
         <tr [class.opacity-60]="!usuario.ativo">
-          
+
           <td class="font-semibold">{{ usuario.nome }}</td>
           <td>{{ usuario.email }}</td>
           <td>
             <p-tag [value]="usuario.perfil" [severity]="usuario.perfil === PerfilEnum.ADMIN ? 'warning' : 'info'">
             </p-tag>
           </td>
-          
+
           <td class="text-center">
-            <p-tag 
-              [value]="usuario.ativo ? 'ATIVO' : 'INATIVO'" 
+            <p-tag
+              [value]="usuario.ativo ? 'ATIVO' : 'INATIVO'"
               [severity]="usuario.ativo ? 'success' : 'danger'"
               styleClass="text-xs">
             </p-tag>
@@ -46,17 +95,15 @@
           <td class="text-center">
             <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
               [routerLink]="['editar', usuario.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
-            
-            <p-button 
-              [icon]="usuario.ativo ? 'pi pi-ban' : 'pi pi-check-circle'" 
+
+            <p-button
+              [icon]="usuario.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (usuario.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
-              (onClick)="confirmarAlteracaoStatus(usuario)" 
-              [pTooltip]="usuario.ativo ? 'Inativar' : 'Reativar'" 
+              (onClick)="confirmarAlteracaoStatus(usuario)"
+              [pTooltip]="usuario.ativo ? 'Inativar' : 'Reativar'"
               tooltipPosition="top">
             </p-button>
 
-            <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger"
-              (onClick)="confirmarExclusao(usuario)" pTooltip="Excluir Permanentemente" tooltipPosition="top"></p-button>
           </td>
         </tr>
       </ng-template>

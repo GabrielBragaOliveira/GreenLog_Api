@@ -9,6 +9,8 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TipoResiduoService } from '../../../nucleo/servicos/tipo-residuo.service';
 import { TipoResiduoResponse } from '../../../compartilhado/models/tipo-residuo.model';
+import { FormsModule } from '@angular/forms';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @Component({
   selector: 'app-residuos-lista',
@@ -20,7 +22,9 @@ import { TipoResiduoResponse } from '../../../compartilhado/models/tipo-residuo.
     CardModule,
     TooltipModule,
     TagModule,
-    RouterLink
+    RouterLink,
+    FormsModule,
+    InputTextareaModule
   ],
   templateUrl: './residuos-lista.component.html',
   styleUrl: './residuos-lista.component.scss'
@@ -33,9 +37,42 @@ export class ResiduosListaComponent implements OnInit {
 
   residuos: TipoResiduoResponse[] = [];
   isLoading = true;
+  queryManual: string = '';
+
+  atalhos = [
+    { label: 'Nome', valor: 'nome=""' },
+    { label: 'Ativo', valor: 'ativo=true' },
+    { label: 'Inativo', valor: 'ativo=false' },
+    { label: 'E (AND)', valor: ' AND ' },
+    { label: 'OU (OR)', valor: ' OR ' }
+  ];
 
   ngOnInit(): void {
     this.carregarResiduos();
+  }
+
+   adicionarAtalho(snippet: string) {
+    this.queryManual += snippet;
+  }
+
+  buscar() {
+    this.isLoading = true;
+    const query = this.queryManual.trim();
+    this.tipoResiduoService.listar(query).subscribe({
+      next: (dados) => {
+        this.residuos = dados;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Erro na busca:', err);
+      }
+    });
+  }
+
+  limparFiltros() {
+    this.queryManual = '';
+    this.buscar();
   }
 
   carregarResiduos() {
@@ -67,18 +104,6 @@ export class ResiduosListaComponent implements OnInit {
   private alterarStatus(residuo: TipoResiduoResponse) {
     this.tipoResiduoService.alterarStatus(residuo.id).subscribe({
       next: () => this.carregarResiduos()
-    });
-  }
-
-  confirmarExclusao(residuo: TipoResiduoResponse) {
-    this.confirmationService.confirm({
-      message: `Tem certeza que deseja excluir permanentemente o tipo <b>${residuo.nome}</b>?`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, excluir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept: () => this.excluir(residuo.id)
     });
   }
 

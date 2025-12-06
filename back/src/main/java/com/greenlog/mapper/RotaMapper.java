@@ -30,7 +30,8 @@ public class RotaMapper {
                 rota.getListaDeBairros() == null ? null
                 : rota.getListaDeBairros().stream()
                         .map(bairroMapper::toResponseDTO)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                rota.getAtivo()
         );
     }
 

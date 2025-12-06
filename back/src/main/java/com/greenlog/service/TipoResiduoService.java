@@ -7,8 +7,6 @@ package com.greenlog.service;
 import com.greenlog.domain.dto.TipoResiduoRequestDTO;
 import com.greenlog.domain.dto.TipoResiduoResponseDTO;
 import com.greenlog.domain.entity.TipoResiduo;
-import com.greenlog.domain.repository.CaminhaoRepository;
-import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.TipoResiduoMapper;
 import com.greenlog.domain.repository.TipoResiduoRepository;
@@ -31,10 +29,6 @@ public class TipoResiduoService {
 
     @Autowired
     private TipoResiduoRepository tipoResiduoRepository;
-    @Autowired
-    private CaminhaoRepository caminhaoRepository;
-    @Autowired
-    private PontoColetaRepository pontoColetaRepository;
     @Autowired
     private TipoResiduoMapper tipoResiduoMapper;
     @Autowired
@@ -109,6 +103,11 @@ public class TipoResiduoService {
     public TipoResiduoResponseDTO atualizar(Long id, TipoResiduoRequestDTO request) {
         TipoResiduo tipoExistente = buscarEntityPorId(id);
         tipoResiduoMapper.updateEntityFromDTO(request, tipoExistente);
+        
+        if (!tipoExistente.isAtivo()) {
+            throw new ErroValidacaoException("Não é possível atualizar os dados de um tipo de residuo inativo. Ative-o primeiro.");
+        }
+        
         return tipoResiduoMapper.toResponseDTO(tipoResiduoRepository.save(tipoExistente));
     }
 

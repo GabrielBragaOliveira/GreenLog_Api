@@ -17,10 +17,12 @@ public final class ValidadorRegexSingleton {
     
     private final Pattern placaPattern;
     private final Pattern telefonePattern;
+    private final Pattern senhaPattern;
 
     private ValidadorRegexSingleton() {
         this.placaPattern = Pattern.compile(RegexConstants.PLACA_REGEX);
         this.telefonePattern = Pattern.compile(RegexConstants.TELEFONE_REGEX);
+        this.senhaPattern = Pattern.compile(RegexConstants.SENHA_REGEX);
     }
     
     public static ValidadorRegexSingleton getInstance() {
@@ -36,6 +38,12 @@ public final class ValidadorRegexSingleton {
     public boolean isTelefoneValido(String telefone) {
         if (telefone == null) return false;
         Matcher matcher = telefonePattern.matcher(telefone);
+        return matcher.matches();
+    }
+    
+    public boolean isSenhaValida(String senha){
+        if (senha == null) return false;
+        Matcher matcher = senhaPattern.matcher(senha);
         return matcher.matches();
     }
 }

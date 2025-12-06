@@ -2,12 +2,10 @@
     display: block;
 }
 
-// Utilitário para altura total menos margens
 .h-screen-calc {
     height: calc(100vh - 2rem);
 }
 
-// Scrollbar bonita para a área da grid
 .custom-scrollbar {
     &::-webkit-scrollbar {
         width: 8px;
@@ -25,13 +23,11 @@
     }
 }
 
-// Layout da Grid Fixa (7 colunas iguais)
 .grid-nogutter > .col {
-    flex: 1 0 0; // Garante largura igual
-    min-width: 0; // Evita overflow de flexbox
+    flex: 1 0 0;
+    min-width: 0;
 }
 
-// Botão 'xs' customizado para o card
 ::ng-deep .p-button.p-button-xs {
     width: 1.5rem;
     height: 1.5rem;

@@ -4,6 +4,7 @@
  */
 package com.greenlog.domain.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -19,6 +20,9 @@ public record ItinerarioRequestDTO(
     Long caminhaoId,
 
     @NotNull(message = "O ID da rota é obrigatório.")
-    Long rotaId
+    Long rotaId,
+    
+    @NotNull(message = "Deve haver pelo menos um tipo de resíduo aceito.")
+    Long tipoResiduoId
       
 ) {}

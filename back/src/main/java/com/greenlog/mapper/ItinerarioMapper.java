@@ -18,10 +18,12 @@ public class ItinerarioMapper {
 
     private final CaminhaoMapper caminhaoMapper;
     private final RotaMapper rotaMapper;
+    private final TipoResiduoMapper tipoResiduoMapper;
 
-    public ItinerarioMapper(CaminhaoMapper caminhaoMapper, RotaMapper rotaMapper) {
+    public ItinerarioMapper(CaminhaoMapper caminhaoMapper, RotaMapper rotaMapper, TipoResiduoMapper tipoResiduoMapper) {
         this.caminhaoMapper = caminhaoMapper;
         this.rotaMapper = rotaMapper;
+        this.tipoResiduoMapper = tipoResiduoMapper;
     }
 
     public ItinerarioResponseDTO toResponseDTO(Itinerario itinerario) {
@@ -29,7 +31,9 @@ public class ItinerarioMapper {
                 itinerario.getId(),
                 itinerario.getData(),
                 caminhaoMapper.toResponseDTO(itinerario.getCaminhao()),
-                rotaMapper.toResponseDTO(itinerario.getRota())
+                rotaMapper.toResponseDTO(itinerario.getRota()),
+                itinerario.getTipoResiduo() != null ? tipoResiduoMapper.toResponseDTO(itinerario.getTipoResiduo()) : null,
+                itinerario.getStatusItinerarioEnum()
         );
     }
 
@@ -37,7 +41,6 @@ public class ItinerarioMapper {
         if (request == null) {
             return null;
         }
-
         Itinerario entity = new Itinerario();
         entity.setData(request.data());
         return entity;
