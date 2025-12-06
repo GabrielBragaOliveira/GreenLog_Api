@@ -121,17 +121,25 @@ public class PontoColetaService {
         return pontoColetaMapper.toResponseDTO(salvo);
     }
 
-    @Transactional
+   @Transactional
     public PontoColetaResponseDTO atualizar(Long id, PontoColetaRequestDTO request) {
+        String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
         PontoColeta pontoExistente = buscarEntityPorId(id);
 
-        if (request.bairroId() != null) pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
-        if (request.tiposResiduosIds() != null) pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
-            .map(tipoResiduoService::buscarEntityPorId)
-            .collect(Collectors.toList()));
+        if (pontoColetaRepository.existsByNomePontoAndIdNot(nomePonto, id)) {
+            throw new ErroValidacaoException("Já existe um ponto de coleta com este nome.");
+        }
 
-        PontoColeta pontoSalvo = processadorCadastroPontoColeto.processar(pontoExistente);
-        return pontoColetaMapper.toResponseDTO(pontoSalvo);
+        pontoColetaMapper.updateEntityFromDTO(request, pontoExistente);
+        
+        pontoExistente.setNomePonto(nomePonto);
+        pontoExistente.setEmail(request.email());
+        pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
+        pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
+                .map(tipoResiduoService::buscarEntityPorId)
+                .collect(Collectors.toList()));
+
+        return pontoColetaMapper.toResponseDTO(pontoColetaRepository.save(pontoExistente));
     }
 
     @Transactional

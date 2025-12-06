@@ -149,11 +149,11 @@ MERGE INTO conexao_bairro (id, bairro_origem_id, bairro_destino_id, distancia, a
     (59, 16, 11, 2.8, true),
     (60, 13, 16, 7.8, true);
 
-MERGE INTO itinerario (id, data, caminhao_id, rota_id, tipo_residuo_id, status_itinerario_enum) KEY(id) VALUES
-    (1, DATE '2025-03-01', 1, 1, 1, 'PENDENTE'),
-    (2, DATE '2025-03-01', 2, 2, 2, 'PENDENTE'),
-    (3, DATE '2025-03-02', 3, 3, 1, 'PENDENTE'),
-    (4, DATE '2025-03-03', 1, 3, 1, 'PENDENTE');
+MERGE INTO itinerario (id, data, caminhao_id, rota_id, tipo_residuo_id) KEY(id) VALUES
+    (1, DATE '2025-03-01', 1, 1, 1),
+    (2, DATE '2025-03-01', 2, 2, 2),
+    (3, DATE '2025-03-02', 3, 3, 1),
+    (4, DATE '2025-03-03', 1, 3, 1);
 
 ALTER TABLE USUARIO ALTER COLUMN id RESTART WITH (SELECT COALESCE(MAX(id), 0) + 1 FROM USUARIO);
 ALTER TABLE bairro ALTER COLUMN id RESTART WITH (SELECT COALESCE(MAX(id), 0) + 1 FROM bairro);

@@ -25,16 +25,9 @@ public class RegistroDeObservers {
     @Autowired
     private BairroObserver bairroObserver;
 
-    @Autowired
-    private RotaSubject rotaSubject;
-
-    @Autowired
-    private RotaObserver rotaObserver;
-
     @PostConstruct
     public void registrar() {
         tipoResiduoSubject.addObserver(tipoResiduoObserver);
         bairroSubject.addObserver(bairroObserver);
-        rotaSubject.addObserver(rotaObserver);
     }
 }

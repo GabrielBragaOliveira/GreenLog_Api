@@ -4,17 +4,13 @@
  */
 package com.greenlog.domain.entity;
 
-import com.greenlog.enums.StatusItinerarioEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -54,11 +50,6 @@ public class Itinerario {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_residuo_id", nullable = false)
     private TipoResiduo tipoResiduo;
-
-    @NotNull(message = "O Statusf é obrigatório.")
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusItinerarioEnum statusItinerarioEnum;
 
     public Itinerario() {
     }
@@ -101,14 +92,6 @@ public class Itinerario {
 
     public void setTipoResiduo(TipoResiduo tipoResiduo) {
         this.tipoResiduo = tipoResiduo;
-    }
-
-    public StatusItinerarioEnum getStatusItinerarioEnum() {
-        return statusItinerarioEnum;
-    }
-
-    public void setStatusItinerarioEnum(StatusItinerarioEnum statusItinerarioEnum) {
-        this.statusItinerarioEnum = statusItinerarioEnum;
     }
 
     @Override

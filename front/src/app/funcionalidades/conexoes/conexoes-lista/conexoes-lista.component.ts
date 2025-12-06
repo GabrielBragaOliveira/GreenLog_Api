@@ -1,29 +1,27 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ConexaoService } from '../../../nucleo/servicos/conexao.service';
-import { ConexaoBairroResponse } from '../../../compartilhado/models/conexao-bairro.model';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
-import { FormsModule } from '@angular/forms';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ConfirmationService } from 'primeng/api';
+import { ConexaoService } from '../../../nucleo/servicos/conexao.service';
+import { ConexaoBairroResponse } from '../../../compartilhado/models/conexao-bairro.model';
 
 @Component({
   selector: 'app-conexoes-lista',
   standalone: true,
   imports: [
-    CommonModule,
     RouterLink,
+    FormsModule,
     TableModule,
     ButtonModule,
     CardModule,
     TooltipModule,
     TagModule,
-    FormsModule,
     InputTextareaModule
   ],
   templateUrl: './conexoes-lista.component.html',
@@ -75,11 +73,13 @@ export class ConexoesListaComponent implements OnInit {
     this.buscar();
   }
 
-
   carregarDados() {
     this.isLoading = true;
     this.conexaoService.listar().subscribe({
-      next: (dados) => { this.conexoes = dados; this.isLoading = false; },
+      next: (dados) => { 
+        this.conexoes = dados; 
+        this.isLoading = false; 
+      },
       error: () => this.isLoading = false
     });
   }
@@ -91,7 +91,7 @@ export class ConexoesListaComponent implements OnInit {
       message: estaAtivo
         ? `Deseja inativar a conexão entre <b>${conexao.bairroOrigem.nome}</b> e <b>${conexao.bairroDestino.nome}</b>?`
         : `Deseja reativar a conexão entre <b>${conexao.bairroOrigem.nome}</b> e <b>${conexao.bairroDestino.nome}</b>?`,
-      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      header: estaAtivo ? 'Inativar' : 'Reativar',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
       acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
@@ -103,11 +103,5 @@ export class ConexoesListaComponent implements OnInit {
       this.conexaoService.alterarStatus(conexao.id).subscribe({
           next: () => this.carregarDados()
       });
-  }
-
-  private excluir(id: number) {
-    this.conexaoService.excluir(id).subscribe(() => {
-      this.conexoes = this.conexoes.filter(c => c.id !== id);
-    });
   }
 }
