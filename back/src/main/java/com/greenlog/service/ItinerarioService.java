@@ -16,7 +16,6 @@ import com.greenlog.mapper.ItinerarioMapper;
 import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.enums.StatusItinerarioEnum;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,8 +36,6 @@ public class ItinerarioService {
     private RotaService rotaService;
     @Autowired
     private TipoResiduoService tipoResiduoService;
-    @Autowired
-    private PontoColetaService pontoColetaService;
     @Autowired
     private ItinerarioMapper itinerarioMapper;
     @Autowired
