@@ -40,7 +40,7 @@ public class BairroMapper {
         if (request == null || entity == null) {
             return;
         }
-        entity.setNome(request.nome());
+        entity.setNome(request.nome().trim());
         entity.setDescricao(request.descricao());
     }
 }

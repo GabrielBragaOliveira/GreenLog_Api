@@ -85,7 +85,9 @@ public class CaminhaoService {
 
     @Transactional
     public CaminhaoResponseDTO salvar(CaminhaoRequestDTO request) {
-        if (request.placa() == null || request.placa().isBlank()) {
+        String placa = request.placa() != null ? request.placa().trim() : null;
+
+        if (placa == null || placa.isBlank()) {
             throw new ErroValidacaoException("A placa do caminhão é obrigatória.");
         }
         if (request.motorista() == null || request.motorista().isBlank()) {
@@ -98,12 +100,12 @@ public class CaminhaoService {
             throw new ErroValidacaoException("O caminhão deve suportar pelo menos um tipo de resíduo.");
         }
 
-        Optional<Caminhao> existente = caminhaoRepository.findByPlaca(request.placa());
+        Optional<Caminhao> existente = caminhaoRepository.findByPlaca(placa);
 
         if (existente.isPresent()) {
             Caminhao caminhao = existente.get();
             if (!caminhao.isAtivo()) {
-                caminhao.setPlaca(request.placa());
+                caminhao.setPlaca(placa);
                 caminhao.setMotorista(request.motorista());
                 caminhao.setCapacidadeKg(request.capacidadeKg());
                 caminhao.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
@@ -129,6 +131,10 @@ public class CaminhaoService {
     @Transactional
     public CaminhaoResponseDTO atualizar(Long id, CaminhaoRequestDTO request) {
         Caminhao caminhaoExistente = buscarEntityPorId(id);
+
+        if (caminhaoRepository.existsByPlacaAndIdNot(request.placa(), id)) {
+            throw new ErroValidacaoException("Já existe um caminhão cadastrado com esta placa.");
+        }
         caminhaoMapper.updateEntityFromDTO(request, caminhaoExistente);
         caminhaoExistente.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
 
@@ -186,15 +192,15 @@ public class CaminhaoService {
                 .map(caminhaoMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
-    
+
     private List<TipoResiduo> buscarTiposResiduoAtivos(List<Long> ids) {
-    return ids.stream()
-            .map(tipoResiduoService::buscarEntityPorId)
-            .peek(tipo -> {
-                if (!tipo.isAtivo()) {
-                    throw new ErroValidacaoException("O tipo de resíduo '" + tipo.getNome() + "' está inativo e não pode ser vinculado ao caminhão.");
-                }
-            })
-            .collect(Collectors.toList());
-}
+        return ids.stream()
+                .map(tipoResiduoService::buscarEntityPorId)
+                .peek(tipo -> {
+                    if (!tipo.isAtivo()) {
+                        throw new ErroValidacaoException("O tipo de resíduo '" + tipo.getNome() + "' está inativo e não pode ser vinculado ao caminhão.");
+                    }
+                })
+                .collect(Collectors.toList());
+    }
 }

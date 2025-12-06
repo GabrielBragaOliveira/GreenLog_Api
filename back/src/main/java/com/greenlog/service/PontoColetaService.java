@@ -80,8 +80,9 @@ public class PontoColetaService {
 
     @Transactional
     public PontoColetaResponseDTO salvar(PontoColetaRequestDTO request) {
+        String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
 
-        if (request.nomePonto() == null || request.nomePonto().isBlank()) {
+        if (nomePonto  == null || nomePonto.isBlank()) {
             throw new ErroValidacaoException("O nome do ponto é obrigatório.");
         }
         if (request.nomeResponsavel() == null || request.nomeResponsavel().isBlank()) {
@@ -100,13 +101,13 @@ public class PontoColetaService {
             throw new ErroValidacaoException("O bairro é obrigatório.");
         }
 
-        Optional<PontoColeta> existente = pontoColetaRepository.findByNomePonto(request.nomePonto());
+        Optional<PontoColeta> existente = pontoColetaRepository.findByNomePonto(nomePonto);
 
         if (existente.isPresent()) {
             PontoColeta ponto = existente.get();
 
             if (!ponto.isAtivo()) {
-                ponto.setNomePonto(request.nomePonto());
+                ponto.setNomePonto(request.nomePonto().trim());
                 ponto.setNomeResponsavel(request.nomeResponsavel());
                 ponto.setContato(request.contato());
                 ponto.setEmail(request.email());
@@ -141,9 +142,15 @@ public class PontoColetaService {
 
     @Transactional
     public PontoColetaResponseDTO atualizar(Long id, PontoColetaRequestDTO request) {
+        String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
         PontoColeta pontoExistente = buscarEntityPorId(id);
 
+        if (pontoColetaRepository.existsByNomePontoAndIdNot(nomePonto, id)) {
+            throw new ErroValidacaoException("Já existe um ponto de coleta com este nome.");
+        }
+
         pontoColetaMapper.updateEntityFromDTO(request, pontoExistente);
+        pontoExistente.setNomePonto(nomePonto);
         pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
         pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
                 .map(tipoResiduoService::buscarEntityPorId)

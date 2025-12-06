@@ -78,17 +78,18 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO salvar(BairroRequestDTO request) {
+        String nome = request.nome() != null ? request.nome().trim() : null;
         if (request.nome() == null || request.nome().isBlank()) {
             throw new ErroValidacaoException("O nome do bairro é obrigatório.");
         }
 
-        Optional<Bairro> existente = bairroRepository.findByNome(request.nome());
+        Optional<Bairro> existente = bairroRepository.findByNome(nome);
 
         if (existente.isPresent()) {
             Bairro bairro = existente.get();
 
             if (!bairro.isAtivo()) {
-                bairro.setNome(request.nome());
+                bairro.setNome(nome);
                 bairro.setDescricao(request.descricao());
                 bairro.setAtivo(true);
 
@@ -109,9 +110,13 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO atualizar(Long id, BairroRequestDTO request) {
+        String nome = request.nome() != null ? request.nome().trim() : null;
         Bairro bairroExistente = buscarEntityPorId(id);
+
+        if (bairroRepository.existsByNomeAndIdNot(nome, id)) {
+            throw new ErroValidacaoException("Já existe um bairro cadastrado com este nome.");
+        }
         bairroMapper.updateEntityFromDTO(request, bairroExistente);
-        
         if (!bairroExistente.isAtivo()) {
             throw new ErroValidacaoException("Não é possível atualizar os dados de um bairro inativo. Ative-o primeiro.");
         }
