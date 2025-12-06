@@ -18,11 +18,17 @@ public final class ValidadorRegexSingleton {
     private final Pattern placaPattern;
     private final Pattern telefonePattern;
     private final Pattern senhaPattern;
+    private final Pattern nomePattern;
+    private final Pattern capacidadePattern;
+    private final Pattern nomeNumeroPattern;
 
     private ValidadorRegexSingleton() {
         this.placaPattern = Pattern.compile(RegexConstants.PLACA_REGEX);
         this.telefonePattern = Pattern.compile(RegexConstants.TELEFONE_REGEX);
         this.senhaPattern = Pattern.compile(RegexConstants.SENHA_REGEX);
+        this.nomePattern = Pattern.compile(RegexConstants.NOME_REGEX);
+        this.capacidadePattern = Pattern.compile(RegexConstants.CAPACIDADE_REGEX);
+        this.nomeNumeroPattern = Pattern.compile(RegexConstants.NOME_NUMERO);
     }
     
     public static ValidadorRegexSingleton getInstance() {
@@ -44,6 +50,24 @@ public final class ValidadorRegexSingleton {
     public boolean isSenhaValida(String senha){
         if (senha == null) return false;
         Matcher matcher = senhaPattern.matcher(senha);
+        return matcher.matches();
+    }
+    
+    public boolean isNomeValida(String nome){
+        if (nome == null) return false;
+        Matcher matcher = nomePattern.matcher(nome);
+        return matcher.matches();
+    }
+    
+    public boolean isCapacidadeValida(Integer valor) {
+        if (valor == null) return false;
+        Matcher matcher = capacidadePattern.matcher(String.valueOf(valor));
+        return matcher.matches();
+    }
+    
+    public boolean isNomeENumeroValida(String entrada){
+        if (entrada == null) return false;
+        Matcher matcher = nomeNumeroPattern.matcher(entrada);
         return matcher.matches();
     }
 }

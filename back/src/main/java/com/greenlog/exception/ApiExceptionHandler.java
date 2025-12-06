@@ -7,8 +7,12 @@ package com.greenlog.exception;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -104,8 +108,22 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body, status);
     }
- 
-    // Você pode adicionar mais handlers aqui para:
-    // 1. ConstraintViolationException (Erros de Bean Validation)
-    // 2. DataIntegrityViolationException (Erros de unicidade/FK do banco)
+    
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+        HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        FieldError firstError = ex.getBindingResult().getFieldError();
+        String mensagemErro = (firstError != null) ? firstError.getDefaultMessage() : "Erro de validação";
+
+        HttpStatus code = HttpStatus.BAD_REQUEST; 
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", code.value());
+        
+        body.put("mensagem", mensagemErro); 
+
+        return new ResponseEntity<>(body, code);
+    }
 }

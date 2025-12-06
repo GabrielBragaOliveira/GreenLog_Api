@@ -38,6 +38,6 @@ public class TipoResiduoMapper {
         if (request == null || entity == null) {
             return;
         }
-        entity.setNome(request.nome());
+        entity.setNome(request.nome().trim());
     }
 }

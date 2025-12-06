@@ -4,7 +4,6 @@
  */
 package com.greenlog.domain.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 

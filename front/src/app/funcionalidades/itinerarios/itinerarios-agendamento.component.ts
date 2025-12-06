@@ -74,19 +74,27 @@ export class ItinerarioSchedulerComponent implements OnInit {
 
   diasDaSemana = computed<DiaCalendario[]>(() => {
     const start = new Date(this.dataSelecionada());
+    start.setHours(0, 0, 0, 0);
     const dias: DiaCalendario[] = [];
     const hoje = new Date();
     for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      dias.push({
-        data: d,
-        diaMes: d.getDate(),
-        diaSemana: this.getDiaSemana(d),
-        hoje: d.toDateString() === hoje.toDateString(),
-        isoString: d.toISOString().split('T')[0]
-      });
-    }
+
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    const dataFormatada = `${ano}-${mes}-${dia}`;
+
+    dias.push({
+      data: d,
+      diaMes: d.getDate(),
+      diaSemana: this.getDiaSemana(d),
+      hoje: d.toDateString() === hoje.toDateString(),
+      isoString: dataFormatada 
+    });
+  }
     return dias;
   });
 

@@ -11,6 +11,7 @@ import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.RotaMapper;
 import com.greenlog.domain.repository.RotaRepository;
 import com.greenlog.service.observer.RotaSubject;
+import com.greenlog.service.template.ProcessadorCadastroRota;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class RotaService {
     private BuscaAvancadaService buscaAvancadaService;
     @Autowired
     private RotaSubject rotaSubject;
+    @Autowired
+    private ProcessadorCadastroRota processadorCadastroRota;
 
     @Transactional(readOnly = true)
     public List<RotaResponseDTO> buscarAvancado(String query) {
@@ -75,8 +78,8 @@ public class RotaService {
         novaRota.setListaDeBairros(request.listaDeBairrosIds().stream()
                 .map(bairroService::buscarEntityPorId)
                 .collect(Collectors.toList()));
-
-        return rotaMapper.toResponseDTO(rotaRepository.save(novaRota));
+        novaRota = processadorCadastroRota.processar(novaRota);
+        return rotaMapper.toResponseDTO(novaRota);
     }
 
     @Transactional
@@ -89,7 +92,8 @@ public class RotaService {
                 .map(bairroService::buscarEntityPorId)
                 .collect(Collectors.toList()));
 
-        return rotaMapper.toResponseDTO(rotaRepository.save(rotaExistente));
+        Rota save = processadorCadastroRota.processar(rotaExistente);
+        return rotaMapper.toResponseDTO(save);
     }
 
     @Transactional

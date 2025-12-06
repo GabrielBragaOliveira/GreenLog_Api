@@ -26,21 +26,21 @@ public class ProcessadorCadastroUsuario extends ProcessadorDeCadastro<Usuario> {
     @Override
     protected void validarRegrasEspecificas(Usuario usuario) {
         
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new IllegalArgumentException("Erro: O email já está em uso.");
-        }
+        if (usuario.getNome().trim() == null || usuario.getNome().trim().isBlank()) throw new RegraDeNegocioException("O nome do usuário é obrigatório.");
+        if (usuario.getEmail().trim() == null || usuario.getEmail().trim().isBlank()) throw new RegraDeNegocioException("O email do usuário é obrigatório.");
+       
+        if (!ValidadorRegexSingleton.getInstance().isNomeValida(usuario.getNome().trim())) throw new RegraDeNegocioException("Erro: Nome do Usuario inválido. Deve conter apenas letras e ter no mínimo 3 caracteres.");
+        if (usuarioRepository.existsByEmail(usuario.getEmail().trim())) throw new IllegalArgumentException("Erro: O email já está em uso.");  
         
     }
 
     @Override
     protected Usuario salvarNoBanco(Usuario usuario) {
-        // O Service já teria criptografado a senha antes de chamar o Template
         return usuarioRepository.save(usuario);
     }
     
     @Override
     protected void notificarSucesso(Usuario usuarioSalvo) {
         System.out.println("Usuário " + usuarioSalvo.getNome() + " cadastrado com sucesso.");
-        // Implementação real: Enviar email de boas-vindas
     }
 }

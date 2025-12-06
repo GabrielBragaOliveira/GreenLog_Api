@@ -5,6 +5,7 @@
 package com.greenlog.domain.dto;
 
 import com.greenlog.util.RegexConstants;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -26,6 +27,7 @@ public record CaminhaoRequestDTO(
 
     @NotNull(message = "A capacidade em Kg é obrigatória.")
     @Min(value = 1, message = "A capacidade deve ser maior que zero.")
+    @Max(value = 100000, message = "A capacidade deve ser menor que 100.000Kg.")
     Integer capacidadeKg,
     
     @NotEmpty(message = "O caminhão deve suportar pelo menos um tipo de resíduo.")

@@ -18,7 +18,7 @@
 
         <div class="field col-12 md:col-6">
           <label for="capacidade" class="font-semibold">Capacidade (Kg) <span class="text-red-500">*</span></label>
-          <p-inputNumber id="capacidade" formControlName="capacidadeKg" suffix=" Kg" [min]="1" styleClass="w-full"
+          <p-inputNumber id="capacidade" formControlName="capacidadeKg" suffix=" Kg" [min]="1" [maxlength]="7" styleClass="w-full"
             class="w-full"></p-inputNumber>
         </div>
       </div>

@@ -9,13 +9,18 @@ package com.greenlog.util;
  * @author Kayqu
  */
 public final class RegexConstants {
-    // AAA-9999 ou ABC1D23
+
     public static final String PLACA_REGEX = "^[A-Z]{3}-?\\d{4}|^[A-Z]{3}[0-9]{1}[A-Z]{1}[0-9]{2}$";
     
-    // (99) 99999-9999 ou 9999-9999
     public static final String TELEFONE_REGEX = "^\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}$";
     
     public static final String SENHA_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,}$";
+    
+    public static final String NOME_REGEX = "^[a-zA-Z]{3,}$";
+    
+    public static final String CAPACIDADE_REGEX = "^\\d{1,7}$";
+    
+    public static final String NOME_NUMERO = "^[a-zA-Z0-9]{3,}$";
     
     private RegexConstants() {}
 }

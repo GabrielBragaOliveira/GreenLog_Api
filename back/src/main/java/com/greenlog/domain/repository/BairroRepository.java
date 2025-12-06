@@ -19,4 +19,5 @@ public interface BairroRepository extends JpaRepository<Bairro, Long>, JpaSpecif
     Optional<Bairro> findByNome(String nome);
     boolean existsByNome(String nome);
     List<Usuario> findByAtivo(Boolean ativo);
+    boolean existsByNomeAndIdNot(String nome, Long id);
 }
