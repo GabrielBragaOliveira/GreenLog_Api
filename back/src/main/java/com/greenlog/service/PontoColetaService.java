@@ -187,7 +187,12 @@ public class PontoColetaService {
 
     @Transactional(readOnly = true)
     public List<PontoColetaResponseDTO> listarPorBairro(Long bairroId) {
-        return pontoColetaRepository.findByBairroId(bairroId).stream()
+        if (!bairroService.buscarPorId(bairroId).ativo()) {
+            throw new RegraDeNegocioException(
+                    "O Bairro selecionado esta Inativo"
+            );
+        }
+        return pontoColetaRepository.findByBairroIdAndAtivo(bairroId, true).stream()
                 .map(pontoColetaMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }

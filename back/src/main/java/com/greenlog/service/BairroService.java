@@ -9,7 +9,6 @@ import com.greenlog.domain.dto.BairroResponseDTO;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.mapper.BairroMapper;
 import com.greenlog.domain.repository.BairroRepository;
-import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
@@ -34,8 +33,6 @@ public class BairroService {
     private BairroMapper bairroMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
-    @Autowired
-    private PontoColetaRepository pontoColetaRepository;
     @Autowired
     private BairroSubject bairroSubject;
 
@@ -114,6 +111,10 @@ public class BairroService {
     public BairroResponseDTO atualizar(Long id, BairroRequestDTO request) {
         Bairro bairroExistente = buscarEntityPorId(id);
         bairroMapper.updateEntityFromDTO(request, bairroExistente);
+        
+        if (!bairroExistente.isAtivo()) {
+            throw new ErroValidacaoException("Não é possível atualizar os dados de um bairro inativo. Ative-o primeiro.");
+        }
         return bairroMapper.toResponseDTO(bairroRepository.save(bairroExistente));
     }
 

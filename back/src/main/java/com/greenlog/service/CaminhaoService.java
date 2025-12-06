@@ -102,16 +102,11 @@ public class CaminhaoService {
 
         if (existente.isPresent()) {
             Caminhao caminhao = existente.get();
-
             if (!caminhao.isAtivo()) {
                 caminhao.setPlaca(request.placa());
                 caminhao.setMotorista(request.motorista());
                 caminhao.setCapacidadeKg(request.capacidadeKg());
-                caminhao.setTiposSuportados(
-                        request.tiposSuportadosIds().stream()
-                                .map(tipoResiduoService::buscarEntityPorId)
-                                .collect(Collectors.toList())
-                );
+                caminhao.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
                 caminhao.setAtivo(true);
 
                 Caminhao salvo = caminhaoRepository.save(caminhao);
@@ -123,11 +118,7 @@ public class CaminhaoService {
         }
 
         Caminhao novoCaminhao = caminhaoMapper.toEntity(request);
-        novoCaminhao.setTiposSuportados(
-                request.tiposSuportadosIds().stream()
-                        .map(tipoResiduoService::buscarEntityPorId)
-                        .collect(Collectors.toList())
-        );
+        novoCaminhao.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
         novoCaminhao.setAtivo(true);
 
         Caminhao caminhaoSalvo = processadorCadastroCaminhao.processar(novoCaminhao);
@@ -139,9 +130,7 @@ public class CaminhaoService {
     public CaminhaoResponseDTO atualizar(Long id, CaminhaoRequestDTO request) {
         Caminhao caminhaoExistente = buscarEntityPorId(id);
         caminhaoMapper.updateEntityFromDTO(request, caminhaoExistente);
-        caminhaoExistente.setTiposSuportados(request.tiposSuportadosIds().stream()
-                .map(tipoResiduoService::buscarEntityPorId)
-                .collect(Collectors.toList()));
+        caminhaoExistente.setTiposSuportados(buscarTiposResiduoAtivos(request.tiposSuportadosIds()));
 
         return caminhaoMapper.toResponseDTO(caminhaoRepository.save(caminhaoExistente));
     }
@@ -197,4 +186,15 @@ public class CaminhaoService {
                 .map(caminhaoMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
+    
+    private List<TipoResiduo> buscarTiposResiduoAtivos(List<Long> ids) {
+    return ids.stream()
+            .map(tipoResiduoService::buscarEntityPorId)
+            .peek(tipo -> {
+                if (!tipo.isAtivo()) {
+                    throw new ErroValidacaoException("O tipo de resíduo '" + tipo.getNome() + "' está inativo e não pode ser vinculado ao caminhão.");
+                }
+            })
+            .collect(Collectors.toList());
+}
 }

@@ -121,6 +121,9 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO request) {
         Usuario usuarioExistente = buscarEntityPorId(id);
         usuarioMapper.updateEntityFromDTO(request, usuarioExistente);
+        if (!usuarioExistente.isAtivo()) {
+            throw new ErroValidacaoException("Não é possível atualizar os dados de um Usuario inativo. Ative-o primeiro.");
+        }
         if (request.senha() != null && !request.senha().isEmpty()) {
             usuarioExistente.setSenha(request.senha());
         }

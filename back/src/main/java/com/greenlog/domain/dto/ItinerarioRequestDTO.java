@@ -22,7 +22,7 @@ public record ItinerarioRequestDTO(
     @NotNull(message = "O ID da rota é obrigatório.")
     Long rotaId,
     
-    @NotEmpty(message = "Deve haver pelo menos um tipo de resíduo aceito.")
+    @NotNull(message = "Deve haver pelo menos um tipo de resíduo aceito.")
     Long tipoResiduoId
       
 ) {}

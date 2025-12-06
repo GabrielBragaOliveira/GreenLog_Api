@@ -62,8 +62,10 @@ public class RoteamentoService {
                     "O bairro Centro deve estar ativo");
         }
 
-        bairroService.buscarEntityPorId(idOrigem);
-        bairroService.buscarEntityPorId(idDestino);
+        if (Boolean.FALSE.equals(bairroService.buscarEntityPorId(idDestino).getAtivo())){
+            throw new RegraDeNegocioException(
+                    "O bairro destino deve estar ativo");
+        }
 
         if (idOrigem.equals(idDestino)) {
             throw new RegraDeNegocioException("Os bairros de origem e destino não podem ser iguais.");
