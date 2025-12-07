@@ -17,7 +17,7 @@ export class AuthService {
   private readonly STORAGE_KEY = 'greenlog_user';
 
   // O Signal que detém o estado do usuário (Reativo)
-  public currentUser = signal<UsuarioResponse | null>(this.getUserFromStorage());
+  private currentUser = signal<UsuarioResponse | null>(this.getUserFromStorage());
 
   login(credenciais: LoginRequest): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(this.apiUrl, credenciais).pipe(
@@ -30,6 +30,11 @@ export class AuthService {
         this.router.navigate(['/']); // Vai para a home
       })
     );
+  }
+
+  getUsuarioLogado(): UsuarioResponse | null {
+    const usuario = localStorage.getItem(this.STORAGE_KEY);
+    return usuario ? JSON.parse(usuario) : null;
   }
 
   logout(): void {

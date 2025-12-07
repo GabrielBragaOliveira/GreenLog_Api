@@ -7,9 +7,11 @@ package com.greenlog.service;
 import com.greenlog.domain.dto.RotaRequestDTO;
 import com.greenlog.domain.dto.RotaResponseDTO;
 import com.greenlog.domain.entity.Rota;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.RotaMapper;
 import com.greenlog.domain.repository.RotaRepository;
+import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.service.template.ProcessadorCadastroRota;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +36,8 @@ public class RotaService {
     private BuscaAvancadaService buscaAvancadaService;
     @Autowired
     private ProcessadorCadastroRota processadorCadastroRota;
+    @Autowired
+    private ItinerarioRepository itinerarioRepository;
 
     @Transactional(readOnly = true)
     public List<RotaResponseDTO> buscarAvancado(String query) {
@@ -95,6 +99,11 @@ public class RotaService {
 
     @Transactional
     public void excluir(Long id) {
+        
+        if (itinerarioRepository.existsByRotaId(id)) {
+            throw new RegraDeNegocioException("A rota não pode ser excluída pois está vinculada a um ou mais itinerários.");
+        }
+        
         Rota rota = buscarEntityPorId(id);
         rotaRepository.delete(rota);
     }

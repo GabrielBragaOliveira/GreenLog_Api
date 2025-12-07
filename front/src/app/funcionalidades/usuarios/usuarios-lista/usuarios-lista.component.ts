@@ -11,6 +11,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
 import { UsuarioResponse } from '../../../compartilhado/models/usuario.model';
 import { Perfil } from '../../../compartilhado/models/perfil.enum';
+import { AuthService } from '../../../nucleo/servicos/auth.service';
 
 @Component({
   selector: 'app-usuarios-lista',
@@ -33,6 +34,7 @@ export class UsuariosListaComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  protected authService = inject(AuthService);
 
   usuarios: UsuarioResponse[] = [];
   isLoading = true;
