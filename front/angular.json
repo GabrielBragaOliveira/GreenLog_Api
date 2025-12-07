@@ -22,7 +22,17 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/primeng/resources/themes/aura-light-green",
+                "output": "/assets/themes/aura-light-green"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/primeng/resources/themes/aura-dark-green",
+                "output": "/assets/themes/aura-dark-green"
+              }
             ],
             "styles": [
               "src/styles.css"
