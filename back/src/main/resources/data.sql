@@ -61,27 +61,28 @@ MERGE INTO ponto_coleta (id, nome_ponto, nome_responsavel, contato, email, ender
     (16, 'Ponto Coleta 16', 'Maria Oliveira', '(62) 97183-7080', 'juliana.reis@ecoville.gov', 'Rua A, nº 789', 4, true);
 
 MERGE INTO ponto_residuo (ponto_coleta_id, tipo_residuo_id) KEY(ponto_coleta_id, tipo_residuo_id) VALUES
-    (1, 3), -- Ponto 1: Metal
-    (2, 3), (2, 5), (2, 2), -- Ponto 2: Metal, Papel, Plástico
-    (3, 1), (3, 3), -- Ponto 3: Orgânico, Metal
-    (4, 5), (4, 1), (4, 2), -- Ponto 4: Papel, Orgânico, Plástico
-    (5, 5), (5, 3), (5, 1), -- Ponto 5: Papel, Metal, Orgânico
-    (6, 3), (6, 5), -- Ponto 6: Metal, Papel
-    (7, 5), (7, 3), (7, 2), -- Ponto 7: Papel, Metal, Plástico
-    (8, 2), (8, 3), (8, 1), -- Ponto 8: Plástico, Metal, Orgânico
-    (9, 2), (9, 5), -- Ponto 9: Plástico, Papel
-    (10, 1), -- Ponto 10: Orgânico
-    (11, 3), -- Ponto 11: Metal
-    (12, 2), (12, 3), -- Ponto 12: Plástico, Metal
-    (13, 3), -- Ponto 13: Metal
-    (14, 2), -- Ponto 14: Plástico
-    (15, 1), (15, 5), -- Ponto 15: Orgânico, Papel
-    (16, 1), (16, 3); -- Ponto 16: Orgânico, Metal
+    (1, 3),
+    (2, 3), (2, 5), (2, 2),
+    (3, 1), (3, 3),
+    (4, 5), (4, 1), (4, 2),
+    (5, 5), (5, 3), (5, 1),
+    (6, 3), (6, 5),
+    (7, 5), (7, 3), (7, 2),
+    (8, 2), (8, 3), (8, 1),
+    (9, 2), (9, 5),
+    (10, 1),
+    (11, 3),
+    (12, 2), (12, 3),
+    (13, 3),
+    (14, 2),
+    (15, 1), (15, 5),
+    (16, 1), (16, 3);
 
-MERGE INTO rota (id, nome, ativo) KEY(id) VALUES
-    (1, 'Rota Norte', true),
-    (2, 'Rota Leste', true),
-    (3, 'Rota Sul', true);
+MERGE INTO rota (id, nome, ativo, ponto_destino_id) KEY(id) VALUES
+    (1, 'Rota Norte', true, 3),
+    (2, 'Rota Leste', true, 8),
+    (3, 'Rota Sul', true, 12);
+
 MERGE INTO rota_bairro (rota_id, bairro_id) KEY(rota_id, bairro_id) VALUES
     (1, 1), (1, 2),
     (2, 3), (2, 5),

@@ -6,12 +6,15 @@ package com.greenlog.service;
 
 import com.greenlog.domain.dto.RotaRequestDTO;
 import com.greenlog.domain.dto.RotaResponseDTO;
+import com.greenlog.domain.entity.PontoColeta;
 import com.greenlog.domain.entity.Rota;
+import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.RotaMapper;
 import com.greenlog.domain.repository.RotaRepository;
 import com.greenlog.service.template.ProcessadorCadastroRota;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,8 @@ public class RotaService {
     private RotaRepository rotaRepository;
     @Autowired
     private BairroService bairroService;
+    @Autowired
+    private PontoColetaService pontoColetaService;
     @Autowired
     private RotaMapper rotaMapper;
     @Autowired
@@ -70,11 +75,33 @@ public class RotaService {
 
     @Transactional
     public RotaResponseDTO salvar(RotaRequestDTO request) {
-        Rota novaRota = rotaMapper.toEntity(request);
+        Optional<Rota> rotaExistenteOpt = rotaRepository.findByNome(request.nome().trim());
 
+        if (rotaExistenteOpt.isPresent()) {
+            Rota rotaExistente = rotaExistenteOpt.get();
+
+            if (rotaExistente.isAtivo()) {
+                throw new ConflitoException("Já existe uma rota ativa com o nome '" + request.nome() + "'.");
+            } else {
+                rotaMapper.updateEntityFromDTO(request, rotaExistente);
+                rotaExistente.setListaDeBairros(request.listaDeBairrosIds().stream()
+                        .map(bairroService::buscarEntityPorId)
+                        .collect(Collectors.toList()));
+                PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
+                rotaExistente.setPontoColetaDestino(pontoDestino);
+                rotaExistente.setAtivo(true);
+                Rota rotaSalva = processadorCadastroRota.processar(rotaExistente);
+                return rotaMapper.toResponseDTO(rotaSalva);
+            }
+        }
+
+        Rota novaRota = rotaMapper.toEntity(request);
         novaRota.setListaDeBairros(request.listaDeBairrosIds().stream()
                 .map(bairroService::buscarEntityPorId)
                 .collect(Collectors.toList()));
+        PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
+        novaRota.setPontoColetaDestino(pontoDestino);
+        novaRota.setAtivo(true);
         novaRota = processadorCadastroRota.processar(novaRota);
         return rotaMapper.toResponseDTO(novaRota);
     }
@@ -89,6 +116,8 @@ public class RotaService {
                 .map(bairroService::buscarEntityPorId)
                 .collect(Collectors.toList()));
 
+        PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
+        rotaExistente.setPontoColetaDestino(pontoDestino);
         Rota save = processadorCadastroRota.processar(rotaExistente);
         return rotaMapper.toResponseDTO(save);
     }
@@ -102,7 +131,11 @@ public class RotaService {
     @Transactional
     public void alterarStatus(Long id) {
         Rota rota = rotaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Ponto de coleta não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Rota não encontrada."));
+
+        if (!rota.isAtivo() && !rota.getPontoColetaDestino().isAtivo()) {
+            throw new RecursoNaoEncontradoException("Não é possível ativar esta rota pois o Ponto de Coleta de destino está inativo.");
+        }
 
         rota.setAtivo(!rota.isAtivo());
         rotaRepository.save(rota);

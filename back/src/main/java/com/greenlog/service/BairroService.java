@@ -9,9 +9,11 @@ import com.greenlog.domain.dto.BairroResponseDTO;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.mapper.BairroMapper;
 import com.greenlog.domain.repository.BairroRepository;
+import com.greenlog.domain.repository.RotaRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
+import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.service.observer.BairroSubject;
 import com.greenlog.service.template.ProcessadorCadastroBairro;
 import com.greenlog.util.ValidadorRegexSingleton;
@@ -31,6 +33,8 @@ public class BairroService {
 
     @Autowired
     private BairroRepository bairroRepository;
+    @Autowired
+    private RotaRepository rotaRepository;
     @Autowired
     private BairroMapper bairroMapper;
     @Autowired
@@ -86,15 +90,15 @@ public class BairroService {
         if (nome == null || nome.isBlank()) {
             throw new ErroValidacaoException("O nome do bairro é obrigatório.");
         }
-        /*
+
         if (!ValidadorRegexSingleton.getInstance().isNomeValida(nome)) {
             throw new ConflitoException("O nome do bairro tem que ter no minimo 3 caracteres e tem que ter 1 espaço de distancia entre os nomes");
-        } */
+        }
         Optional<Bairro> existente = bairroRepository.findByNome(nome);
 
         if (existente.isPresent()) {
             Bairro bairro = existente.get();
-            if (!bairro.isAtivo()) {
+            if (!bairro.getAtivo()) {
                 bairro.setNome(nome);
                 bairro.setDescricao(request.descricao());
                 bairro.setAtivo(true);
@@ -125,7 +129,7 @@ public class BairroService {
 
         bairroMapper.updateEntityFromDTO(request, bairroExistente);
 
-        if (!bairroExistente.isAtivo()) {
+        if (!bairroExistente.getAtivo()) {
             throw new ErroValidacaoException("Não é possível atualizar os dados de um bairro inativo. Ative-o primeiro.");
         }
 
@@ -137,9 +141,18 @@ public class BairroService {
     public void alterarStatus(Long id) {
         Bairro bairro = buscarEntityPorId(id);
 
+        if (Boolean.TRUE.equals(bairro.getAtivo())) {
+            boolean existeRotaAtiva = rotaRepository.existsByBairroIdAndAtivoTrue(id);
+            if (existeRotaAtiva) {
+                throw new RegraDeNegocioException(
+                        "Não é possível inativar o bairro '" + bairro.getNome()
+                        + "' pois ele faz parte de uma ou mais Rotas ativas. Edite ou inative as rotas primeiro."
+                );
+            }
+        }
+
         bairro.setAtivo(!bairro.getAtivo());
         bairroRepository.save(bairro);
-
         bairroSubject.notifyObservers(bairro);
     }
 }

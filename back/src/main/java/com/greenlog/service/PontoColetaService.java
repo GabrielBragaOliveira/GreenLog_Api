@@ -6,9 +6,11 @@ package com.greenlog.service;
 
 import com.greenlog.domain.entity.PontoColeta;
 import com.greenlog.domain.repository.PontoColetaRepository;
+import com.greenlog.domain.repository.RotaRepository;
 import com.greenlog.domain.dto.PontoColetaRequestDTO;
 import com.greenlog.domain.dto.PontoColetaResponseDTO;
 import com.greenlog.domain.entity.Bairro;
+import com.greenlog.domain.entity.Rota;
 import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
@@ -32,6 +34,8 @@ public class PontoColetaService {
 
     @Autowired
     private PontoColetaRepository pontoColetaRepository;
+    @Autowired
+    private RotaRepository rotaRepository;
     @Autowired
     private BairroService bairroService;
     @Autowired
@@ -85,7 +89,7 @@ public class PontoColetaService {
     public PontoColetaResponseDTO salvar(PontoColetaRequestDTO request) {
         String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
 
-        if (nomePonto  == null || nomePonto.isBlank()) {
+        if (nomePonto == null || nomePonto.isBlank()) {
             throw new ErroValidacaoException("O nome do ponto é obrigatório.");
         }
         Optional<PontoColeta> existente = pontoColetaRepository.findByNomePonto(nomePonto);
@@ -94,6 +98,10 @@ public class PontoColetaService {
             PontoColeta ponto = existente.get();
 
             if (!ponto.isAtivo()) {
+                if(!ponto.getBairro().getAtivo()) {
+                     throw new RegraDeNegocioException("Não é possível reativar o ponto pois o Bairro vinculado está inativo.");
+                }
+                
                 ponto.setNomePonto(request.nomePonto().trim());
                 ponto.setNomeResponsavel(request.nomeResponsavel());
                 ponto.setContato(request.contato());
@@ -109,8 +117,10 @@ public class PontoColetaService {
 
                 processadorCadastroPontoColeto.processar(ponto);
                 return pontoColetaMapper.toResponseDTO(ponto);
-                
-            } else throw new ConflitoException("Já existe um ponto de coleta ativo com este nome.");
+
+            } else {
+                throw new ConflitoException("Já existe um ponto de coleta ativo com este nome.");
+            }
         }
 
         PontoColeta novo = pontoColetaMapper.toEntity(request);
@@ -125,7 +135,7 @@ public class PontoColetaService {
         return pontoColetaMapper.toResponseDTO(salvo);
     }
 
-   @Transactional
+    @Transactional
     public PontoColetaResponseDTO atualizar(Long id, PontoColetaRequestDTO request) {
         String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
         PontoColeta pontoExistente = buscarEntityPorId(id);
@@ -133,9 +143,13 @@ public class PontoColetaService {
         if (pontoColetaRepository.existsByNomePontoAndIdNot(nomePonto, id)) {
             throw new ErroValidacaoException("Já existe um ponto de coleta com este nome.");
         }
+        
+        if (!pontoExistente.isAtivo()) {
+             throw new RegraDeNegocioException("Não é possível atualizar um ponto de coleta inativo.");
+        }
 
         pontoColetaMapper.updateEntityFromDTO(request, pontoExistente);
-        
+
         pontoExistente.setNomePonto(nomePonto);
         pontoExistente.setEmail(request.email());
         pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
@@ -154,7 +168,7 @@ public class PontoColetaService {
         boolean novoStatus = !ponto.isAtivo();
 
         if (novoStatus) {
-            if (!ponto.getBairro().isAtivo()) {
+            if (!ponto.getBairro().getAtivo()) {
                 throw new RegraDeNegocioException(
                         "Não é possível ativar o ponto de coleta: o bairro associado está inativo."
                 );
@@ -172,6 +186,14 @@ public class PontoColetaService {
                 throw new RegraDeNegocioException(
                         "Não é possível ativar o ponto de coleta: ele possui tipos de resíduo inativos."
                 );
+            }
+        } else {
+            List<Rota> rotasDependentes = rotaRepository.findByPontoColetaDestinoAndAtivoTrue(ponto);
+
+            for (Rota rota : rotasDependentes) {
+                rota.setAtivo(false);
+                rotaRepository.save(rota);
+                System.out.println("LOG: Rota " + rota.getNome() + " inativada automaticamente pois o ponto de destino foi inativado.");
             }
         }
 
