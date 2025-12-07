@@ -81,7 +81,8 @@ public class UsuarioService {
         }
 
         if (!ValidadorRegexSingleton.getInstance().isSenhaValida(request.senha())) {
-            throw new RegraDeNegocioException("Erro: Formato da Senha inválido. Ultilizar pelo menos um maiusculo, um minusculo, um numero e um caractere especial");
+            throw new RegraDeNegocioException("Erro: Formato da Senha inválido. Ultilizar pe\n" +
+"        lo menos um maiusculo, um minusculo, um numero e um caractere especial");
         }
         Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(request.email());
 

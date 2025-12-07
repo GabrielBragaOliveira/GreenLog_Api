@@ -83,8 +83,12 @@ public class PontoColetaService {
 
     @Transactional
     public PontoColetaResponseDTO salvar(PontoColetaRequestDTO request) {
-        
-        Optional<PontoColeta> existente = pontoColetaRepository.findByNomePonto(request.nomePonto());
+        String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
+
+        if (nomePonto  == null || nomePonto.isBlank()) {
+            throw new ErroValidacaoException("O nome do ponto é obrigatório.");
+        }
+        Optional<PontoColeta> existente = pontoColetaRepository.findByNomePonto(nomePonto);
 
         if (existente.isPresent()) {
             PontoColeta ponto = existente.get();

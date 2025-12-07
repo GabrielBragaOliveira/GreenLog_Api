@@ -14,6 +14,7 @@ import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.service.observer.BairroSubject;
 import com.greenlog.service.template.ProcessadorCadastroBairro;
+import com.greenlog.util.ValidadorRegexSingleton;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,20 +82,29 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO salvar(BairroRequestDTO request) {
-
-        Optional<Bairro> existente = bairroRepository.findByNome(request.nome());
+        String nome = request.nome() != null ? request.nome().trim() : null;
+        if (nome == null || nome.isBlank()) {
+            throw new ErroValidacaoException("O nome do bairro é obrigatório.");
+        }
+        /*
+        if (!ValidadorRegexSingleton.getInstance().isNomeValida(nome)) {
+            throw new ConflitoException("O nome do bairro tem que ter no minimo 3 caracteres e tem que ter 1 espaço de distancia entre os nomes");
+        } */
+        Optional<Bairro> existente = bairroRepository.findByNome(nome);
 
         if (existente.isPresent()) {
             Bairro bairro = existente.get();
             if (!bairro.isAtivo()) {
-                bairro.setNome(request.nome());
+                bairro.setNome(nome);
                 bairro.setDescricao(request.descricao());
                 bairro.setAtivo(true);
-                
+
                 Bairro salvo = bairroRepository.save(bairro);
                 return bairroMapper.toResponseDTO(salvo);
-                
-            } else throw new ConflitoException("Já existe um bairro ativo com este nome.");
+
+            } else {
+                throw new ConflitoException("Já existe um bairro ativo com este nome.");
+            }
         }
 
         Bairro novo = bairroMapper.toEntity(request);
@@ -106,16 +116,23 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO atualizar(Long id, BairroRequestDTO request) {
+        String nome = request.nome() != null ? request.nome().trim() : null;
         Bairro bairroExistente = buscarEntityPorId(id);
+
+        if (bairroRepository.existsByNomeAndIdNot(nome, id)) {
+            throw new ErroValidacaoException("Já existe um bairro cadastrado com este nome.");
+        }
 
         bairroMapper.updateEntityFromDTO(request, bairroExistente);
 
-        if (!bairroExistente.isAtivo()) throw new ErroValidacaoException("Não é possível atualizar os dados de um bairro inativo. Ative-o primeiro.");
+        if (!bairroExistente.isAtivo()) {
+            throw new ErroValidacaoException("Não é possível atualizar os dados de um bairro inativo. Ative-o primeiro.");
+        }
 
         Bairro salvo = processadorCadastroBairro.processar(bairroExistente);
         return bairroMapper.toResponseDTO(salvo);
     }
-    
+
     @Transactional
     public void alterarStatus(Long id) {
         Bairro bairro = buscarEntityPorId(id);
