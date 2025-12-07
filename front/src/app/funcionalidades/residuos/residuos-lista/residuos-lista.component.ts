@@ -1,27 +1,29 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TipoResiduoService } from '../../../nucleo/servicos/tipo-residuo.service';
 import { TipoResiduoResponse } from '../../../compartilhado/models/tipo-residuo.model';
+import { FormsModule } from '@angular/forms';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @Component({
   selector: 'app-residuos-lista',
   standalone: true,
   imports: [
-    RouterLink,
-    FormsModule,
+    CommonModule,
     TableModule,
     ButtonModule,
     CardModule,
     TooltipModule,
     TagModule,
+    RouterLink,
+    FormsModule,
     InputTextareaModule
   ],
   templateUrl: './residuos-lista.component.html',
@@ -91,7 +93,7 @@ export class ResiduosListaComponent implements OnInit {
       message: estaAtivo
         ? `Deseja inativar o tipo de resíduo <b>${residuo.nome}</b>? <br><small>Ele não poderá ser selecionado em novos cadastros.</small>`
         : `Deseja reativar o tipo de resíduo <b>${residuo.nome}</b>?`,
-      header: estaAtivo ? 'Inativar' : 'Reativar',
+      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
       acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
@@ -102,6 +104,24 @@ export class ResiduosListaComponent implements OnInit {
   private alterarStatus(residuo: TipoResiduoResponse) {
     this.tipoResiduoService.alterarStatus(residuo.id).subscribe({
       next: () => this.carregarResiduos()
+    });
+  }
+
+  private excluir(id: number) {
+    this.tipoResiduoService.excluir(id).subscribe({
+      next: () => {
+        this.residuos = this.residuos.filter(r => r.id !== id);
+      },
+      error: (err) => {
+        if (err.status === 409) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Não é possível excluir',
+            detail: 'Este tipo de resíduo está em uso e não pode ser removido.',
+            life: 5000
+          });
+        }
+      }
     });
   }
 }

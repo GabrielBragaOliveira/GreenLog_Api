@@ -1,6 +1,9 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../nucleo/servicos/auth.service';
+
+// PrimeNG Imports
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +14,7 @@ import { MessageModule } from 'primeng/message';
   selector: 'app-login',
   standalone: true,
   imports: [
+    CommonModule, 
     ReactiveFormsModule,
     CardModule,
     InputTextModule,

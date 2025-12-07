@@ -1,4 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, inject, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { SidebarModule } from 'primeng/sidebar';
 import { TableModule } from 'primeng/table';
@@ -19,6 +20,7 @@ import { ConexaoBairroResponse } from '../../compartilhado/models/conexao-bairro
     selector: 'app-mapa-interativo',
     standalone: true,
     imports: [
+        CommonModule,
         SidebarModule,
         TableModule,
         TagModule,

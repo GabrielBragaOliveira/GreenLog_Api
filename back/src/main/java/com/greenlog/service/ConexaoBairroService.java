@@ -11,9 +11,6 @@ import com.greenlog.domain.entity.ConexaoBairro;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.ConexaoBairroMapper;
 import com.greenlog.domain.repository.ConexaoBairroRepository;
-import com.greenlog.domain.repository.ItinerarioRepository;
-import com.greenlog.exception.RegraDeNegocioException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +32,6 @@ public class ConexaoBairroService {
     private ConexaoBairroMapper conexaoBairroMapper;
     @Autowired
     private BuscaAvancadaService buscaAvancadaService;
-    @Autowired
-    private ItinerarioRepository itinerarioRepository;
 
     @Transactional(readOnly = true)
     public List<ConexaoBairroResponseDTO> buscarAvancado(String query) {
@@ -100,19 +95,13 @@ public class ConexaoBairroService {
     public void alterarStatus(Long id) {
         ConexaoBairro conexao = conexaoBairroRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Conexão de bairro não encontrada."));
-        boolean novoStatus = !conexao.isAtivo();
-        if (!novoStatus) { 
-            boolean origemEmUso = itinerarioRepository.isBairroEmUsoNoFuturo(conexao.getBairroOrigem().getId(), LocalDate.now());
-            boolean destinoEmUso = itinerarioRepository.isBairroEmUsoNoFuturo(conexao.getBairroDestino().getId(), LocalDate.now());
-            
-            if (origemEmUso || destinoEmUso) {
-                throw new RegraDeNegocioException(
-                    "Não é possível desativar esta conexão. Os bairros vinculados estão em rotas agendadas."
-                );
-            }
+
+        if (conexao.isAtivo()) {
+            conexao.setAtivo(false);
+        } else {
+            conexao.setAtivo(true);
         }
 
-        conexao.setAtivo(novoStatus);
         conexaoBairroRepository.save(conexao);
     }
 }

@@ -1,14 +1,18 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
+import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CaminhaoService } from '../../nucleo/servicos/caminhao.service';
 import { ItinerarioService } from '../../nucleo/servicos/itinerario.service';
 import { RotaService } from '../../nucleo/servicos/rota.service';
@@ -30,16 +34,11 @@ export interface DiaCalendario {
   selector: 'app-itinerario-scheduler',
   standalone: true,
   imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    CalendarModule,
-    ButtonModule,
-    TooltipModule,
-    TagModule,
-    DialogModule,
-    DropdownModule,
-    InputTextareaModule
+    CommonModule, FormsModule, ReactiveFormsModule,
+    CalendarModule, ButtonModule, CheckboxModule, TooltipModule,
+    TagModule, CardModule, DialogModule, DropdownModule, ToastModule, ConfirmPopupModule
   ],
+  providers: [DatePipe, ConfirmationService, MessageService],
   templateUrl: './itinerarios-agendamento.component.html',
   styleUrl: './itinerarios-agendamento.component.scss'
 })
@@ -52,10 +51,12 @@ export class ItinerarioSchedulerComponent implements OnInit {
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+
   dataSelecionada = signal<Date>(new Date());
   rotas = signal<RotaResponse[]>([]);
   itinerarios = signal<ItinerarioResponse[]>([]); 
   isLoading = signal(true);
+
   caminhoesFiltrados = signal<CaminhaoResponse[]>([]);
   residuosFinais = signal<TipoResiduoResponse[]>([]);
   isLoadingCompatibilidade = signal(false);
@@ -76,24 +77,24 @@ export class ItinerarioSchedulerComponent implements OnInit {
     start.setHours(0, 0, 0, 0);
     const dias: DiaCalendario[] = [];
     const hoje = new Date();
-    
     for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
 
-      const ano = d.getFullYear();
-      const mes = String(d.getMonth() + 1).padStart(2, '0');
-      const dia = String(d.getDate()).padStart(2, '0');
-      const dataFormatada = `${ano}-${mes}-${dia}`;
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
 
-      dias.push({
-        data: d,
-        diaMes: d.getDate(),
-        diaSemana: this.getDiaSemana(d),
-        hoje: d.toDateString() === hoje.toDateString(),
-        isoString: dataFormatada 
-      });
-    }
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    const dataFormatada = `${ano}-${mes}-${dia}`;
+
+    dias.push({
+      data: d,
+      diaMes: d.getDate(),
+      diaSemana: this.getDiaSemana(d),
+      hoje: d.toDateString() === hoje.toDateString(),
+      isoString: dataFormatada 
+    });
+  }
     return dias;
   });
 
@@ -238,6 +239,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
     this.itinerarioService.salvar(request).subscribe({
       next: (novo) => {
         this.itinerarios.update(lista => [...lista, novo]);
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Agendamento criado!' });
         this.modalVisivel = false;
         this.isSaving = false;
       },
@@ -254,6 +256,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
       accept: () => {
         this.itinerarioService.excluir(id).subscribe(() => {
           this.itinerarios.update(l => l.filter(i => i.id !== id));
+          this.messageService.add({severity:'info', summary:'Cancelado', detail:'Itinerário removido.'});
         });
       }
     });

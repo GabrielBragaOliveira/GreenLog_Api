@@ -1,5 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -8,7 +10,6 @@ import { TagModule } from 'primeng/tag';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CardModule } from 'primeng/card';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { RotaService } from '../../../nucleo/servicos/rota.service';
 import { RotaResponse } from '../../../compartilhado/models/rota.model';
 
@@ -16,13 +17,14 @@ import { RotaResponse } from '../../../compartilhado/models/rota.model';
   selector: 'app-rota-lista',
   standalone: true,
   imports: [
-    FormsModule,
+    CommonModule,
     TableModule,
     ButtonModule,
     TooltipModule,
     DialogModule,
     TagModule,
     ListboxModule,
+    FormsModule,
     InputTextareaModule,
     CardModule
   ],

@@ -18,7 +18,7 @@ export class SidebarComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      if (this.authService.getUsuarioLogado()) {
+      if (this.authService.currentUser()) {
         this.construirMenu();
       }
     });

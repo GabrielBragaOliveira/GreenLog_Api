@@ -64,6 +64,5 @@ public class PontoColetaMapper {
         entity.setNomeResponsavel(request.nomeResponsavel());
         entity.setContato(request.contato());
         entity.setEndereco(request.endereco());
-        entity.setEmail(request.email());
     }
 }

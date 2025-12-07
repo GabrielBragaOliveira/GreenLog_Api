@@ -21,12 +21,13 @@
         [(ngModel)]="queryManual"
         rows="3"
         class="w-full font-mono text-lg surface-0"
-        placeholder='Ex: placa="ABC" AND capacidadeKg>=5000'
+        placeholder='Digite sua busca... Ex: placa="ABC" AND capacidadeKg>=5000'
         (keydown.control.enter)="buscar()">
       </textarea>
 
       <div class="flex gap-2 align-items-center flex-wrap bg-white p-2 border-round border-1 surface-border">
         <span class="text-xs text-500 font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
+
         @for (atalho of atalhos; track atalho.label) {
           <button
             pButton
@@ -38,15 +39,26 @@
             (click)="adicionarAtalho(atalho.valor)">
           </button>
         }
+
         <div class="flex-grow-1"></div>
-        <p-button label="Executar Query" icon="pi pi-search" styleClass="p-button-sm" (onClick)="buscar()"></p-button>
+
+        <p-button
+          label="Executar Query"
+          icon="pi pi-search"
+          styleClass="p-button-sm"
+          (onClick)="buscar()">
+        </p-button>
       </div>
-      <small class="text-500 ml-1">Dica: Use <b>Ctrl + Enter</b> para buscar. Textos entre aspas duplas.</small>
+
+      <small class="text-500 ml-1">
+        Dica: Use <b>Ctrl + Enter</b> para buscar. Textos devem estar entre aspas duplas (<code>"exemplo"</code>).
+      </small>
     </div>
   </p-card>
 
   <p-card styleClass="shadow-2">
      <p-table [value]="caminhoes" [loading]="isLoading" [rows]="10" [paginator]="true" styleClass="p-datatable-sm" responsiveLayout="stack">
+
         <ng-template pTemplate="header">
           <tr>
             <th>Placa</th>
@@ -70,18 +82,27 @@
                 }
               </div>
             </td>
+
             <td class="text-center">
-              <p-tag [value]="caminhao.ativo ? 'ATIVO' : 'INATIVO'" [severity]="caminhao.ativo ? 'success' : 'danger'" styleClass="text-xs"></p-tag>
+              <p-tag
+                [value]="caminhao.ativo ? 'ATIVO' : 'INATIVO'"
+                [severity]="caminhao.ativo ? 'success' : 'danger'"
+                styleClass="text-xs">
+              </p-tag>
             </td>
+
             <td class="text-center">
-              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" [routerLink]="['editar', caminhao.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
-              <p-button 
-                [icon]="caminhao.ativo ? 'pi pi-ban' : 'pi pi-check-circle'" 
+              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
+                        [routerLink]="['editar', caminhao.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
+
+              <p-button
+                [icon]="caminhao.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
                 [styleClass]="'p-button-rounded p-button-text ' + (caminhao.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
-                (onClick)="confirmarAlteracaoStatus(caminhao)" 
-                [pTooltip]="caminhao.ativo ? 'Inativar' : 'Ativar'" 
+                (onClick)="confirmarAlteracaoStatus(caminhao)"
+                [pTooltip]="caminhao.ativo ? 'Inativar' : 'Ativar'"
                 tooltipPosition="top">
               </p-button>
+
             </td>
           </tr>
         </ng-template>
@@ -92,6 +113,7 @@
               <div class="flex flex-column align-items-center gap-2">
                 <i class="pi pi-search text-4xl text-500"></i>
                 <span class="font-semibold text-600">Nenhum resultado encontrado.</span>
+                <small *ngIf="queryManual" class="text-500">Verifique a sintaxe da sua query ou tente outros termos.</small>
               </div>
             </td>
           </tr>

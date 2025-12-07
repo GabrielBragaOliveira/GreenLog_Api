@@ -1,3 +1,6 @@
+<p-toast position="top-right"></p-toast>
+<p-confirmPopup></p-confirmPopup>
+
 <div class="flex flex-column md:flex-row h-screen-calc bg-gray-50 p-4 gap-4 overflow-hidden" style="height: calc(100vh - 9rem);">
     
     <div class="w-full md:w-3 flex flex-column gap-3 fadein animation-duration-300">
@@ -132,9 +135,7 @@
         emptyMessage="Nenhum caminhão atende esta rota">
         
         <ng-template pTemplate="selectedItem" let-item>
-            @if (item) {
-                <div>{{ item.placa }} - {{ item.motorista }}</div>
-            }
+            <div *ngIf="item">{{ item.placa }} - {{ item.motorista }}</div>
         </ng-template>
         <ng-template pTemplate="item" let-item>
             <div>
@@ -163,20 +164,16 @@
         emptyMessage="Sem compatibilidade de resíduo">
         
         <ng-template pTemplate="selectedItem" let-item>
-            @if (item) {
-                <div class="flex align-items-center gap-2">
-                    <i class="pi pi-box text-green-500"></i>
-                    <span class="font-bold">{{ item.nome }}</span>
-                </div>
-            }
+            <div *ngIf="item" class="flex align-items-center gap-2">
+                <i class="pi pi-box text-green-500"></i>
+                <span class="font-bold">{{ item.nome }}</span>
+            </div>
         </ng-template>
       </p-dropdown>
       
-      @if (!!form.get('tipoResiduoId')?.enabled) {
-          <small class="block mt-1 text-500">
-             Este caminhão coletará apenas este tipo de material nesta rota.
-          </small>
-      }
+      <small class="block mt-1 text-500" *ngIf="!!form.get('tipoResiduoId')?.enabled">
+         Este caminhão coletará apenas este tipo de material nesta rota.
+      </small>
     </div>
 
   </form>
