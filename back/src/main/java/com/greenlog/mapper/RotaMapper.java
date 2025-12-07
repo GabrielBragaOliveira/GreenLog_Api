@@ -18,9 +18,11 @@ import org.springframework.stereotype.Component;
 public class RotaMapper {
 
     private final BairroMapper bairroMapper;
+    private final PontoColetaMapper pontoColetaMapper;
 
-    public RotaMapper(BairroMapper bairroMapper) {
+    public RotaMapper(BairroMapper bairroMapper, PontoColetaMapper pontoColetaMapper) {
         this.bairroMapper = bairroMapper;
+        this.pontoColetaMapper = pontoColetaMapper;
     }
 
     public RotaResponseDTO toResponseDTO(Rota rota) {
@@ -31,6 +33,7 @@ public class RotaMapper {
                 : rota.getListaDeBairros().stream()
                         .map(bairroMapper::toResponseDTO)
                         .collect(Collectors.toList()),
+                rota.getPontoColetaDestino() != null ? pontoColetaMapper.toResponseDTO(rota.getPontoColetaDestino()) : null,
                 rota.getAtivo()
         );
     }

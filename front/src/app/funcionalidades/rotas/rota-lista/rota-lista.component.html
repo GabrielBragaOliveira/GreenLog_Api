@@ -61,9 +61,10 @@
 
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 50%">Nome da Rota</th>
-          <th style="width: 30%">Abrangência</th>
-          <th style="width: 20%" class="text-center">Ações</th>
+          <th style="width: 40%">Nome da Rota</th>
+          <th style="width: 30%">Destino Final</th>
+          <th style="width: 20%">Abrangência</th>
+          <th style="width: 10%" class="text-center">Ações</th>
         </tr>
       </ng-template>
 
@@ -72,6 +73,17 @@
           <td>
             <span class="p-column-title">Nome</span>
             <span class="font-medium text-lg">{{ rota.nome }}</span>
+            @if(!rota.ativo) {
+              <p-tag value="Inativa" severity="danger" styleClass="ml-2 text-xs"></p-tag>
+            }
+          </td>
+          <td>
+            <span class="p-column-title">Destino</span>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-flag-fill text-red-500"></i>
+              <span class="text-700">{{ rota.pontoColetaDestino?.nomePonto || 'N/A' }}</span>
+            </div>
+            <small class="text-500 ml-4 block">{{ rota.pontoColetaDestino?.bairro?.nome }}</small>
           </td>
           <td>
             <span class="p-column-title">Abrangência</span>
@@ -93,7 +105,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="3" class="text-center p-4">
+          <td colspan="4" class="text-center p-4">
             <div class="flex flex-column align-items-center">
               <i class="pi pi-map text-500 text-3xl mb-3"></i>
               <span class="text-500">Nenhuma rota encontrada.</span>
@@ -113,6 +125,17 @@
 
   @if (rotaSelecionada(); as rota) {
   <div class="flex flex-column gap-3 pt-2">
+    <div class="surface-50 p-3 border-round border-1 surface-border flex align-items-center gap-3">
+        <div class="border-circle bg-red-100 w-3rem h-3rem flex align-items-center justify-content-center text-red-500">
+            <i class="pi pi-flag-fill text-xl"></i>
+        </div>
+        <div>
+            <span class="text-xs text-500 font-semibold uppercase">Ponto de Destino</span>
+            <div class="font-bold text-900">{{ rota.pontoColetaDestino?.nomePonto}}</div>
+            <div class="text-sm text-600">{{ rota.pontoColetaDestino?.bairro?.nome }}</div>
+        </div>
+    </div>
+
     <div>
       <h5 class="mb-2 text-700">Bairros inclusos nesta rota:</h5>
       @if (rota.listaDeBairros && rota.listaDeBairros.length > 0) {

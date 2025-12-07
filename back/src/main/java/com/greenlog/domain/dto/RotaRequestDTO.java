@@ -6,6 +6,7 @@ package com.greenlog.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -17,6 +18,8 @@ public record RotaRequestDTO(
     String nome,
 
     @NotEmpty(message = "A rota deve incluir pelo menos um bairro.")
-    List<Long> listaDeBairrosIds
-     
+    List<Long> listaDeBairrosIds,
+
+    @NotNull(message = "O ID do ponto de coleta de destino é obrigatório.")
+    Long pontoColetaDestinoId
 ) {}

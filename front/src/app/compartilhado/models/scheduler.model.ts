@@ -1,3 +1,4 @@
+/*
 import { CaminhaoResponse } from './caminhao.model';
 import { ItinerarioResponse } from './itinerario.model';
 
@@ -13,3 +14,4 @@ export interface LinhaCronograma {
   caminhao: CaminhaoResponse;
   agendamentosPorDia: { [key: string]: ItinerarioResponse | null };
 }
+  */

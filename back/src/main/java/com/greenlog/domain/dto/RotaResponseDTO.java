@@ -14,6 +14,7 @@ public record RotaResponseDTO(
     Long id,
     String nome,
     List<BairroResponseDTO> listaDeBairros,
+    PontoColetaResponseDTO pontoColetaDestino,
     Boolean ativo
         
 ) {}

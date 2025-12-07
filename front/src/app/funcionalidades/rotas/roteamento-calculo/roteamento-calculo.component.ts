@@ -253,7 +253,7 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
     const nomeBairro = this.todosBairros.find(b => b.id === this.destinoBairroId)?.nome;
     const pontoSelecionado = this.pontosDestino.find(p => p.id === this.destinoPontoId);
     if (nomeBairro && pontoSelecionado) {
-      this.nomeRotaSalvar = `${nomeBairro} (${pontoSelecionado.nomePonto})`;
+      this.nomeRotaSalvar = `Bairro: ${nomeBairro} Ponto: ${pontoSelecionado.nomePonto}`;
     } else {
       this.nomeRotaSalvar = '';
     }
@@ -261,14 +261,23 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
   }
 
   salvarRota() {
-    if (!this.resultado) return;
+    if (!this.resultado || !this.destinoPontoId) {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Destino não selecionado corretamente.' });
+        return;
+    }
+
     const idsBairros = this.resultado.listaOrdenadaDeBairros.map(b => b.id);
+    
     const novaRota: RotaRequest = {
       nome: this.nomeRotaSalvar,
-      listaDeBairrosIds: idsBairros
+      listaDeBairrosIds: idsBairros,
+      pontoColetaDestinoId: this.destinoPontoId
     };
+
     this.rotaService.salvar(novaRota).subscribe({
-      next: () => this.showSalvarDialog = false,
+      next: () => {
+        this.showSalvarDialog = false;
+      },
       error: () => {} 
     });
   }

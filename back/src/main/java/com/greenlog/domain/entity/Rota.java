@@ -13,8 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,7 +41,12 @@ public class Rota {
             joinColumns = @JoinColumn(name = "rota_id"),
             inverseJoinColumns = @JoinColumn(name = "bairro_id"))
     private List<Bairro> listaDeBairros;
-    
+
+    @NotNull(message = "O ponto de coleta de destino é obrigatório.")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ponto_destino_id", nullable = false)
+    private PontoColeta pontoColetaDestino;
+
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 
@@ -69,7 +76,15 @@ public class Rota {
     public void setListaDeBairros(List<Bairro> listaDeBairros) {
         this.listaDeBairros = listaDeBairros;
     }
-    
+
+    public PontoColeta getPontoColetaDestino() {
+        return pontoColetaDestino;
+    }
+
+    public void setPontoColetaDestino(PontoColeta pontoColetaDestino) {
+        this.pontoColetaDestino = pontoColetaDestino;
+    }
+
     public Boolean getAtivo() {
         return ativo;
     }
@@ -77,7 +92,7 @@ public class Rota {
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }
-    
+
     public boolean isAtivo() {
         return ativo != null && ativo;
     }

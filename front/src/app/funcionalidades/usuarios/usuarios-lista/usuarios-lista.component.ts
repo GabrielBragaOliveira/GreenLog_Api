@@ -9,9 +9,9 @@ import { TooltipModule } from "primeng/tooltip";
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
+import { AuthService } from '../../../nucleo/servicos/auth.service';
 import { UsuarioResponse } from '../../../compartilhado/models/usuario.model';
 import { Perfil } from '../../../compartilhado/models/perfil.enum';
-import { AuthService } from '../../../nucleo/servicos/auth.service';
 
 @Component({
   selector: 'app-usuarios-lista',
@@ -34,7 +34,7 @@ export class UsuariosListaComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
-  protected authService = inject(AuthService);
+  public authService = inject(AuthService);
 
   usuarios: UsuarioResponse[] = [];
   isLoading = true;
@@ -91,6 +91,16 @@ export class UsuariosListaComponent implements OnInit {
   }
 
   confirmarAlteracaoStatus(usuario: UsuarioResponse) {
+    const usuarioLogado = this.authService.currentUser();
+    if (usuarioLogado && usuarioLogado.id === usuario.id) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Ação Bloqueada',
+        detail: 'Você não pode inativar seu próprio usuário enquanto estiver logado.'
+      });
+      return;
+    }
+
     const estaAtivo = usuario.ativo;
 
     this.confirmationService.confirm({

@@ -2,8 +2,8 @@
 
   <div class="flex justify-content-between align-items-center">
     <div>
-      <h2 class="m-0 text-800">Gestão de Usuários</h2>
-      <p class="text-500 m-0 text-sm">Controle de acesso e perfis do sistema.</p>
+      <h2 class="m-0 text-color">Gestão de Usuários</h2>
+      <p class="text-color-secondary m-0 text-sm">Controle de acesso e perfis do sistema.</p>
     </div>
     <div class="flex gap-2">
       <p-button icon="pi pi-refresh" [text]="true" (onClick)="carregarUsuarios()" pTooltip="Recarregar lista" tooltipPosition="left"></p-button>
@@ -11,13 +11,13 @@
     </div>
   </div>
 
-  <p-card styleClass="shadow-1 surface-50 mb-3">
+  <p-card styleClass="shadow-1 surface-card mb-3">
     <div class="flex flex-column gap-2">
       <div class="flex justify-content-between align-items-center">
-        <label class="font-bold text-sm text-700 flex align-items-center gap-2">
+        <label class="font-bold text-sm text-color flex align-items-center gap-2">
           <i class="pi pi-terminal"></i> Busca Avançada (Console)
         </label>
-        <span class="text-xs text-500 cursor-pointer hover:text-primary transition-colors" (click)="limparFiltros()">
+        <span class="text-xs text-color-secondary cursor-pointer hover:text-primary transition-colors" (click)="limparFiltros()">
           <i class="pi pi-eraser"></i> Limpar terminal
         </span>
       </div>
@@ -26,13 +26,13 @@
         pInputTextarea
         [(ngModel)]="queryManual"
         rows="3"
-        class="w-full font-mono text-lg surface-0"
+        class="w-full font-mono text-lg surface-ground text-color"
         placeholder='Digite sua busca... Ex: nome="Gabriel" AND ativo=true'
         (keydown.control.enter)="buscar()">
       </textarea>
 
-      <div class="flex gap-2 align-items-center flex-wrap bg-white p-2 border-round border-1 surface-border">
-        <span class="text-xs text-500 font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
+      <div class="flex gap-2 align-items-center flex-wrap surface-ground p-2 border-round border-1 surface-border">
+        <span class="text-xs text-color-secondary font-semibold mr-2 select-none"><i class="pi pi-bolt text-yellow-500"></i> Inserir:</span>
         @for (atalho of atalhos; track atalho.label) {
           <button
             pButton
@@ -45,11 +45,11 @@
         <div class="flex-grow-1"></div>
         <p-button label="Executar Query" icon="pi pi-search" styleClass="p-button-sm" (onClick)="buscar()"></p-button>
       </div>
-      <small class="text-500 ml-1">Dica: Use <b>Ctrl + Enter</b> para buscar. Textos entre aspas duplas.</small>
+      <small class="text-color-secondary ml-1">Dica: Use <b>Ctrl + Enter</b> para buscar. Textos entre aspas duplas.</small>
     </div>
   </p-card>
 
-  <p-card styleClass="shadow-2">
+  <p-card styleClass="shadow-2 surface-card">
     <p-table
       [value]="usuarios"
       [loading]="isLoading"
@@ -61,18 +61,18 @@
 
       <ng-template pTemplate="header">
         <tr>
-          <th>Nome</th>
-          <th>E-mail</th>
-          <th style="width: 150px">Perfil</th>
-          <th class="text-center w-8rem">Status</th>
-          <th class="text-center w-10rem">Ações</th>
+          <th class="text-color">Nome</th>
+          <th class="text-color">E-mail</th>
+          <th style="width: 150px" class="text-color">Perfil</th>
+          <th class="text-center w-8rem text-color">Status</th>
+          <th class="text-center w-10rem text-color">Ações</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-usuario>
         <tr [class.opacity-60]="!usuario.ativo">
-          <td class="font-semibold">{{ usuario.nome }}</td>
-          <td>{{ usuario.email }}</td>
+          <td class="font-semibold text-color">{{ usuario.nome }}</td>
+          <td class="text-color-secondary">{{ usuario.email }}</td>
           <td>
             <p-tag [value]="usuario.perfil" [severity]="usuario.perfil === PerfilEnum.ADMIN ? 'warning' : 'info'"></p-tag>
           </td>
@@ -80,15 +80,16 @@
             <p-tag [value]="usuario.ativo ? 'ATIVO' : 'INATIVO'" [severity]="usuario.ativo ? 'success' : 'danger'" styleClass="text-xs"></p-tag>
           </td>
           <td class="text-center">
-            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" [routerLink]="['editar', usuario.id]" pTooltip="Editar" tooltipPosition="top" [disabled]="usuario.id == authService.getUsuarioLogado()?.id"></p-button>
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" [routerLink]="['editar', usuario.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
             <p-button
               [icon]="usuario.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (usuario.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
               (onClick)="confirmarAlteracaoStatus(usuario)"
-              [pTooltip]="usuario.ativo ? 'Inativar' : 'Reativar'"
-              tooltipPosition="top"
-              [disabled]="usuario.id == authService.getUsuarioLogado()?.id">
+              [disabled]="authService.currentUser()?.id === usuario.id"
+              [pTooltip]="authService.currentUser()?.id === usuario.id ? 'Você não pode inativar a si mesmo' : (usuario.ativo ? 'Inativar' : 'Reativar')"
+              tooltipPosition="top">
             </p-button>
+          
           </td>
         </tr>
       </ng-template>
