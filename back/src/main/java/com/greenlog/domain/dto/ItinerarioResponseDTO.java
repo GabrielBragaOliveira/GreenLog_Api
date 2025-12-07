@@ -3,10 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.greenlog.domain.dto;
-
-import com.greenlog.enums.StatusItinerarioEnum;
 import java.time.LocalDate;
-import java.util.List;
 
 /**
  *
@@ -17,7 +14,5 @@ public record ItinerarioResponseDTO(
     LocalDate data,
     CaminhaoResponseDTO caminhao,
     RotaResponseDTO rota,
-    TipoResiduoResponseDTO tipoResiduo,
-    StatusItinerarioEnum statusItinerarioEnum
-        
+    TipoResiduoResponseDTO tipoResiduo        
 ) {}

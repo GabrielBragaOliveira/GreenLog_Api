@@ -1,24 +1,18 @@
-import { Component, OnInit, inject, ViewChild, ElementRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, ViewChild, ElementRef, OnDestroy, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs'; // Importante para carregar dados em paralelo
-
-// Services
+import { forkJoin } from 'rxjs';
 import { RoteamentoService } from '../../../nucleo/servicos/roteamento.service';
 import { BairroService } from '../../../nucleo/servicos/bairro.service';
 import { PontoColetaService } from '../../../nucleo/servicos/ponto-coleta.service';
 import { RotaService } from '../../../nucleo/servicos/rota.service';
-import { ConexaoService } from '../../../nucleo/servicos/conexao.service'; // <--- NOVO
+import { ConexaoService } from '../../../nucleo/servicos/conexao.service';
 import { MessageService } from 'primeng/api';
-
-// Models
+import { ThemeService } from '../../../nucleo/servicos/theme.service';
 import { BairroResponse } from '../../../compartilhado/models/bairro.model';
 import { PontoColetaResponse } from '../../../compartilhado/models/ponto-coleta.model';
 import { ResultadoRota } from '../../../compartilhado/models/roteamento.model';
 import { RotaRequest } from '../../../compartilhado/models/rota.model';
-import { ConexaoBairroResponse } from '../../../compartilhado/models/conexao-bairro.model'; // <--- NOVO
-
-// PrimeNG & Vis.js
+import { ConexaoBairroResponse } from '../../../compartilhado/models/conexao-bairro.model';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -33,8 +27,7 @@ import { DataSet } from 'vis-data';
   selector: 'app-roteamento-calculo',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
+    FormsModule,
     DropdownModule, 
     ButtonModule, 
     CardModule, 
@@ -48,35 +41,38 @@ import { DataSet } from 'vis-data';
 })
 export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
   
-  // Injeções
   private roteamentoService = inject(RoteamentoService);
   private bairroService = inject(BairroService);
   private pontoService = inject(PontoColetaService);
   private rotaService = inject(RotaService);
-  private conexaoService = inject(ConexaoService); // <--- INJETADO
+  private conexaoService = inject(ConexaoService);
   private messageService = inject(MessageService);
+  private themeService = inject(ThemeService);
   
   @ViewChild('networkContainer') networkContainer!: ElementRef;
   private network: Network | null = null;
 
   readonly NOME_BAIRRO_ORIGEM = 'Centro';
-
-  // Dados
   todosBairros: BairroResponse[] = [];
-  todasConexoes: ConexaoBairroResponse[] = []; // <--- Cache das conexões
+  todasConexoes: ConexaoBairroResponse[] = [];
   bairrosDestinoFiltrados: BairroResponse[] = [];
-  
-  // Seleção
   origemBairroId: number | null = null;
   pontosDestino: PontoColetaResponse[] = [];
   destinoBairroId: number | null = null;
   destinoPontoId: number | null = null;
-
-  // Estado
   isCalculating = false;
   resultado: ResultadoRota | null = null;
   showSalvarDialog = false;
   nomeRotaSalvar = '';
+
+  constructor() {
+    effect(() => {
+      const isDark = this.themeService.isDarkMode();
+      if (this.resultado && this.network) {
+        this.renderizarGrafo();
+      }
+    });
+  }
 
   ngOnInit() {
     this.carregarDadosIniciais();
@@ -89,14 +85,13 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
   }
 
   carregarDadosIniciais() {
-    // Usamos forkJoin para carregar Bairros e Conexões simultaneamente
     forkJoin({
       bairros: this.bairroService.listar(),
       conexoes: this.conexaoService.listar()
     }).subscribe({
       next: (dados) => {
         this.todosBairros = dados.bairros;
-        this.todasConexoes = dados.conexoes; // Guarda as conexões para consulta futura
+        this.todasConexoes = dados.conexoes;
         this.definirOrigemFixa();
       },
       error: () => {
@@ -161,6 +156,11 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
   private renderizarGrafo() {
     if (!this.networkContainer || !this.resultado) return;
 
+    const isDark = this.themeService.isDarkMode();
+    const textColor = isDark ? '#e2e8f0' : '#374151';
+    const edgeLabelBg = isDark ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.7)';
+    const edgeColor = isDark ? '#475569' : '#64748B';
+
     const bairros = this.resultado.listaOrdenadaDeBairros;
     const nodes = new DataSet<any>([]);
     const edges = new DataSet<any>([]);
@@ -169,7 +169,6 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
       const isOrigem = index === 0;
       const isDestino = index === bairros.length - 1;
 
-      // Adiciona o Nó (Bairro)
       nodes.add({
         id: bairro.id,
         label: bairro.nome,
@@ -178,39 +177,36 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
         color: isOrigem ? '#22C55E' : (isDestino ? '#EF4444' : '#3B82F6'),
         size: isOrigem || isDestino ? 35 : 25,
         font: { 
-          color: '#374151', 
+          color: textColor, 
           size: 14, 
           face: 'Inter', 
-          strokeWidth: 3, 
+          strokeWidth: isDark ? 0 : 3,
           strokeColor: '#ffffff' 
         },
         borderWidth: 2
       });
 
-      // Lógica da Aresta (Conexão)
       if (index < bairros.length - 1) {
         const proximoBairro = bairros[index + 1];
         
-        // Buscamos a distância na nossa lista de conexões carregada
         const conexao = this.todasConexoes.find(c => 
           c.bairroOrigem.id === bairro.id && c.bairroDestino.id === proximoBairro.id
         );
 
-        // Define o texto da aresta
         const labelDistancia = conexao ? `${conexao.distancia} km` : '?';
 
         edges.add({
           from: bairro.id,
           to: proximoBairro.id,
-          label: labelDistancia, // <--- EXIBE A DISTÂNCIA
+          label: labelDistancia,
           arrows: 'to',
-          color: { color: '#64748B' },
+          color: { color: edgeColor },
           width: 3,
           font: { 
-            align: 'top', // Texto fica acima da linha
+            align: 'top',
             size: 12,
-            color: '#475569',
-            background: 'rgba(255, 255, 255, 0.7)' // Fundo branco suave para leitura
+            color: textColor,
+            background: edgeLabelBg
           }
         });
       }
@@ -244,6 +240,11 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
     };
 
     const data = { nodes, edges };
+    
+    if (this.network) {
+        this.network.destroy();
+    }
+    
     this.network = new Network(this.networkContainer.nativeElement, data, options);
     this.network.fit();
   }

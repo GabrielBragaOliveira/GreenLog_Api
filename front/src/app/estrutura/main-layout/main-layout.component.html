@@ -2,11 +2,10 @@
   <app-navbar></app-navbar>
   
   <div class="flex flex-grow-1 overflow-hidden">
-    <div class="w-18rem hidden md:block h-full overflow-y-auto">
+    <div class="w-18rem hidden md:block h-full overflow-y-auto surface-card border-right-1 surface-border">
       <app-sidebar></app-sidebar>
     </div>
-
-    <main class="flex-grow-1 p-4 bg-gray-50 overflow-y-auto">
+    <main class="flex-grow-1 p-4 surface-ground overflow-y-auto transition-colors transition-duration-300">
       <router-outlet></router-outlet>
     </main>
   </div>

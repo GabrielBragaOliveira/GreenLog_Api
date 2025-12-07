@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  *
@@ -23,4 +25,9 @@ public interface ItinerarioRepository extends JpaRepository<Itinerario, Long>, J
     boolean existsByRota(Rota rota);
     List<Itinerario> findByRota(Rota rota);
     List<Itinerario> findByTipoResiduo_Id(Long tipoResiduoId);
+    boolean existsByRotaId(Long rotaId);
+    boolean existsByCaminhaoIdAndDataGreaterThanEqual(Long caminhaoId, LocalDate data);
+    boolean existsByTipoResiduoIdAndDataGreaterThanEqual(Long tipoResiduoId, LocalDate data);
+    @Query("SELECT COUNT(i) > 0 FROM Itinerario i JOIN i.rota r JOIN r.listaDeBairros b WHERE b.id = :bairroId AND i.data >= :data")
+    boolean isBairroEmUsoNoFuturo(@Param("bairroId") Long bairroId, @Param("data") LocalDate data);
 }

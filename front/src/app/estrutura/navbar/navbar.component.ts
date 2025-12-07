@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../nucleo/servicos/auth.service';
+import { ThemeService } from '../../nucleo/servicos/theme.service';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -14,7 +15,9 @@ import { TooltipModule } from 'primeng/tooltip';
 })
 export class NavbarComponent {
   private authService = inject(AuthService);
-  user = this.authService.currentUser;
+  public themeService = inject(ThemeService);
+  
+  user = this.authService.getUsuarioLogado();
 
   logout() {
     this.authService.logout();

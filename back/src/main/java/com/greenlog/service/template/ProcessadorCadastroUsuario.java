@@ -6,6 +6,7 @@ package com.greenlog.service.template;
 
 import com.greenlog.domain.entity.Usuario;
 import com.greenlog.domain.repository.UsuarioRepository;
+import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.util.ValidadorRegexSingleton;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,11 @@ public class ProcessadorCadastroUsuario extends ProcessadorDeCadastro<Usuario> {
         if (usuario.getEmail().trim() == null || usuario.getEmail().trim().isBlank()) throw new RegraDeNegocioException("O email do usuário é obrigatório.");
        
         if (!ValidadorRegexSingleton.getInstance().isNomeValida(usuario.getNome().trim())) throw new RegraDeNegocioException("Erro: Nome do Usuario inválido. Deve conter apenas letras e ter no mínimo 3 caracteres.");
-        if (usuarioRepository.existsByEmail(usuario.getEmail().trim())) throw new IllegalArgumentException("Erro: O email já está em uso.");  
+        var usuarioExistenteOpt = usuarioRepository.findByEmail(usuario.getEmail().trim());
+        if (usuarioExistenteOpt.isPresent()) {
+            Usuario usuarioNoBanco = usuarioExistenteOpt.get();
+            if (usuario.getId() == null || !usuarioNoBanco.getId().equals(usuario.getId())) throw new ConflitoException("Erro: O email já está em uso.");
+        }
         
     }
 

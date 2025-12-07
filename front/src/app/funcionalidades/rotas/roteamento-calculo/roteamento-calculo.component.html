@@ -1,22 +1,23 @@
 <div class="flex flex-column gap-4">
-  
-  <h2 class="m-0 text-800">Cálculo de Melhor Rota</h2>
+  <h2 class="m-0 text-color">Cálculo de Melhor Rota</h2>
 
-  <p-card styleClass="shadow-2">
+  <p-card styleClass="shadow-2 surface-card">
     <div class="grid">
       <div class="col-12 md:col-5">
-        <div class="flex flex-column gap-3 p-4 border-round bg-green-50 surface-border border-1 h-full justify-content-center">
-          <div class="font-bold text-green-700 text-xl flex align-items-center gap-2 mb-2">
+        <div
+          class="flex flex-column gap-3 p-4 border-round surface-card border-1 border-green-500 h-full justify-content-center">
+          <div class="font-bold text-green-500 text-xl flex align-items-center gap-2 mb-2">
             <i class="pi pi-building"></i> Ponto de Partida
           </div>
           <div class="text-center py-4">
-            <div class="surface-0 inline-flex align-items-center justify-content-center border-circle w-4rem h-4rem mb-3 shadow-1">
-              <i class="pi pi-home text-3xl text-green-600"></i>
+            <div
+              class="surface-ground inline-flex align-items-center justify-content-center border-circle w-4rem h-4rem mb-3 shadow-1">
+              <i class="pi pi-home text-3xl text-green-500"></i>
             </div>
-            <div class="font-bold text-2xl text-800">{{ NOME_BAIRRO_ORIGEM }}</div>
-            <span class="text-600 text-sm">Central de Distribuição</span>
+            <div class="font-bold text-2xl text-color">{{ NOME_BAIRRO_ORIGEM }}</div>
+            <span class="text-color-secondary text-sm">Central de Distribuição</span>
           </div>
-          <div class="flex align-items-center gap-2 text-sm text-green-700 bg-white p-2 border-round opacity-80">
+          <div class="flex align-items-center gap-2 text-sm text-green-500 surface-ground p-2 border-round">
             <i class="pi pi-info-circle"></i>
             <span>Origem fixa padrão do sistema.</span>
           </div>
@@ -24,45 +25,30 @@
       </div>
 
       <div class="col-12 md:col-2 flex align-items-center justify-content-center py-3 md:py-0">
-        <div class="surface-200 border-circle w-3rem h-3rem flex align-items-center justify-content-center shadow-1">
-          <i class="pi pi-arrow-right text-xl text-600 hidden md:block"></i>
-          <i class="pi pi-arrow-down text-xl text-600 md:hidden"></i>
+        <div class="surface-ground border-circle w-3rem h-3rem flex align-items-center justify-content-center shadow-1">
+          <i class="pi pi-arrow-right text-xl text-color hidden md:block"></i>
+          <i class="pi pi-arrow-down text-xl text-color md:hidden"></i>
         </div>
       </div>
 
       <div class="col-12 md:col-5">
-        <div class="flex flex-column gap-3 p-3 border-round bg-blue-50 surface-border border-1 h-full">
-          <div class="font-bold text-blue-700 text-lg flex align-items-center gap-2">
+        <div class="flex flex-column gap-3 p-3 border-round surface-card border-1 border-blue-500 h-full">
+          <div class="font-bold text-blue-500 text-lg flex align-items-center gap-2">
             <i class="pi pi-flag"></i> Destino Final
           </div>
-          
+
           <div class="flex flex-column gap-2 mt-2">
-            <label for="destinoBairro" class="font-medium text-sm">Selecione o Bairro</label>
-            <p-dropdown 
-              id="destinoBairro"
-              [options]="bairrosDestinoFiltrados" 
-              [(ngModel)]="destinoBairroId" 
-              optionLabel="nome" 
-              optionValue="id" 
-              placeholder="Bairro de Destino..." 
-              [filter]="true" filterBy="nome"
-              showClear="true"
-              styleClass="w-full"
-              (onChange)="aoSelecionarDestino()">
+            <label for="destinoBairro" class="font-medium text-sm text-color">Selecione o Bairro</label>
+            <p-dropdown id="destinoBairro" [options]="bairrosDestinoFiltrados" [(ngModel)]="destinoBairroId"
+              optionLabel="nome" optionValue="id" placeholder="Bairro de Destino..." [filter]="true" filterBy="nome"
+              showClear="true" styleClass="w-full" (onChange)="aoSelecionarDestino()">
             </p-dropdown>
           </div>
 
           <div class="flex flex-column gap-2">
-            <label for="destinoPonto" class="font-medium text-sm">Selecione o Ponto de Coleta</label>
-            <p-dropdown 
-              id="destinoPonto"
-              [options]="pontosDestino" 
-              [(ngModel)]="destinoPontoId" 
-              optionLabel="nomePonto"   
-              optionValue="id" 
-              placeholder="Selecione o ponto..." 
-              styleClass="w-full"
-              [disabled]="!destinoBairroId"
+            <label for="destinoPonto" class="font-medium text-sm text-color">Selecione o Ponto de Coleta</label>
+            <p-dropdown id="destinoPonto" [options]="pontosDestino" [(ngModel)]="destinoPontoId" optionLabel="nomePonto"
+              optionValue="id" placeholder="Selecione o ponto..." styleClass="w-full" [disabled]="!destinoBairroId"
               emptyMessage="Nenhum ponto neste bairro">
             </p-dropdown>
           </div>
@@ -70,12 +56,8 @@
       </div>
 
       <div class="col-12 mt-4 flex justify-content-end">
-        <p-button 
-          label="Calcular Rota Otimizada" 
-          icon="pi pi-compass" 
-          (click)="calcular()" 
-          [disabled]="!origemBairroId || !destinoPontoId"
-          [loading]="isCalculating"
+        <p-button label="Calcular Rota Otimizada" icon="pi pi-compass" (click)="calcular()"
+          [disabled]="!origemBairroId || !destinoPontoId" [loading]="isCalculating"
           styleClass="p-button-lg w-full md:w-auto">
         </p-button>
       </div>
@@ -83,40 +65,36 @@
   </p-card>
 
   @if (resultado) {
-    <p-panel header="Trajeto Otimizado" styleClass="shadow-2 border-green-500 border-left-3">
-      <div class="flex flex-column gap-4">
-        
-        <div class="flex flex-column md:flex-row justify-content-between align-items-center gap-4 border-bottom-1 surface-border pb-3">
-          <div>
-            <div class="text-500 mb-1 text-sm">Distância Total Estimada</div>
-            <div class="text-4xl font-bold text-green-700">
-              {{ resultado.distanciaTotal }} <span class="text-xl text-600">km</span>
-            </div>
+  <p-panel header="Trajeto Otimizado" styleClass="shadow-2 border-green-500 border-left-3 surface-card">
+    <div class="flex flex-column gap-4">
+
+      <div
+        class="flex flex-column md:flex-row justify-content-between align-items-center gap-4 border-bottom-1 surface-border pb-3">
+        <div>
+          <div class="text-color-secondary mb-1 text-sm">Distância Total Estimada</div>
+          <div class="text-4xl font-bold text-green-500">
+            {{ resultado.distanciaTotal }} <span class="text-xl text-color-secondary">km</span>
           </div>
-          
-          <p-button 
-            label="Salvar como Rota Fixa" 
-            icon="pi pi-save" 
-            styleClass="p-button-outlined p-button-secondary" 
-            (click)="abrirModalSalvar()">
-          </p-button>
         </div>
 
-        <div class="relative w-full border-1 surface-border border-round bg-gray-50 overflow-hidden">
-             <div #networkContainer class="network-container w-full"></div>
-             
-             <div class="absolute top-0 right-0 m-2 p-2 bg-white-alpha-90 shadow-1 border-round text-sm">
-                <div class="flex align-items-center gap-2 mb-1">
-                    <span class="w-1rem h-1rem border-circle bg-green-500 block"></span> Início
-                </div>
-                <div class="flex align-items-center gap-2">
-                    <span class="w-1rem h-1rem border-circle bg-red-500 block"></span> Fim
-                </div>
-             </div>
-        </div>
-
+        <p-button label="Salvar como Rota Fixa" icon="pi pi-save" styleClass="p-button-outlined p-button-secondary"
+          (click)="abrirModalSalvar()">
+        </p-button>
       </div>
-    </p-panel>
+
+      <div class="relative w-full border-1 surface-border border-round surface-ground overflow-hidden">
+        <div #networkContainer class="network-container w-full"></div>
+        <div class="absolute top-0 right-0 m-2 p-2 surface-overlay shadow-1 border-round text-sm">
+          <div class="flex align-items-center gap-2 mb-1 text-color">
+            <span class="w-1rem h-1rem border-circle bg-green-500 block"></span> Início
+          </div>
+          <div class="flex align-items-center gap-2 text-color">
+            <span class="w-1rem h-1rem border-circle bg-red-500 block"></span> Fim
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-panel>
   }
 
   <p-dialog header="Salvar Rota" [(visible)]="showSalvarDialog" [modal]="true" [style]="{width: '400px'}">
@@ -126,9 +104,9 @@
       <small class="text-500">A sequência de bairros calculada será salva automaticamente.</small>
     </div>
     <ng-template pTemplate="footer">
-      <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" (click)="showSalvarDialog = false"></p-button>
+      <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text"
+        (click)="showSalvarDialog = false"></p-button>
       <p-button label="Salvar" icon="pi pi-check" (click)="salvarRota()" [disabled]="!nomeRotaSalvar"></p-button>
     </ng-template>
   </p-dialog>
-
 </div>

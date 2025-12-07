@@ -1,25 +1,28 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CaminhaoService } from '../../../nucleo/servicos/caminhao.service';
-import { CaminhaoResponse } from '../../../compartilhado/models/caminhao.model';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { CaminhaoService } from '../../../nucleo/servicos/caminhao.service';
+import { CaminhaoResponse } from '../../../compartilhado/models/caminhao.model';
 
 @Component({
   selector: 'app-caminhao-lista',
   standalone: true,
   imports: [
-    CommonModule, RouterLink, FormsModule,
-    TableModule, ButtonModule, CardModule, TooltipModule,
-    ConfirmDialogModule, TagModule, InputTextareaModule
+    RouterLink,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    CardModule,
+    TooltipModule,
+    InputTextareaModule,
+    TagModule
   ],
   templateUrl: './caminhao-lista.component.html',
   styleUrl: './caminhao-lista.component.scss'
@@ -55,8 +58,6 @@ export class CaminhaoListaComponent implements OnInit {
     this.isLoading = true;
     const buscaFinal = this.queryManual.trim();
 
-    console.log('Executando Query:', buscaFinal);
-
     this.caminhaoService.listar(buscaFinal).subscribe({
       next: (dados) => {
         this.caminhoes = dados;
@@ -80,7 +81,7 @@ export class CaminhaoListaComponent implements OnInit {
       message: estaAtivo
         ? `Deseja inativar o caminhão <b>${caminhao.placa}</b>?`
         : `Deseja reativar o caminhão <b>${caminhao.placa}</b>?`,
-      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
+      header: estaAtivo ? 'Inativar' : 'Reativar',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
       acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
@@ -95,6 +96,16 @@ export class CaminhaoListaComponent implements OnInit {
     });
   }
 
+  confirmarExclusao(caminhao: CaminhaoResponse) {
+     this.confirmationService.confirm({
+        message: `Tem certeza que deseja excluir o caminhão <b>${caminhao.placa}</b>?`,
+        header: 'Confirmar Exclusão',
+        icon: 'pi pi-trash',
+        acceptButtonStyleClass: 'p-button-danger p-button-text',
+        accept: () => this.excluir(caminhao.id)
+     });
+  }
+
   private excluir(id: number) {
     this.caminhaoService.excluir(id).subscribe({
       next: () => {
@@ -104,8 +115,8 @@ export class CaminhaoListaComponent implements OnInit {
         if (err.status === 409) {
           this.messageService.add({
             severity: 'warn',
-            summary: 'Não é possível excluir',
-            detail: 'Registro em uso.',
+            summary: 'Ação Bloqueada',
+            detail: 'Não é possível excluir pois o registro está em uso.',
             life: 5000
           });
         }
