@@ -74,13 +74,13 @@ public class TipoResiduoService {
 
     @Transactional
     public TipoResiduoResponseDTO salvar(TipoResiduoRequestDTO request) {
-
-        Optional<TipoResiduo> existente = tipoResiduoRepository.findByNome(request.nome());
+        String nome = request.nome() != null ? request.nome().trim() : null;
+        Optional<TipoResiduo> existente = tipoResiduoRepository.findByNome(nome);
 
         if (existente.isPresent()) {
             TipoResiduo tipo = existente.get();
             if (!tipo.isAtivo()) {
-                tipo.setNome(request.nome());
+                tipo.setNome(nome);
                 tipo.setAtivo(true);
 
                 TipoResiduo response = processadorCadastroTipoResiduo.processar(tipo);
@@ -98,11 +98,16 @@ public class TipoResiduoService {
 
     @Transactional
     public TipoResiduoResponseDTO atualizar(Long id, TipoResiduoRequestDTO request) {
+        String nome = request.nome() != null ? request.nome().trim() : null;
         TipoResiduo tipoExistente = buscarEntityPorId(id);
         
+        if (tipoResiduoRepository.existsByNomeAndIdNot(nome, id)) {
+            throw new ErroValidacaoException("Já existe um tipo de resíduo com este nome.");
+        }
         if (!tipoExistente.isAtivo()) throw new ErroValidacaoException("Não é possível atualizar os dados de um tipo de residuo inativo. Ative-o primeiro.");
         
         TipoResiduo salvo = processadorCadastroTipoResiduo.processar(tipoExistente);
+        tipoExistente.setNome(nome);
         return tipoResiduoMapper.toResponseDTO(salvo);
         
     }
