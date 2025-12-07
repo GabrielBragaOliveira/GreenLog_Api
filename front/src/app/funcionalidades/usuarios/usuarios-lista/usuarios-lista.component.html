@@ -80,13 +80,14 @@
             <p-tag [value]="usuario.ativo ? 'ATIVO' : 'INATIVO'" [severity]="usuario.ativo ? 'success' : 'danger'" styleClass="text-xs"></p-tag>
           </td>
           <td class="text-center">
-            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" [routerLink]="['editar', usuario.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
+            <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" [routerLink]="['editar', usuario.id]" pTooltip="Editar" tooltipPosition="top" [disabled]="usuario.id == authService.getUsuarioLogado()?.id"></p-button>
             <p-button
               [icon]="usuario.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (usuario.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
               (onClick)="confirmarAlteracaoStatus(usuario)"
               [pTooltip]="usuario.ativo ? 'Inativar' : 'Reativar'"
-              tooltipPosition="top">
+              tooltipPosition="top"
+              [disabled]="usuario.id == authService.getUsuarioLogado()?.id">
             </p-button>
           </td>
         </tr>

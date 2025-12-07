@@ -16,11 +16,11 @@ public final class RegexConstants {
 
     public static final String SENHA_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,}$";
 
-    public static final String NOME_REGEX = "^[a-zA-Z\\sÀ-úâêîôûãõçÁÉÍÓÚÂÊÎÔÛÃÕÇ]{3,}$";
+    public static final String NOME_REGEX = "^(?!.*\\s\\s)[a-zA-Z\\u00C0-\\u00FF][a-zA-Z\\u00C0-\\u00FF ]{1,}[a-zA-Z\\u00C0-\\u00FF]$";
     
     public static final String CAPACIDADE_REGEX = "^\\d{1,7}$";
 
-    public static final String NOME_NUMERO = "^[a-zA-Z0-9\\sÀ-úâêîôûãõçÁÉÍÓÚÂÊÎÔÛÃÕÇ]{3,}$";
+    public static final String NOME_NUMERO = "^(?!.*\\s\\s)[a-zA-Z0-9\\u00C0-\\u00FF][a-zA-Z0-9\\u00C0-\\u00FF ]{1,}[a-zA-Z0-9\\u00C0-\\u00FF]$";
 
     private RegexConstants() {
     }

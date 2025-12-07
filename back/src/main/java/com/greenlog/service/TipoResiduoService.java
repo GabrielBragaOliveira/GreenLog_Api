@@ -7,13 +7,16 @@ package com.greenlog.service;
 import com.greenlog.domain.dto.TipoResiduoRequestDTO;
 import com.greenlog.domain.dto.TipoResiduoResponseDTO;
 import com.greenlog.domain.entity.TipoResiduo;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.TipoResiduoMapper;
 import com.greenlog.domain.repository.TipoResiduoRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
+import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.service.observer.TipoResiduoSubject;
 import com.greenlog.service.template.ProcessadorCadastroTipoResiduo;
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -38,6 +41,8 @@ public class TipoResiduoService {
     private TipoResiduoSubject tipoResiduoSubject;
     @Autowired
     private ProcessadorCadastroTipoResiduo processadorCadastroTipoResiduo;
+    @Autowired
+    private ItinerarioRepository itinerarioRepository;
     
     @Transactional(readOnly = true)
     public List<TipoResiduoResponseDTO> buscarAvancado(String query) {
@@ -115,10 +120,16 @@ public class TipoResiduoService {
     @Transactional
     public void alterarStatus(Long id) {
         TipoResiduo tipo = buscarEntityPorId(id);
-
+        boolean novoStatus = !tipo.isAtivo();
+        if (!novoStatus) { // Tentando desativar
+            if (itinerarioRepository.existsByTipoResiduoIdAndDataGreaterThanEqual(id, LocalDate.now())) {
+                throw new RegraDeNegocioException(
+                    "Não é possível desativar este tipo de resíduo. Existem coletas futuras agendadas para este material."
+                );
+            }
+        }   
         tipo.setAtivo(!tipo.isAtivo());
         tipoResiduoRepository.save(tipo);
-
         tipoResiduoSubject.notifyObservers(tipo);
     }
 }

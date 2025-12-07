@@ -10,12 +10,14 @@ import com.greenlog.domain.dto.PontoColetaRequestDTO;
 import com.greenlog.domain.dto.PontoColetaResponseDTO;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.domain.entity.TipoResiduo;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.PontoColetaMapper;
 import com.greenlog.service.template.ProcessadorCadastroPontoColeto;
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -42,6 +44,8 @@ public class PontoColetaService {
     private BuscaAvancadaService buscaAvancadaService;
     @Autowired
     private ProcessadorCadastroPontoColeto processadorCadastroPontoColeto;
+    @Autowired
+    private ItinerarioRepository itinerarioRepository;
 
     @Transactional(readOnly = true)
     public List<PontoColetaResponseDTO> buscarAvancado(String query) {
@@ -171,6 +175,12 @@ public class PontoColetaService {
             if (possuiTipoInativo) {
                 throw new RegraDeNegocioException(
                         "Não é possível ativar o ponto de coleta: ele possui tipos de resíduo inativos."
+                );
+            }
+        }else{
+            if (itinerarioRepository.isBairroEmUsoNoFuturo(ponto.getBairro().getId(), LocalDate.now())) {
+                throw new RegraDeNegocioException(
+                    "Não é possível desativar este ponto de coleta. O bairro dele (" + ponto.getBairro().getNome() + ") faz parte de um itinerário agendado."
                 );
             }
         }

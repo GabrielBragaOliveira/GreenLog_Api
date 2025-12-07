@@ -9,12 +9,14 @@ import com.greenlog.domain.dto.BairroResponseDTO;
 import com.greenlog.domain.entity.Bairro;
 import com.greenlog.mapper.BairroMapper;
 import com.greenlog.domain.repository.BairroRepository;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
+import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.service.observer.BairroSubject;
 import com.greenlog.service.template.ProcessadorCadastroBairro;
-import com.greenlog.util.ValidadorRegexSingleton;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +41,8 @@ public class BairroService {
     private BairroSubject bairroSubject;
     @Autowired
     private ProcessadorCadastroBairro processadorCadastroBairro;
+    @Autowired
+    private ItinerarioRepository itinerarioRepository;
 
     @Transactional(readOnly = true)
     public List<BairroResponseDTO> buscarAvancado(String query) {
@@ -82,24 +86,17 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO salvar(BairroRequestDTO request) {
-        String nome = request.nome() != null ? request.nome().trim() : null;
-        if (nome == null || nome.isBlank()) {
-            throw new ErroValidacaoException("O nome do bairro é obrigatório.");
-        }
-        /*
-        if (!ValidadorRegexSingleton.getInstance().isNomeValida(nome)) {
-            throw new ConflitoException("O nome do bairro tem que ter no minimo 3 caracteres e tem que ter 1 espaço de distancia entre os nomes");
-        } */
-        Optional<Bairro> existente = bairroRepository.findByNome(nome);
+
+        Optional<Bairro> existente = bairroRepository.findByNome(request.nome());
 
         if (existente.isPresent()) {
             Bairro bairro = existente.get();
             if (!bairro.isAtivo()) {
-                bairro.setNome(nome);
+                bairro.setNome(request.nome());
                 bairro.setDescricao(request.descricao());
                 bairro.setAtivo(true);
 
-                Bairro salvo = bairroRepository.save(bairro);
+                Bairro salvo = processadorCadastroBairro.processar(bairro);
                 return bairroMapper.toResponseDTO(salvo);
 
             } else {
@@ -116,15 +113,12 @@ public class BairroService {
 
     @Transactional
     public BairroResponseDTO atualizar(Long id, BairroRequestDTO request) {
-        String nome = request.nome() != null ? request.nome().trim() : null;
         Bairro bairroExistente = buscarEntityPorId(id);
-
-        if (bairroRepository.existsByNomeAndIdNot(nome, id)) {
-            throw new ErroValidacaoException("Já existe um bairro cadastrado com este nome.");
-        }
+        
+        if (bairroExistente.getNome().equals("Centro")) throw new ErroValidacaoException("O bairro Centro é fixo nao deve ser modificado");
 
         bairroMapper.updateEntityFromDTO(request, bairroExistente);
-
+        
         if (!bairroExistente.isAtivo()) {
             throw new ErroValidacaoException("Não é possível atualizar os dados de um bairro inativo. Ative-o primeiro.");
         }
@@ -136,10 +130,21 @@ public class BairroService {
     @Transactional
     public void alterarStatus(Long id) {
         Bairro bairro = buscarEntityPorId(id);
-
-        bairro.setAtivo(!bairro.getAtivo());
+        
+        if (bairro.getNome().equals("Centro")) throw new ErroValidacaoException("O bairro Centro é fixo e não deve ser modificado.");
+        
+        boolean novoStatus = !bairro.isAtivo(); 
+        
+        if (!novoStatus) {
+            if (itinerarioRepository.isBairroEmUsoNoFuturo(id, LocalDate.now())) {
+                throw new RegraDeNegocioException(
+                    "Não é possível desativar o bairro. Ele faz parte de uma rota agendada para datas futuras."
+                );
+            }
+        }
+        
+        bairro.setAtivo(novoStatus);
         bairroRepository.save(bairro);
-
         bairroSubject.notifyObservers(bairro);
     }
 }
