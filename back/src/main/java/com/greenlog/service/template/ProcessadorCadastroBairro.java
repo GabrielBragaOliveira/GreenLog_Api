@@ -28,7 +28,8 @@ public class ProcessadorCadastroBairro extends ProcessadorDeCadastro<Bairro> {
     protected void validarRegrasEspecificas(Bairro bairro) {
         
         if (bairro.getNome().trim() == null || bairro.getNome().trim().isBlank()) throw new RegraDeNegocioException("O nome do bairro é obrigatório.");
-    
+        if (bairro.getNome().trim().equals("Centro")) throw new RegraDeNegocioException("O Bairro é fixo e nao pode ser modificado");
+        
         if (!ValidadorRegexSingleton.getInstance().isNomeValida(bairro.getNome().trim())) throw new RegraDeNegocioException("Erro: Nome do Bairro inválido. Deve conter apenas letras e ter no mínimo 3 caracteres.");
         if (bairroRepository.existsByNomeAndIdNot(bairro.getNome().trim(), bairro.getId())) throw new ErroValidacaoException("Já existe um bairro cadastrado com este nome.");
     }

@@ -17,7 +17,7 @@ export class NavbarComponent {
   private authService = inject(AuthService);
   public themeService = inject(ThemeService);
   
-  user = this.authService.currentUser;
+  user = this.authService.getUsuarioLogado();
 
   logout() {
     this.authService.logout();

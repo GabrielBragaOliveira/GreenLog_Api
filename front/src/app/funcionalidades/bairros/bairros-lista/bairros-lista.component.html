@@ -68,7 +68,7 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-bairro>
-        <tr [class.opacity-60]="!bairro.ativo">
+        <tr [class.opacity-60]="!bairro.ativo || bairro.nome=='Centro'">
 
           <td><span class="font-bold">{{ bairro.nome }}</span></td>
           <td>{{ bairro.descricao || '-' }}</td>
@@ -81,12 +81,12 @@
 
           <td class="text-center">
             <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1"
-              [routerLink]="['editar', bairro.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
+              [routerLink]="['editar', bairro.id]" pTooltip="Editar" tooltipPosition="top" [disabled]="bairro.nome=='Centro'"></p-button>
 
             <p-button [icon]="bairro.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (bairro.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
               (onClick)="confirmarAlteracaoStatus(bairro)" [pTooltip]="bairro.ativo ? 'Inativar' : 'Reativar'"
-              tooltipPosition="top">
+              tooltipPosition="top" [disabled]="bairro.nome=='Centro'">
             </p-button>
 
           </td>
