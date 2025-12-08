@@ -78,16 +78,6 @@ MERGE INTO ponto_residuo (ponto_coleta_id, tipo_residuo_id) KEY(ponto_coleta_id,
     (15, 1), (15, 5),
     (16, 1), (16, 3);
 
-MERGE INTO rota (id, nome, ativo, ponto_destino_id) KEY(id) VALUES
-    (1, 'Rota Norte', true, 3),
-    (2, 'Rota Leste', true, 8),
-    (3, 'Rota Sul', true, 12);
-
-MERGE INTO rota_bairro (rota_id, bairro_id) KEY(rota_id, bairro_id) VALUES
-    (1, 1), (1, 2),
-    (2, 3), (2, 5),
-    (3, 4), (3, 1);
-
 MERGE INTO conexao_bairro (id, bairro_origem_id, bairro_destino_id, distancia, ativo) KEY(id) VALUES
     (1, 9, 16, 6.4, true),
     (2, 15, 19, 8.3, true),
@@ -149,12 +139,6 @@ MERGE INTO conexao_bairro (id, bairro_origem_id, bairro_destino_id, distancia, a
     (58, 4, 19, 3.8, true),
     (59, 16, 11, 2.8, true),
     (60, 13, 16, 7.8, true);
-
-MERGE INTO itinerario (id, data, caminhao_id, rota_id, tipo_residuo_id) KEY(id) VALUES
-    (1, DATE '2025-03-01', 1, 1, 1),
-    (2, DATE '2025-03-01', 2, 2, 2),
-    (3, DATE '2025-03-02', 3, 3, 1),
-    (4, DATE '2025-03-03', 1, 3, 1);
 
 ALTER TABLE USUARIO ALTER COLUMN id RESTART WITH (SELECT COALESCE(MAX(id), 0) + 1 FROM USUARIO);
 ALTER TABLE bairro ALTER COLUMN id RESTART WITH (SELECT COALESCE(MAX(id), 0) + 1 FROM bairro);

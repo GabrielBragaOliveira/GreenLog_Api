@@ -22,6 +22,7 @@ public interface RotaRepository extends JpaRepository<Rota, Long>, JpaSpecificat
     boolean existsByNome(String nome);
     @Query("SELECT COUNT(r) > 0 FROM Rota r JOIN r.listaDeBairros b WHERE b.id = :bairroId AND r.ativo = true")
     boolean existsByBairroIdAndAtivoTrue(@Param("bairroId") Long bairroId);
-    @Query("SELECT r FROM Rota r WHERE r.pontoColetaDestino = :pontoColeta AND r.ativo = true")
-    List<Rota> findByPontoColetaDestinoAndAtivoTrue(@Param("pontoColeta") PontoColeta pontoColeta);
+    List<Rota> findByPontoColetaDestinoAndAtivoTrue(PontoColeta pontoColeta);
+    List<Rota> findByPontoColetaDestino(PontoColeta pontoColeta);
+    List<Rota> findByAtivoTrue();
 }

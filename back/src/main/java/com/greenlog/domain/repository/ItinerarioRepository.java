@@ -28,6 +28,10 @@ public interface ItinerarioRepository extends JpaRepository<Itinerario, Long>, J
     boolean existsByRotaId(Long rotaId);
     boolean existsByCaminhaoIdAndDataGreaterThanEqual(Long caminhaoId, LocalDate data);
     boolean existsByTipoResiduoIdAndDataGreaterThanEqual(Long tipoResiduoId, LocalDate data);
+    boolean existsByRotaIdAndDataGreaterThanEqual(Long rotaId, LocalDate data);
     @Query("SELECT COUNT(i) > 0 FROM Itinerario i JOIN i.rota r JOIN r.listaDeBairros b WHERE b.id = :bairroId AND i.data >= :data")
     boolean isBairroEmUsoNoFuturo(@Param("bairroId") Long bairroId, @Param("data") LocalDate data);
+    @Query("SELECT COUNT(i) > 0 FROM Itinerario i WHERE i.rota.pontoColetaDestino.id = :pontoId AND i.data >= :data")
+    boolean existsByPontoColetaDestinoIdAndDataGreaterThanEqual(@Param("pontoId") Long pontoId, @Param("data") LocalDate data);
+    List<Itinerario> findByDataGreaterThanEqual(LocalDate data);
 }
