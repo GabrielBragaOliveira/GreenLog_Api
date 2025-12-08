@@ -10,11 +10,13 @@ import com.greenlog.domain.entity.PontoColeta;
 import com.greenlog.domain.entity.Rota;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.RecursoNaoEncontradoException;
+import com.greenlog.exception.RegraDeNegocioException;
 import com.greenlog.mapper.RotaMapper;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.domain.repository.RotaRepository;
 import com.greenlog.service.template.ProcessadorCadastroRota;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class RotaService {
 
     @Autowired
     private RotaRepository rotaRepository;
+    @Autowired
+    private ItinerarioRepository itinerarioRepository;
     @Autowired
     private BairroService bairroService;
     @Autowired
@@ -75,33 +79,35 @@ public class RotaService {
 
     @Transactional
     public RotaResponseDTO salvar(RotaRequestDTO request) {
-        Optional<Rota> rotaExistenteOpt = rotaRepository.findByNome(request.nome().trim());
+        PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
 
-        if (rotaExistenteOpt.isPresent()) {
-            Rota rotaExistente = rotaExistenteOpt.get();
+        List<Rota> rotasExistentes = rotaRepository.findByPontoColetaDestino(pontoDestino);
+
+        if (!rotasExistentes.isEmpty()) {
+            Rota rotaExistente = rotasExistentes.get(0);
 
             if (rotaExistente.isAtivo()) {
-                throw new ConflitoException("Já existe uma rota ativa com o nome '" + request.nome() + "'.");
+                throw new ConflitoException("Já existe uma rota ativa (" + rotaExistente.getNome() + ") para o ponto de coleta '" + pontoDestino.getNomePonto() + "'.");
             } else {
                 rotaMapper.updateEntityFromDTO(request, rotaExistente);
                 rotaExistente.setListaDeBairros(request.listaDeBairrosIds().stream()
                         .map(bairroService::buscarEntityPorId)
                         .collect(Collectors.toList()));
-                PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
                 rotaExistente.setPontoColetaDestino(pontoDestino);
                 rotaExistente.setAtivo(true);
                 Rota rotaSalva = processadorCadastroRota.processar(rotaExistente);
                 return rotaMapper.toResponseDTO(rotaSalva);
             }
         }
-
         Rota novaRota = rotaMapper.toEntity(request);
+
         novaRota.setListaDeBairros(request.listaDeBairrosIds().stream()
                 .map(bairroService::buscarEntityPorId)
                 .collect(Collectors.toList()));
-        PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
+
         novaRota.setPontoColetaDestino(pontoDestino);
         novaRota.setAtivo(true);
+
         novaRota = processadorCadastroRota.processar(novaRota);
         return rotaMapper.toResponseDTO(novaRota);
     }
@@ -118,12 +124,17 @@ public class RotaService {
 
         PontoColeta pontoDestino = pontoColetaService.buscarEntityPorId(request.pontoColetaDestinoId());
         rotaExistente.setPontoColetaDestino(pontoDestino);
+
         Rota save = processadorCadastroRota.processar(rotaExistente);
         return rotaMapper.toResponseDTO(save);
     }
 
     @Transactional
     public void excluir(Long id) {
+        if (itinerarioRepository.existsByRotaIdAndDataGreaterThanEqual(id, LocalDate.now())) {
+            throw new RegraDeNegocioException("Não é possível excluir esta rota pois existe um itinerário agendado para hoje ou futuro.");
+        }
+
         Rota rota = buscarEntityPorId(id);
         rotaRepository.delete(rota);
     }
@@ -133,8 +144,14 @@ public class RotaService {
         Rota rota = rotaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Rota não encontrada."));
 
-        if (!rota.isAtivo() && !rota.getPontoColetaDestino().isAtivo()) {
-            throw new RecursoNaoEncontradoException("Não é possível ativar esta rota pois o Ponto de Coleta de destino está inativo.");
+        if (!rota.isAtivo()) {
+            if (!rota.getPontoColetaDestino().isAtivo()) {
+                throw new RecursoNaoEncontradoException("Não é possível ativar esta rota pois o Ponto de Coleta de destino está inativo.");
+            }
+        } else {
+            if (itinerarioRepository.existsByRotaIdAndDataGreaterThanEqual(id, LocalDate.now())) {
+                throw new RegraDeNegocioException("Não é possível inativar esta rota pois existe um itinerário agendado para hoje ou futuro.");
+            }
         }
 
         rota.setAtivo(!rota.isAtivo());

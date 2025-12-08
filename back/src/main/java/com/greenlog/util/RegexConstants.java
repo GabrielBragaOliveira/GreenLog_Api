@@ -21,7 +21,9 @@ public final class RegexConstants {
     public static final String CAPACIDADE_REGEX = "^\\d{1,7}$";
 
     public static final String NOME_NUMERO = "^(?!.*\\s\\s)[a-zA-Z0-9\\u00C0-\\u00FF][a-zA-Z0-9\\u00C0-\\u00FF ]{1,}[a-zA-Z0-9\\u00C0-\\u00FF]$";
-
+    
+    public static final String NOME_ROTA = "^(?!.*\s\s)[a-zA-Z0-9\u00C0-\u00FF()]{1}[a-zA-Z0-9\u00C0-\u00FF() ]{1,}[a-zA-Z0-9\u00C0-\u00FF()]$";
+   
     private RegexConstants() {
     }
 }

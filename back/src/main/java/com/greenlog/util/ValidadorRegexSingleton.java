@@ -21,6 +21,7 @@ public final class ValidadorRegexSingleton {
     private final Pattern nomePattern;
     private final Pattern capacidadePattern;
     private final Pattern nomeNumeroPattern;
+    private final Pattern rotaPattern;
 
     private ValidadorRegexSingleton() {
         this.placaPattern = Pattern.compile(RegexConstants.PLACA_REGEX);
@@ -29,6 +30,7 @@ public final class ValidadorRegexSingleton {
         this.nomePattern = Pattern.compile(RegexConstants.NOME_REGEX);
         this.capacidadePattern = Pattern.compile(RegexConstants.CAPACIDADE_REGEX);
         this.nomeNumeroPattern = Pattern.compile(RegexConstants.NOME_NUMERO);
+        this.rotaPattern = Pattern.compile(RegexConstants.NOME_ROTA);
     }
     
     public static ValidadorRegexSingleton getInstance() {
@@ -68,6 +70,12 @@ public final class ValidadorRegexSingleton {
     public boolean isNomeENumeroValida(String entrada){
         if (entrada == null) return false;
         Matcher matcher = nomeNumeroPattern.matcher(entrada);
+        return matcher.matches();
+    }
+    
+    public boolean isRotaValida(String entrada){
+        if (entrada == null) return false;
+        Matcher matcher = rotaPattern.matcher(entrada);
         return matcher.matches();
     }
 }

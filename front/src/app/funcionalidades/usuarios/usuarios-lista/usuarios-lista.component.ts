@@ -91,7 +91,7 @@ export class UsuariosListaComponent implements OnInit {
   }
 
   confirmarAlteracaoStatus(usuario: UsuarioResponse) {
-    const usuarioLogado = this.authService.currentUser();
+    const usuarioLogado = this.authService.getUsuarioLogado();
     if (usuarioLogado && usuarioLogado.id === usuario.id) {
       this.messageService.add({
         severity: 'warn',

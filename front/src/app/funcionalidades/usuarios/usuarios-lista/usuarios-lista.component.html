@@ -85,8 +85,8 @@
               [icon]="usuario.ativo ? 'pi pi-ban' : 'pi pi-check-circle'"
               [styleClass]="'p-button-rounded p-button-text ' + (usuario.ativo ? 'p-button-warning' : 'p-button-success') + ' mr-1'"
               (onClick)="confirmarAlteracaoStatus(usuario)"
-              [disabled]="authService.currentUser()?.id === usuario.id"
-              [pTooltip]="authService.currentUser()?.id === usuario.id ? 'Você não pode inativar a si mesmo' : (usuario.ativo ? 'Inativar' : 'Reativar')"
+              [disabled]="authService.getUsuarioLogado()?.id === usuario.id"
+              [pTooltip]="authService.getUsuarioLogado()?.id === usuario.id ? 'Você não pode inativar a si mesmo' : (usuario.ativo ? 'Inativar' : 'Reativar')"
               tooltipPosition="top">
             </p-button>
           

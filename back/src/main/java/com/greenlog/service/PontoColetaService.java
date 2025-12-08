@@ -7,6 +7,7 @@ package com.greenlog.service;
 import com.greenlog.domain.entity.PontoColeta;
 import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.domain.repository.RotaRepository;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.domain.dto.PontoColetaRequestDTO;
 import com.greenlog.domain.dto.PontoColetaResponseDTO;
 import com.greenlog.domain.entity.Bairro;
@@ -20,6 +21,7 @@ import com.greenlog.mapper.PontoColetaMapper;
 import com.greenlog.service.template.ProcessadorCadastroPontoColeto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +38,8 @@ public class PontoColetaService {
     private PontoColetaRepository pontoColetaRepository;
     @Autowired
     private RotaRepository rotaRepository;
+    @Autowired
+    private ItinerarioRepository itinerarioRepository;
     @Autowired
     private BairroService bairroService;
     @Autowired
@@ -98,10 +102,10 @@ public class PontoColetaService {
             PontoColeta ponto = existente.get();
 
             if (!ponto.isAtivo()) {
-                if(!ponto.getBairro().getAtivo()) {
-                     throw new RegraDeNegocioException("Não é possível reativar o ponto pois o Bairro vinculado está inativo.");
+                if (!ponto.getBairro().getAtivo()) {
+                    throw new RegraDeNegocioException("Não é possível reativar o ponto pois o Bairro vinculado está inativo.");
                 }
-                
+
                 ponto.setNomePonto(request.nomePonto().trim());
                 ponto.setNomeResponsavel(request.nomeResponsavel());
                 ponto.setContato(request.contato());
@@ -115,8 +119,8 @@ public class PontoColetaService {
                 );
                 ponto.setAtivo(true);
 
-                processadorCadastroPontoColeto.processar(ponto);
-                return pontoColetaMapper.toResponseDTO(ponto);
+                PontoColeta salvo = processadorCadastroPontoColeto.processar(ponto);
+                return pontoColetaMapper.toResponseDTO(salvo);
 
             } else {
                 throw new ConflitoException("Já existe um ponto de coleta ativo com este nome.");
@@ -143,9 +147,9 @@ public class PontoColetaService {
         if (pontoColetaRepository.existsByNomePontoAndIdNot(nomePonto, id)) {
             throw new ErroValidacaoException("Já existe um ponto de coleta com este nome.");
         }
-        
+
         if (!pontoExistente.isAtivo()) {
-             throw new RegraDeNegocioException("Não é possível atualizar um ponto de coleta inativo.");
+            throw new RegraDeNegocioException("Não é possível atualizar um ponto de coleta inativo.");
         }
 
         pontoColetaMapper.updateEntityFromDTO(request, pontoExistente);
@@ -156,8 +160,7 @@ public class PontoColetaService {
         pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
                 .map(tipoResiduoService::buscarEntityPorId)
                 .collect(Collectors.toList()));
-
-        return pontoColetaMapper.toResponseDTO(pontoColetaRepository.save(pontoExistente));
+        return pontoColetaMapper.toResponseDTO(processadorCadastroPontoColeto.processar(pontoExistente));
     }
 
     @Transactional
@@ -188,12 +191,18 @@ public class PontoColetaService {
                 );
             }
         } else {
+            boolean existeItinerarioFuturo = itinerarioRepository.existsByPontoColetaDestinoIdAndDataGreaterThanEqual(id, LocalDate.now());
+            if (existeItinerarioFuturo) {
+                throw new RegraDeNegocioException(
+                        "Não é possível inativar este ponto de coleta. Existem rotas e itinerários agendados (hoje ou futuro) que dependem dele como destino."
+                );
+            }
             List<Rota> rotasDependentes = rotaRepository.findByPontoColetaDestinoAndAtivoTrue(ponto);
 
             for (Rota rota : rotasDependentes) {
                 rota.setAtivo(false);
                 rotaRepository.save(rota);
-                System.out.println("LOG: Rota " + rota.getNome() + " inativada automaticamente pois o ponto de destino foi inativado.");
+                System.out.println("LOG: Rota " + rota.getNome() + " inativada automaticamente pois o ponto de destino foi inativado (sem itinerários futuros).");
             }
         }
 

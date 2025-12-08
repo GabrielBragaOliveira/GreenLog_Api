@@ -57,6 +57,9 @@ public class ProcessadorCadastroPontoColeto extends ProcessadorDeCadastro<PontoC
         if (!ValidadorRegexSingleton.getInstance().isNomeValida(pontoColeta.getNomeResponsavel().trim())) {
             throw new RegraDeNegocioException("Erro: Nome do Responsável inválido. Deve conter apenas letras e ter no mínimo 3 caracteres.");
         }
+        if (!ValidadorRegexSingleton.getInstance().isTelefoneValido(pontoColeta.getContato().trim())) {
+            throw new RegraDeNegocioException("Erro: Telefone inválido.");
+        }
 
     }
 

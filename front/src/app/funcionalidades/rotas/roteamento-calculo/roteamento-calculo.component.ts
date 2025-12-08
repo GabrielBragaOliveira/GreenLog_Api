@@ -253,7 +253,7 @@ export class RoteamentoCalculoComponent implements OnInit, OnDestroy {
     const nomeBairro = this.todosBairros.find(b => b.id === this.destinoBairroId)?.nome;
     const pontoSelecionado = this.pontosDestino.find(p => p.id === this.destinoPontoId);
     if (nomeBairro && pontoSelecionado) {
-      this.nomeRotaSalvar = `Bairro: ${nomeBairro} Ponto: ${pontoSelecionado.nomePonto}`;
+      this.nomeRotaSalvar = `(${nomeBairro} ${pontoSelecionado.nomePonto}) `;
     } else {
       this.nomeRotaSalvar = '';
     }

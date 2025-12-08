@@ -9,6 +9,7 @@ import com.greenlog.domain.entity.PontoColeta;
 import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.domain.repository.CaminhaoRepository;
 import com.greenlog.domain.repository.PontoColetaRepository;
+import com.greenlog.service.PontoColetaService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class TipoResiduoObserver implements StatusObserver {
 
     @Autowired
     private PontoColetaRepository pontoColetaRepository;
+    
+    @Autowired
+    private PontoColetaService pontoColetaService;
 
     @Override
     public void notificarAlteracaoStatus(Object entidade) {
@@ -66,8 +70,7 @@ public class TipoResiduoObserver implements StatusObserver {
                     .anyMatch(TipoResiduo::isAtivo);
 
             if (!possuiTipoAtivo) {
-                ponto.setAtivo(false);
-                pontoColetaRepository.save(ponto);
+                if (ponto.getAtivo()) pontoColetaService.alterarStatus(ponto.getId());
             }
         }
     }
