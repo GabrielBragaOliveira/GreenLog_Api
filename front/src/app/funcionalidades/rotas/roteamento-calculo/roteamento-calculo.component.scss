@@ -4,9 +4,8 @@
 
 .network-container {
   height: 400px;
-  background-color: var(--surface-ground);
+  background-color: #ffffff;
   border-radius: 6px;
-  border: 1px solid var(--surface-border);
 }
 
 :host ::ng-deep .vis-manipulation {

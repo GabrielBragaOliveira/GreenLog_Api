@@ -141,12 +141,12 @@ public class PontoColetaService {
 
     @Transactional
     public PontoColetaResponseDTO atualizar(Long id, PontoColetaRequestDTO request) {
-        String nomePonto = request.nomePonto() != null ? request.nomePonto().trim() : null;
         PontoColeta pontoExistente = buscarEntityPorId(id);
 
-        if (pontoColetaRepository.existsByNomePontoAndIdNot(nomePonto, id)) {
-            throw new ErroValidacaoException("Já existe um ponto de coleta com este nome.");
-        }
+        if (request.bairroId() != null) pontoExistente.setBairro(bairroService.buscarEntityPorId(request.bairroId()));
+        if (request.tiposResiduosIds() != null) pontoExistente.setTiposResiduosAceitos(request.tiposResiduosIds().stream()
+            .map(tipoResiduoService::buscarEntityPorId)
+            .collect(Collectors.toList()));
 
         if (!pontoExistente.isAtivo()) {
             throw new RegraDeNegocioException("Não é possível atualizar um ponto de coleta inativo.");

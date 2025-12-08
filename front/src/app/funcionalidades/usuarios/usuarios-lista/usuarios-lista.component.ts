@@ -1,12 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from "primeng/tooltip";
-import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
 import { AuthService } from '../../../nucleo/servicos/auth.service';
@@ -17,13 +16,14 @@ import { Perfil } from '../../../compartilhado/models/perfil.enum';
   selector: 'app-usuarios-lista',
   standalone: true,
   imports: [
+    CommonModule,
     RouterLink,
-    FormsModule,
     TableModule,
     ButtonModule,
     CardModule,
     TagModule,
     TooltipModule,
+    FormsModule,
     InputTextareaModule
   ],
   templateUrl: './usuarios-lista.component.html',
@@ -55,7 +55,7 @@ export class UsuariosListaComponent implements OnInit {
     this.carregarUsuarios();
   }
 
-  adicionarAtalho(snippet: string) {
+     adicionarAtalho(snippet: string) {
     this.queryManual += snippet;
   }
 
@@ -107,7 +107,7 @@ export class UsuariosListaComponent implements OnInit {
       message: estaAtivo
         ? `Deseja inativar o usuário <b>${usuario.nome}</b>? <br><small>Ele perderá o acesso ao sistema.</small>`
         : `Deseja reativar o usuário <b>${usuario.nome}</b>? <br><small>Ele poderá fazer login novamente.</small>`,
-      header: estaAtivo ? 'Inativar' : 'Reativar',
+      header: estaAtivo ? 'Confirmar Inativação' : 'Confirmar Reativação',
       icon: estaAtivo ? 'pi pi-ban' : 'pi pi-check-circle',
       acceptLabel: estaAtivo ? 'Sim, inativar' : 'Sim, reativar',
       acceptButtonStyleClass: estaAtivo ? 'p-button-warning p-button-text' : 'p-button-success p-button-text',
@@ -118,6 +118,23 @@ export class UsuariosListaComponent implements OnInit {
   private alterarStatus(usuario: UsuarioResponse) {
     this.usuarioService.alterarStatus(usuario.id).subscribe({
       next: () => this.carregarUsuarios()
+    });
+  }
+
+  private excluir(id: number) {
+    this.usuarioService.excluir(id).subscribe({
+      next: () => {
+        this.carregarUsuarios();
+      },
+      error: (err) => {
+        if (err.status === 409) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Não é possível excluir',
+                detail: 'Este usuário possui registros vinculados.'
+            });
+        }
+      }
     });
   }
 }

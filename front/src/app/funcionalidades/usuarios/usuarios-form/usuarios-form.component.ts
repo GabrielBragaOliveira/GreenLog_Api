@@ -1,27 +1,31 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
-import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
-import { UsuarioRequest } from '../../../compartilhado/models/usuario.model';
-import { Perfil } from '../../../compartilhado/models/perfil.enum';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
 import { DropdownModule } from 'primeng/dropdown';
+import { UsuarioService } from '../../../nucleo/servicos/usuario.service';
+import { UsuarioRequest } from '../../../compartilhado/models/usuario.model';
+import { Perfil } from '../../../compartilhado/models/perfil.enum';
+import { ComponenteComFormulario } from '../../../nucleo/guards/form-exit.guard';
 
 @Component({
   selector: 'app-usuarios-form',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
-    RouterModule,
     InputTextModule,
     PasswordModule,
     DropdownModule,
     ButtonModule,
-    CardModule
+    RouterModule,
+    CardModule,
+    ToastModule
   ],
   templateUrl: './usuarios-form.component.html',
   styleUrl: './usuarios-form.component.scss'
@@ -71,6 +75,7 @@ export class UsuariosFormComponent implements OnInit, ComponenteComFormulario {
           email: usuario.email,
           perfil: usuario.perfil
         });
+
         this.form.markAsPristine();
       },
       error: () => this.cancelar()

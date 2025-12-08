@@ -30,7 +30,7 @@
           @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
             <small class="text-red-500 block mt-1">O email é obrigatório.</small>
           }
-          @if (form.get('email')?.hasError('pattern') && form.get('email')?.touched) {
+          @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
             <small class="text-red-500 block mt-1">Formato de email inválido.</small>
           }
         </div>

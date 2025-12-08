@@ -14,7 +14,6 @@ import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.exception.RecursoNaoEncontradoException;
 import com.greenlog.mapper.CaminhaoMapper;
 import com.greenlog.domain.repository.CaminhaoRepository;
-import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.exception.ConflitoException;
 import com.greenlog.exception.ErroValidacaoException;
 import com.greenlog.exception.RegraDeNegocioException;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.greenlog.service.template.ProcessadorCadastroCaminhao;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -51,8 +49,6 @@ public class CaminhaoService {
     private RotaService rotaService;
     @Autowired
     private PontoColetaService pontoColetaService;
-    @Autowired
-    private ItinerarioRepository itinerarioRepository;
 
     @Transactional(readOnly = true)
     public List<CaminhaoResponseDTO> buscarAvancado(String query) {
@@ -133,22 +129,17 @@ public class CaminhaoService {
         Caminhao caminhao = caminhaoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Caminhão não encontrado."));
 
-        boolean novoStatus = !caminhao.getAtivo(); 
+        boolean novoStatus = !caminhao.getAtivo();
 
-        if (!novoStatus) { 
-             boolean temItinerarioFuturo = itinerarioRepository
-                 .existsByCaminhaoIdAndDataGreaterThanEqual(id, LocalDate.now());
-             
-             if (temItinerarioFuturo) {
-                 throw new RegraDeNegocioException(
-                     "Não é possível desativar o caminhão. Ele possui itinerários agendados a partir de hoje."
-                 );
-             }
-        }
-        
         if (novoStatus) {
-            boolean possuiTiposInativos = caminhao.getTiposSuportados().stream()
-                .anyMatch(t -> !t.isAtivo());
+            boolean possuiTiposInativos = false;
+
+            for (TipoResiduo t : caminhao.getTiposSuportados()) {
+                if (!t.isAtivo()) {
+                    possuiTiposInativos = true;
+                    break;
+                }
+            }
 
             if (possuiTiposInativos) {
                 throw new RegraDeNegocioException(

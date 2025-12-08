@@ -6,14 +6,13 @@
       <div class="formgrid grid">
         <div class="field col-12 md:col-6">
           <label for="placa" class="font-semibold">Placa <span class="text-red-500">*</span></label>
-          <input pInputText id="placa" formControlName="placa" placeholder="AAA-9999 ou ABC1D23" class="w-full"
-            [style.text-transform]="'uppercase'" (input)="converterParaMaiusculas($event)" />
+          <input pInputText id="placa" formControlName="placa" placeholder="AAA-9999 ou ABC1D23" class="w-full" [style.text-transform]="'uppercase'" (input)="converterParaMaiusculas($event)" />
 
           @if (form.get('placa')?.hasError('pattern') && form.get('placa')?.touched) {
           <small class="text-red-500 block mt-1">Formato inválido. Use AAA-0000 ou Padrão Mercosul.</small>
           }
           @if (form.get('placa')?.hasError('required') && form.get('placa')?.touched) {
-          <small class="text-red-500 block mt-1">Obrigatório.</small>
+          <small class="text-red-500 block mt-1">A placa é obrigatória.</small>
           }
         </div>
 
@@ -27,19 +26,14 @@
       <div class="field">
         <label for="motorista" class="font-semibold">Motorista <span class="text-red-500">*</span></label>
         <input pInputText id="motorista" formControlName="motorista" class="w-full" />
-        @if (form.get('motorista')?.hasError('required') && form.get('motorista')?.touched) {
-        <small class="text-red-500 block mt-1">Obrigatório.</small>
-        }
       </div>
 
       <div class="field">
         <label for="tipos" class="font-semibold">Tipos de Resíduo Suportados <span class="text-red-500">*</span></label>
         <p-multiSelect id="tipos" [options]="tiposResiduos" formControlName="tiposSuportadosIds" optionLabel="nome"
-          optionValue="id" placeholder="Selecione os tipos..." display="chip" styleClass="w-full"></p-multiSelect>
-        <small class="block mt-1 text-500">Selecione pelo menos um tipo.</small>
-        @if (form.get('tiposSuportadosIds')?.hasError('required') && form.get('tiposSuportadosIds')?.touched) {
-        <small class="text-red-500 block mt-1">Obrigatório.</small>
-        }
+          optionValue="id" placeholder="Selecione os tipos..." display="chip" styleClass="w-full">
+        </p-multiSelect>
+        <small class="block mt-1 text-500">O caminhão deve suportar pelo menos um tipo.</small>
       </div>
 
       <div class="flex justify-content-end gap-2 mt-3">

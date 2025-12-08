@@ -42,8 +42,15 @@
             (click)="adicionarAtalho(atalho.valor)">
           </button>
         }
+
         <div class="flex-grow-1"></div>
-        <p-button label="Executar Query" icon="pi pi-search" styleClass="p-button-sm" (onClick)="buscar()"></p-button>
+
+        <p-button
+          label="Executar Query"
+          icon="pi pi-search"
+          styleClass="p-button-sm"
+          (onClick)="buscar()">
+        </p-button>
       </div>
       <small class="text-color-secondary ml-1">Dica: Use <b>Ctrl + Enter</b> para buscar. Textos entre aspas duplas.</small>
     </div>
@@ -74,11 +81,18 @@
           <td class="font-semibold text-color">{{ usuario.nome }}</td>
           <td class="text-color-secondary">{{ usuario.email }}</td>
           <td>
-            <p-tag [value]="usuario.perfil" [severity]="usuario.perfil === PerfilEnum.ADMIN ? 'warning' : 'info'"></p-tag>
+            <p-tag [value]="usuario.perfil" [severity]="usuario.perfil === PerfilEnum.ADMIN ? 'warning' : 'info'">
+            </p-tag>
           </td>
+
           <td class="text-center">
-            <p-tag [value]="usuario.ativo ? 'ATIVO' : 'INATIVO'" [severity]="usuario.ativo ? 'success' : 'danger'" styleClass="text-xs"></p-tag>
+            <p-tag
+              [value]="usuario.ativo ? 'ATIVO' : 'INATIVO'"
+              [severity]="usuario.ativo ? 'success' : 'danger'"
+              styleClass="text-xs">
+            </p-tag>
           </td>
+
           <td class="text-center">
             <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-text p-button-secondary mr-1" [routerLink]="['editar', usuario.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
             <p-button
@@ -97,15 +111,11 @@
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="5" class="text-center p-4">
-            <div class="flex flex-column align-items-center">
-              <span class="text-500">Nenhum usuário encontrado.</span>
-              @if (queryManual) {
-                <small class="text-500">Verifique a sintaxe da sua query.</small>
-              }
-            </div>
+            Nenhum usuário encontrado.
           </td>
         </tr>
       </ng-template>
+
     </p-table>
   </p-card>
 </div>

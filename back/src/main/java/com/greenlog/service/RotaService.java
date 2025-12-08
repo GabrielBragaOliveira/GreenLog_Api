@@ -156,5 +156,7 @@ public class RotaService {
 
         rota.setAtivo(!rota.isAtivo());
         rotaRepository.save(rota);
+        rotaSubject.notifyObservers(rota);
     }
+
 }

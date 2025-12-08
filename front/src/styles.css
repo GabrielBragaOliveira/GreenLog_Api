@@ -1,28 +1,29 @@
-/* Arquivo: styles.css
-   Responsável pela importação de estilos core e reset global.
-   NOTA: A importação do tema foi removida daqui e movida para o index.html dinâmico.
+/* Arquivo: styles.scss
+  Responsável pela importação do tema e reset global.
 */
 
-/* 1. Estilos Core do PrimeNG */
+/* 1. Tema do PrimeNG (Aura Light Green) */
+@import "primeng/resources/themes/aura-light-green/theme.css";
+
+/* 2. Estilos Core do PrimeNG */
 @import "primeng/resources/primeng.css";
 
-/* 2. Ícones (PrimeIcons) */
+/* 3. Ícones (PrimeIcons) */
 @import "primeicons/primeicons.css";
 
-/* 3. Utilitários CSS (PrimeFlex) */
+/* 4. Utilitários CSS (PrimeFlex) */
 @import "primeflex/primeflex.css";
 
-/* 4. Reset e Configurações Globais */
+/* 5. Reset e Configurações Globais */
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: var(--font-family);
-    background-color: var(--surface-ground); /* Usa variável semântica */
+    font-family: var(--font-family); /* Usa a fonte definida pelo tema do PrimeNG */
+    background-color: var(--surface-ground); /* Cor de fundo padrão do tema */
     color: var(--text-color);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s, color 0.3s; /* Suaviza a troca de tema */
 }
 
 /* Ajuste para inputs preencherem largura em formulários responsivos */
@@ -30,32 +31,13 @@ html, body {
     width: 100%;
 }
 
-/* --- COMPATIBILIDADE DARK MODE --- */
-/* Sobrescreve classes utilitárias fixas para usarem variáveis do tema */
-
-/* Fundo branco vira cor de cartão (cinza escuro no dark mode) */
-.bg-white {
-    background-color: var(--surface-card) !important;
-    color: var(--text-color) !important;
-}
-
-/* Fundo cinza claro vira cor de fundo geral */
-.bg-gray-50 {
-    background-color: var(--surface-ground) !important;
-}
-
-/* Bordas usam a cor de borda do tema */
-.surface-border {
-    border-color: var(--surface-border) !important;
-}
-
-/* Configuração de Scrollbar */
+/* Configuração de Scrollbar (Opcional - Estilo moderno) */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: var(--surface-ground);
+    background: var(--surface-section);
 }
 ::-webkit-scrollbar-thumb {
     background: var(--surface-400);

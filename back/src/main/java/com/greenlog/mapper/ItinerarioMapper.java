@@ -32,7 +32,8 @@ public class ItinerarioMapper {
                 itinerario.getData(),
                 caminhaoMapper.toResponseDTO(itinerario.getCaminhao()),
                 rotaMapper.toResponseDTO(itinerario.getRota()),
-                itinerario.getTipoResiduo() != null ? tipoResiduoMapper.toResponseDTO(itinerario.getTipoResiduo()) : null
+                itinerario.getTipoResiduo() != null ? tipoResiduoMapper.toResponseDTO(itinerario.getTipoResiduo()) : null,
+                itinerario.getStatusItinerarioEnum()
         );
     }
 

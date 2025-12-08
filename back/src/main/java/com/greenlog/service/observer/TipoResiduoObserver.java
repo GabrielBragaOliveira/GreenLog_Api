@@ -5,9 +5,11 @@
 package com.greenlog.service.observer;
 
 import com.greenlog.domain.entity.Caminhao;
+import com.greenlog.domain.entity.Itinerario;
 import com.greenlog.domain.entity.PontoColeta;
 import com.greenlog.domain.entity.TipoResiduo;
 import com.greenlog.domain.repository.CaminhaoRepository;
+import com.greenlog.domain.repository.ItinerarioRepository;
 import com.greenlog.domain.repository.PontoColetaRepository;
 import com.greenlog.service.PontoColetaService;
 import java.util.List;
@@ -36,6 +38,7 @@ public class TipoResiduoObserver implements StatusObserver {
         if (entidade instanceof TipoResiduo tipo && !tipo.isAtivo()) {
             inativarCaminhoes(tipo.getId());
             inativarPontos(tipo.getId());
+            cancelarItinerarios(tipo.getId());
         }
     }
 
@@ -71,6 +74,17 @@ public class TipoResiduoObserver implements StatusObserver {
 
             if (!possuiTipoAtivo) {
                 if (ponto.getAtivo()) pontoColetaService.alterarStatus(ponto.getId());
+            }
+        }
+    }
+    
+   @Transactional
+    public void cancelarItinerarios(Long tipoId) {
+        List<Itinerario> itinerarios = itinerarioRepository.findByTipoResiduo_Id(tipoId);
+        for (Itinerario itinerario : itinerarios) {
+            if (!itinerario.getTipoResiduo().isAtivo()) {
+                itinerario.setStatusItinerarioEnum(StatusItinerarioEnum.CANCELADO);
+                itinerarioRepository.save(itinerario);
             }
         }
     }
