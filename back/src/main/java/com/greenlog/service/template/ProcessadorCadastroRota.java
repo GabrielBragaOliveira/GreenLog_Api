@@ -33,7 +33,7 @@ public class ProcessadorCadastroRota extends ProcessadorDeCadastro<Rota> {
             throw new RegraDeNegocioException("O nome da rota é obrigatório.");
         }
 
-        if (!ValidadorRegexSingleton.getInstance().isNomeENumeroValida(rota.getNome().trim())) {
+        if (!ValidadorRegexSingleton.getInstance().isRotaValida(rota.getNome().trim())) {
             throw new RegraDeNegocioException("Erro: Nome da Rota inválido. Deve conter apenas letras e numeros e ter no mínimo 3 caracteres.");
         }
         if (rota.getId() == null && rotaRepository.existsByNome(rota.getNome())) {
@@ -59,7 +59,7 @@ public class ProcessadorCadastroRota extends ProcessadorDeCadastro<Rota> {
             }
         }
 
-        if (!rota.getListaDeBairros().contains(rota.getPontoColetaDestino().getBairro())) {
+        if (rota.getListaDeBairros().contains(rota.getPontoColetaDestino().getBairro())) {
             throw new RegraDeNegocioException("O Ponto de Coleta de destino deve pertencer a um dos bairros listados na rota.");
         }
     }

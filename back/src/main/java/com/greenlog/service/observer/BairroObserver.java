@@ -5,7 +5,8 @@
 package com.greenlog.service.observer;
 
 import com.greenlog.domain.entity.Bairro;
-import com.greenlog.domain.repository.PontoColetaRepository;
+import com.greenlog.domain.entity.PontoColeta;
+import com.greenlog.service.PontoColetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +18,14 @@ import org.springframework.stereotype.Service;
 public class BairroObserver implements StatusObserver {
 
     @Autowired
-    private PontoColetaRepository pontoColetaRepository;
+    private PontoColetaService pontoColetaService;
 
     @Override
     public void notificarAlteracaoStatus(Object entidade) {
         if (entidade instanceof Bairro bairro && !bairro.getAtivo()) {
-            pontoColetaRepository.findByBairro(bairro)
-                .forEach(p -> {
-                    p.setAtivo(false);
-                    pontoColetaRepository.save(p);
-                });
+            for (PontoColeta p : pontoColetaService.buscarPontosPorBairro(bairro)) {
+                if (p.getAtivo())pontoColetaService.alterarStatus(p.getId());
+            }
         }
     }
 }

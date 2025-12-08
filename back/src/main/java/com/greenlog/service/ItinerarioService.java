@@ -85,8 +85,12 @@ public class ItinerarioService {
         Rota rota = rotaService.buscarEntityPorId(request.rotaId());
         TipoResiduo tipoResiduo = tipoResiduoService.buscarEntityPorId(request.tipoResiduoId());
 
-        if (!caminhao.isAtivo()) {
+        if (!caminhao.getAtivo()) {
             throw new RegraDeNegocioException("Caminhão inativo.");
+        }
+        
+        if (!rota.isAtivo()) {
+            throw new RegraDeNegocioException("A rota selecionada está inativa.");
         }
 
         if (itinerarioRepository.findByCaminhaoAndData(caminhao, request.data()).isPresent()) {
@@ -98,6 +102,13 @@ public class ItinerarioService {
                     "O caminhão " + caminhao.getPlaca() + " não suporta o tipo de resíduo selecionado: " + tipoResiduo.getNome()
             );
         }
+        if (!rota.getPontoColetaDestino().getTiposResiduosAceitos().contains(tipoResiduo)) {
+            throw new RegraDeNegocioException(
+                    "O Ponto de Coleta de destino (" + rota.getPontoColetaDestino().getNomePonto() + 
+                    ") não aceita o tipo de resíduo selecionado: " + tipoResiduo.getNome()
+            );
+        }
+
         Itinerario novoItinerario = itinerarioMapper.toEntity(request);
         novoItinerario.setCaminhao(caminhao);
         novoItinerario.setRota(rota);
@@ -115,16 +126,26 @@ public class ItinerarioService {
 
         Caminhao novoCaminhao = caminhaoService.buscarEntityPorId(request.caminhaoId());
         Rota novaRota = rotaService.buscarEntityPorId(request.rotaId());
+        TipoResiduo novoTipoResiduo = tipoResiduoService.buscarEntityPorId(request.tipoResiduoId());
 
         if (!itinerarioExistente.getCaminhao().getId().equals(novoCaminhao.getId()) || !itinerarioExistente.getData().equals(request.data())) {
             if (itinerarioRepository.findByCaminhaoAndData(novoCaminhao, request.data()).filter(i -> !i.getId().equals(id)).isPresent()) {
                 throw new RegraDeNegocioException("O caminhão " + novoCaminhao.getPlaca() + " já possui outro itinerário agendado para esta data.");
             }
         }
+        
+        if (!novoCaminhao.getTiposSuportados().contains(novoTipoResiduo)) {
+            throw new RegraDeNegocioException("O caminhão não suporta este tipo de resíduo.");
+        }
+        
+        if (!novaRota.getPontoColetaDestino().getTiposResiduosAceitos().contains(novoTipoResiduo)) {
+             throw new RegraDeNegocioException("O Ponto de Coleta de destino da nova rota não aceita este tipo de resíduo.");
+        }
 
         itinerarioMapper.updateEntityFromDTO(request, itinerarioExistente);
         itinerarioExistente.setCaminhao(novoCaminhao);
         itinerarioExistente.setRota(novaRota);
+        itinerarioExistente.setTipoResiduo(novoTipoResiduo);
         return itinerarioMapper.toResponseDTO(itinerarioRepository.save(itinerarioExistente));
     }
 

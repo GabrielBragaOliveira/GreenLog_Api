@@ -44,7 +44,7 @@ export interface DiaCalendario {
   styleUrl: './itinerarios-agendamento.component.scss'
 })
 export class ItinerarioSchedulerComponent implements OnInit {
-  
+
   private itinerarioService = inject(ItinerarioService);
   private caminhaoService = inject(CaminhaoService);
   private rotaService = inject(RotaService);
@@ -52,9 +52,10 @@ export class ItinerarioSchedulerComponent implements OnInit {
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+
   dataSelecionada = signal<Date>(new Date());
   rotas = signal<RotaResponse[]>([]);
-  itinerarios = signal<ItinerarioResponse[]>([]); 
+  itinerarios = signal<ItinerarioResponse[]>([]);
   isLoading = signal(true);
   caminhoesFiltrados = signal<CaminhaoResponse[]>([]);
   residuosFinais = signal<TipoResiduoResponse[]>([]);
@@ -76,7 +77,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
     start.setHours(0, 0, 0, 0);
     const dias: DiaCalendario[] = [];
     const hoje = new Date();
-    
+
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
@@ -91,7 +92,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
         diaMes: d.getDate(),
         diaSemana: this.getDiaSemana(d),
         hoje: d.toDateString() === hoje.toDateString(),
-        isoString: dataFormatada 
+        isoString: dataFormatada
       });
     }
     return dias;
@@ -107,9 +108,9 @@ export class ItinerarioSchedulerComponent implements OnInit {
     return listaCaminhoes.filter(c => c.ativo).map(caminhao => {
       const agendamentos: { [key: string]: ItinerarioResponse | null } = {};
       dias.forEach(dia => {
-        const match = listaItinerarios.find(it => 
-          it.caminhao.id === caminhao.id && 
-          it.data.toString() === dia.isoString 
+        const match = listaItinerarios.find(it =>
+          it.caminhao.id === caminhao.id &&
+          it.data.toString() === dia.isoString
         );
         agendamentos[dia.isoString] = match || null;
       });
@@ -140,7 +141,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
 
   novoAgendamento(caminhaoPreSelecionado?: CaminhaoResponse, dataPreSelecionada?: Date) {
     this.form.reset();
-    
+
     this.caminhoesFiltrados.set([]);
     this.residuosFinais.set([]);
     this.form.get('caminhaoId')?.disable();
@@ -156,7 +157,6 @@ export class ItinerarioSchedulerComponent implements OnInit {
 
   aoSelecionarRota() {
     const rotaId = this.form.get('rotaId')?.value;
-    
     this.form.patchValue({ caminhaoId: null, tipoResiduoId: null });
     this.form.get('caminhaoId')?.disable();
     this.form.get('tipoResiduoId')?.disable();
@@ -167,26 +167,21 @@ export class ItinerarioSchedulerComponent implements OnInit {
     if (!rotaId) return;
 
     this.isLoadingCompatibilidade.set(true);
-
     const rota = this.rotas().find(r => r.id === rotaId);
-    if (rota && rota.listaDeBairros.length > 0) {
-        const requests = rota.listaDeBairros.map(b => this.pontoService.buscarPorBairro(b.id));
-        forkJoin(requests).subscribe(respostas => {
-            const todosPontos = respostas.flat();
-            const mapRes = new Map<number, TipoResiduoResponse>();
-            todosPontos.forEach(p => p.tiposResiduosAceitos.forEach(t => mapRes.set(t.id, t)));
-            this.residuosDaRotaSelecionada = Array.from(mapRes.values());
-        });
-    }
 
+    if (rota && rota.pontoColetaDestino) {
+      this.residuosDaRotaSelecionada = rota.pontoColetaDestino.tiposResiduosAceitos || [];
+    } else if (rota) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Esta rota não tem ponto de destino definido.' });
+    }
     this.caminhaoService.buscarCompativeisComRota(rotaId).subscribe({
       next: (caminhoes) => {
         this.caminhoesFiltrados.set(caminhoes);
         this.isLoadingCompatibilidade.set(false);
         this.form.get('caminhaoId')?.enable();
-        
-        if(caminhoes.length === 0) {
-            this.messageService.add({severity:'warn', summary:'Aviso', detail:'Nenhum caminhão atende esta rota.'});
+
+        if (caminhoes.length === 0) {
+          this.messageService.add({ severity: 'warn', summary: 'Aviso', detail: 'Nenhum caminhão atende os requisitos desta rota.' });
         }
       },
       error: () => this.isLoadingCompatibilidade.set(false)
@@ -195,7 +190,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
 
   aoSelecionarCaminhao() {
     const caminhaoId = this.form.get('caminhaoId')?.value;
-    
+
     this.form.patchValue({ tipoResiduoId: null });
     this.form.get('tipoResiduoId')?.disable();
     this.residuosFinais.set([]);
@@ -205,23 +200,27 @@ export class ItinerarioSchedulerComponent implements OnInit {
     const caminhao = this.caminhoesFiltrados().find(c => c.id === caminhaoId);
 
     if (caminhao && this.residuosDaRotaSelecionada.length > 0) {
-        const intersecao = this.residuosDaRotaSelecionada.filter(resRota => 
-            caminhao.tiposSuportados.some(resCam => resCam.id === resRota.id)
-        );
+      const intersecao = this.residuosDaRotaSelecionada.filter(resRota =>
+        caminhao.tiposSuportados.some(resCam => resCam.id === resRota.id)
+      );
 
-        this.residuosFinais.set(intersecao);
+      this.residuosFinais.set(intersecao);
+
+      if (intersecao.length > 0) {
         this.form.get('tipoResiduoId')?.enable();
-
         if (intersecao.length === 1) {
-            this.form.patchValue({ tipoResiduoId: intersecao[0].id });
+          this.form.patchValue({ tipoResiduoId: intersecao[0].id });
         }
+      } else {
+        this.messageService.add({ severity: 'error', summary: 'Incompatível', detail: 'Este caminhão não suporta os resíduos do ponto de destino desta rota.' });
+      }
     }
   }
 
   salvar() {
     if (this.form.invalid) return;
     this.isSaving = true;
-    
+
     const val = this.form.value;
     const dataObj = val.data!;
     const ano = dataObj.getFullYear();
@@ -244,7 +243,7 @@ export class ItinerarioSchedulerComponent implements OnInit {
       error: () => this.isSaving = false
     });
   }
-  
+
   confirmarExclusao(event: Event, id: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
